@@ -1,8 +1,14 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #fafafa;
+  --foreground: #222222;
+  --accent-color: #ffc43f;
+  --accent-hover: #f7a422;
+  --light-dark-color: #727272;
+  --grey-color: #dbdbdb;
+  --light-primary-color: #eef1f3;
+  --danger-color: #dc3545;
 }
 
 @theme inline {
@@ -12,15 +18,207 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+  letter-spacing: 0;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+.auth-shell {
+  align-items: center;
+  background:
+    linear-gradient(135deg, #fff9eb 0%, #fafafa 42%, #e6f3fb 100%);
+  display: flex;
+  min-height: 100vh;
+  padding: 32px 16px;
+}
+
+.auth-panel {
+  background: #ffffff;
+  border: 1px solid #f7f7f7;
+  border-radius: 8px;
+  box-shadow: 0 21px 44px rgba(0, 0, 0, 0.08);
+  margin: 0 auto;
+  max-width: 460px;
+  padding: 32px;
+  width: 100%;
+}
+
+.auth-kicker {
+  color: var(--accent-color);
+  font-size: 14px;
+  font-weight: 700;
+  margin: 0 0 4px;
+  text-transform: uppercase;
+}
+
+.auth-panel h1 {
+  color: var(--foreground);
+  font-size: 30px;
+  font-weight: 800;
+  line-height: 1.2;
+  margin: 0 0 28px;
+}
+
+.auth-form {
+  display: grid;
+  gap: 18px;
+}
+
+.auth-form label {
+  color: var(--foreground);
+  display: grid;
+  font-size: 14px;
+  font-weight: 700;
+  gap: 8px;
+}
+
+.auth-form input {
+  background: #ffffff;
+  border: 1px solid var(--grey-color);
+  border-radius: 8px;
+  color: var(--foreground);
+  font: inherit;
+  min-height: 48px;
+  outline: none;
+  padding: 10px 14px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  width: 100%;
+}
+
+.auth-form input:focus {
+  border-color: var(--accent-color);
+  box-shadow: 0 0 0 4px rgba(255, 196, 63, 0.18);
+}
+
+.auth-form input[aria-invalid="true"] {
+  border-color: var(--danger-color);
+}
+
+.auth-form span {
+  color: var(--danger-color);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.auth-form button {
+  background: var(--accent-color);
+  border: 0;
+  border-radius: 8px;
+  color: #ffffff;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 800;
+  min-height: 48px;
+  padding: 12px 16px;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.auth-form button:hover {
+  background: var(--accent-hover);
+  transform: translateY(-1px);
+}
+
+.auth-switch {
+  color: var(--light-dark-color);
+  font-size: 15px;
+  margin: 22px 0 0;
+  text-align: center;
+}
+
+.auth-status {
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.4;
+  margin: 18px 0 0;
+  padding: 10px 12px;
+}
+
+.auth-status-success {
+  background: #eef5e5;
+  color: #486216;
+}
+
+.auth-status-error {
+  background: #f9ebe7;
+  color: var(--danger-color);
+}
+
+.auth-switch a {
+  color: var(--foreground);
+  font-weight: 800;
+  text-decoration-color: var(--accent-color);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 4px;
+}
+
+.dbtest-shell {
+  background: #fafafa;
+  min-height: 100vh;
+  padding: 40px 16px;
+}
+
+.dbtest-panel {
+  background: #ffffff;
+  border: 1px solid #f7f7f7;
+  border-radius: 8px;
+  box-shadow: 0 21px 44px rgba(0, 0, 0, 0.08);
+  margin: 0 auto;
+  max-width: 760px;
+  padding: 32px;
+}
+
+.dbtest-panel h1 {
+  color: var(--foreground);
+  font-size: 28px;
+  font-weight: 800;
+  margin: 0 0 24px;
+}
+
+.dbtest-list {
+  display: grid;
+  gap: 10px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.dbtest-list li {
+  align-items: center;
+  background: var(--light-primary-color);
+  border-radius: 8px;
+  color: var(--foreground);
+  display: flex;
+  font-weight: 700;
+  gap: 10px;
+  min-height: 44px;
+  padding: 10px 14px;
+}
+
+.dbtest-list span {
+  color: var(--light-dark-color);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.dbtest-empty {
+  color: var(--light-dark-color);
+  margin: 0;
+}
+
+@media (max-width: 520px) {
+  .auth-panel {
+    padding: 24px;
+  }
+
+  .auth-panel h1 {
+    font-size: 26px;
+  }
 }

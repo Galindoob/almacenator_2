@@ -1,0 +1,28 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id         String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  nombre     String
+  apellido   String
+  correo     String?
+  contrasena String
+  roleid     String @default(dbgenerated("'28ad34ff-cf2e-4851-a7e7-fffa5d5b53cd'::uuid")) @db.Uuid
+  role       Role   @relation(fields: [roleid], references: [id])
+
+  @@map("users")
+}
+
+model Role {
+  id    String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  role  String
+  users User[]
+
+  @@map("role")
+}
