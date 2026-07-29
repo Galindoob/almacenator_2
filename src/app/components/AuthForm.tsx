@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { FormEvent, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
+import { FormEvent, useEffect, useMemo, useState } from "react";
 
 type AuthMode = "login" | "register";
 
@@ -12,6 +13,7 @@ type AuthFormProps = {
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export function AuthForm({ mode }: AuthFormProps) {
+  const router = useRouter();
   const isRegister = mode === "register";
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -30,6 +32,12 @@ export function AuthForm({ mode }: AuthFormProps) {
     password: false,
     confirmPassword: false,
   });
+
+  useEffect(() => {
+    if (localStorage.length > 0) {
+      router.replace("/home");
+    }
+  }, [router]);
 
   const errors = useMemo(() => {
     return {
@@ -75,10 +83,37 @@ export function AuthForm({ mode }: AuthFormProps) {
     }
 
     if (!isRegister) {
-      setStatus({
-        type: "success",
-        message: "Formulario de login validado correctamente.",
-      });
+      try {
+        const response = await fetch("/api/login", {
+          method: "POST",
+          headers: {
+            correo: email,
+            contrasena: password,
+          },
+        });
+        const data = (await response.json()) as {
+          status?: "ok" | "error";
+          message?: string;
+          token?: string;
+        };
+
+        if (!response.ok || data.status !== "ok" || !data.token) {
+          setStatus({
+            type: "error",
+            message: data.message ?? "Usuario y/o contraseña incorrecta.",
+          });
+          return;
+        }
+
+        localStorage.clear();
+        localStorage.setItem("jwt", data.token);
+        router.push("/home");
+      } catch {
+        setStatus({
+          type: "error",
+          message: "No se pudo conectar con el endpoint de login.",
+        });
+      }
       return;
     }
 
@@ -92,9 +127,12 @@ export function AuthForm({ mode }: AuthFormProps) {
           apellido: lastName.trim(),
         },
       });
-      const data = (await response.json()) as { message?: string };
+      const data = (await response.json()) as {
+        status?: "ok" | "error";
+        message?: string;
+      };
 
-      if (!response.ok) {
+      if (!response.ok || data.status !== "ok") {
         setStatus({
           type: "error",
           message: data.message ?? "No se pudo registrar el usuario.",
@@ -102,10 +140,7 @@ export function AuthForm({ mode }: AuthFormProps) {
         return;
       }
 
-      setStatus({
-        type: "success",
-        message: data.message ?? "Usuario registrado correctamente.",
-      });
+      router.push("/login");
     } catch {
       setStatus({
         type: "error",
@@ -119,6 +154,12 @@ export function AuthForm({ mode }: AuthFormProps) {
       <div className="auth-panel">
         <p className="auth-kicker">Almacenator 2.0</p>
         <h1>{isRegister ? "Registro" : "Iniciar sesión"}</h1>
+
+        {isRegister ? (
+          <p className="auth-return">
+            ¿Te arrepentiste? <Link href="/login">Volver a inicio de sesión</Link>
+          </p>
+        ) : null}
 
         <form className="auth-form" noValidate onSubmit={handleSubmit}>
           {isRegister ? (

@@ -132,6 +132,22 @@ body {
   text-align: center;
 }
 
+.auth-return {
+  color: var(--light-dark-color);
+  font-size: 14px;
+  line-height: 1.4;
+  margin: -16px 0 22px;
+  text-align: center;
+}
+
+.auth-return a {
+  color: var(--foreground);
+  font-weight: 800;
+  text-decoration-color: var(--accent-color);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 4px;
+}
+
 .auth-status {
   border-radius: 8px;
   font-size: 14px;
@@ -213,6 +229,75 @@ body {
   margin: 0;
 }
 
+.home-shell {
+  align-items: center;
+  background:
+    linear-gradient(135deg, #fff9eb 0%, #fafafa 45%, #e6f3fb 100%);
+  display: flex;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 32px 16px;
+  position: relative;
+}
+
+.home-content {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  text-align: center;
+  width: min(100%, 420px);
+}
+
+.home-content h1 {
+  color: var(--foreground);
+  font-size: 40px;
+  font-weight: 800;
+  line-height: 1.1;
+  margin: 0;
+}
+
+.home-content p {
+  color: var(--light-dark-color);
+  font-size: 17px;
+  font-weight: 700;
+  margin: 0 0 10px;
+}
+
+.home-actions {
+  display: grid;
+  gap: 12px;
+  width: 100%;
+}
+
+.home-actions button,
+.logout-button {
+  background: #ffffff;
+  border: 1px solid #f7f7f7;
+  border-radius: 8px;
+  box-shadow: 0 5px 22px rgba(0, 0, 0, 0.04);
+  color: var(--foreground);
+  cursor: pointer;
+  font: inherit;
+  font-weight: 800;
+  min-height: 52px;
+  padding: 12px 16px;
+  transition: background 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.home-actions button:hover,
+.logout-button:hover {
+  background: var(--accent-color);
+  box-shadow: 0 21px 44px rgba(0, 0, 0, 0.08);
+  transform: translateY(-1px);
+}
+
+.logout-button {
+  bottom: 24px;
+  position: fixed;
+  right: 24px;
+}
+
 @media (max-width: 520px) {
   .auth-panel {
     padding: 24px;
@@ -220,5 +305,16 @@ body {
 
   .auth-panel h1 {
     font-size: 26px;
+  }
+
+  .home-content h1 {
+    font-size: 32px;
+  }
+
+  .logout-button {
+    bottom: 16px;
+    left: 16px;
+    right: 16px;
+    width: calc(100% - 32px);
   }
 }
