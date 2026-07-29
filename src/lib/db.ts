@@ -5,10 +5,10 @@ const globalForPrisma = globalThis as unknown as {
   prisma?: PrismaClient;
 };
 
-const connectionString = process.env.string_bbd;
+const connectionString = process.env.DATABASE_URL;
 
 if (!connectionString) {
-  throw new Error("La variable de entorno string_bbd no está configurada.");
+  throw new Error("La variable de entorno DATABASE_URL no está configurada.");
 }
 
 const adapter = new PrismaPg({ connectionString });

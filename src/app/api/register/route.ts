@@ -1,4 +1,5 @@
 import bcrypt from "bcryptjs";
+import { Prisma } from "@/generated/prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 
@@ -44,13 +45,45 @@ export async function POST(request: NextRequest) {
     });
 
     return NextResponse.json(
-      { message: "Usuario registrado correctamente." },
+      { status: "ok", message: "Usuario registrado correctamente." },
       { status: 201 },
     );
   } catch (error) {
+    if (
+      error instanceof Prisma.PrismaClientKnownRequestError &&
+      error.code === "P2002"
+    ) {
+      return NextResponse.json(
+        {
+          status: "error",
+          message: "El correo ya está registrado.",
+        },
+        { status: 409 },
+      );
+    }
+
     const message =
       error instanceof Error ? error.message : "Error al registrar usuario.";
 
-    return NextResponse.json({ message }, { status: 500 });
+    if (
+      message.toLowerCase().includes("duplicate") ||
+      message.toLowerCase().includes("unique")
+    ) {
+      return NextResponse.json(
+        {
+          status: "error",
+          message: "El correo ya está registrado.",
+        },
+        { status: 409 },
+      );
+    }
+
+    return NextResponse.json(
+      {
+        status: "error",
+        message: `Error interno de Neon: ${message}`,
+      },
+      { status: 500 },
+    );
   }
 }
