@@ -8,21 +8,65 @@ datasource db {
 }
 
 model User {
-  id         String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  nombre     String
-  apellido   String
-  correo     String? @unique
+  id         String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  nombre     String  @db.VarChar(100)
+  apellido   String  @db.VarChar(100)
   contrasena String
-  roleid     String @default(dbgenerated("'28ad34ff-cf2e-4851-a7e7-fffa5d5b53cd'::uuid")) @db.Uuid
-  role       Role   @relation(fields: [roleid], references: [id])
+  roleid     String  @default(dbgenerated("'28ad34ff-cf2e-4851-a7e7-fffa5d5b53cd'::uuid")) @db.Uuid
+  correo     String? @unique @db.VarChar(255)
+  role       Role    @relation(fields: [roleid], references: [id], map: "fk_users_role")
 
   @@map("users")
 }
 
 model Role {
   id    String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  role  String
+  role  String @unique @db.VarChar(50)
   users User[]
 
   @@map("role")
+}
+
+model Marca {
+  id        String     @id @default(dbgenerated("gen_random_uuid()")) @map("id_marca") @db.Uuid
+  nombre    String     @unique @db.VarChar(100)
+  productos Producto[]
+
+  @@map("marca")
+}
+
+model Categoria {
+  id              String     @id @default(dbgenerated("gen_random_uuid()")) @map("id_categoria") @db.Uuid
+  nombreCategoria String     @unique @map("nombre_categoria") @db.VarChar(100)
+  productos       Producto[]
+
+  @@map("categoria")
+}
+
+model Unidad {
+  id        String     @id @default(dbgenerated("gen_random_uuid()")) @map("id_unidad") @db.Uuid
+  unidad    String     @unique @db.VarChar(50)
+  productos Producto[]
+
+  @@map("unidad")
+}
+
+model Producto {
+  id               String    @id @default(dbgenerated("gen_random_uuid()")) @map("id_productos") @db.Uuid
+  nombre           String    @db.VarChar(150)
+  descripcion      String?   @db.VarChar(500)
+  marcaId          String    @map("id_marca") @db.Uuid
+  codigoBarra      String?   @unique @map("codigo_barra") @db.VarChar(100)
+  categoriaId      String    @map("id_categoria") @db.Uuid
+  unidadId         String    @map("id_unidad") @db.Uuid
+  precioVenta      Int       @map("precio_venta")
+  stock            Int       @default(0)
+  fechaVencimiento DateTime? @map("fecha_de_vencimiento") @db.Date
+  urlImagen        String?   @map("url_imagen") @db.VarChar(500)
+  costo            Int       @default(0)
+  categoria        Categoria @relation(fields: [categoriaId], references: [id], map: "fk_productos_categoria")
+  marca            Marca     @relation(fields: [marcaId], references: [id], map: "fk_productos_marca")
+  unidad           Unidad    @relation(fields: [unidadId], references: [id], map: "fk_productos_unidad")
+
+  @@map("productos")
 }

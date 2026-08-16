@@ -10,4 +10,8 @@
  */
 export type * from './models/User'
 export type * from './models/Role'
+export type * from './models/Marca'
+export type * from './models/Categoria'
+export type * from './models/Unidad'
+export type * from './models/Producto'
 export type * from './commonInputTypes'

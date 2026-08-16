@@ -52,7 +52,11 @@ export const AnyNull = runtime.AnyNull
 
 export const ModelName = {
   User: 'User',
-  Role: 'Role'
+  Role: 'Role',
+  Marca: 'Marca',
+  Categoria: 'Categoria',
+  Unidad: 'Unidad',
+  Producto: 'Producto'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -75,9 +79,9 @@ export const UserScalarFieldEnum = {
   id: 'id',
   nombre: 'nombre',
   apellido: 'apellido',
-  correo: 'correo',
   contrasena: 'contrasena',
-  roleid: 'roleid'
+  roleid: 'roleid',
+  correo: 'correo'
 } as const
 
 export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
@@ -89,6 +93,48 @@ export const RoleScalarFieldEnum = {
 } as const
 
 export type RoleScalarFieldEnum = (typeof RoleScalarFieldEnum)[keyof typeof RoleScalarFieldEnum]
+
+
+export const MarcaScalarFieldEnum = {
+  id: 'id',
+  nombre: 'nombre'
+} as const
+
+export type MarcaScalarFieldEnum = (typeof MarcaScalarFieldEnum)[keyof typeof MarcaScalarFieldEnum]
+
+
+export const CategoriaScalarFieldEnum = {
+  id: 'id',
+  nombreCategoria: 'nombreCategoria'
+} as const
+
+export type CategoriaScalarFieldEnum = (typeof CategoriaScalarFieldEnum)[keyof typeof CategoriaScalarFieldEnum]
+
+
+export const UnidadScalarFieldEnum = {
+  id: 'id',
+  unidad: 'unidad'
+} as const
+
+export type UnidadScalarFieldEnum = (typeof UnidadScalarFieldEnum)[keyof typeof UnidadScalarFieldEnum]
+
+
+export const ProductoScalarFieldEnum = {
+  id: 'id',
+  nombre: 'nombre',
+  descripcion: 'descripcion',
+  marcaId: 'marcaId',
+  codigoBarra: 'codigoBarra',
+  categoriaId: 'categoriaId',
+  unidadId: 'unidadId',
+  precioVenta: 'precioVenta',
+  stock: 'stock',
+  fechaVencimiento: 'fechaVencimiento',
+  urlImagen: 'urlImagen',
+  costo: 'costo'
+} as const
+
+export type ProductoScalarFieldEnum = (typeof ProductoScalarFieldEnum)[keyof typeof ProductoScalarFieldEnum]
 
 
 export const SortOrder = {

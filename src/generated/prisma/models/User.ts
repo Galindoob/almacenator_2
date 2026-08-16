@@ -28,27 +28,27 @@ export type UserMinAggregateOutputType = {
   id: string | null
   nombre: string | null
   apellido: string | null
-  correo: string | null
   contrasena: string | null
   roleid: string | null
+  correo: string | null
 }
 
 export type UserMaxAggregateOutputType = {
   id: string | null
   nombre: string | null
   apellido: string | null
-  correo: string | null
   contrasena: string | null
   roleid: string | null
+  correo: string | null
 }
 
 export type UserCountAggregateOutputType = {
   id: number
   nombre: number
   apellido: number
-  correo: number
   contrasena: number
   roleid: number
+  correo: number
   _all: number
 }
 
@@ -57,27 +57,27 @@ export type UserMinAggregateInputType = {
   id?: true
   nombre?: true
   apellido?: true
-  correo?: true
   contrasena?: true
   roleid?: true
+  correo?: true
 }
 
 export type UserMaxAggregateInputType = {
   id?: true
   nombre?: true
   apellido?: true
-  correo?: true
   contrasena?: true
   roleid?: true
+  correo?: true
 }
 
 export type UserCountAggregateInputType = {
   id?: true
   nombre?: true
   apellido?: true
-  correo?: true
   contrasena?: true
   roleid?: true
+  correo?: true
   _all?: true
 }
 
@@ -157,9 +157,9 @@ export type UserGroupByOutputType = {
   id: string
   nombre: string
   apellido: string
-  correo: string | null
   contrasena: string
   roleid: string
+  correo: string | null
   _count: UserCountAggregateOutputType | null
   _min: UserMinAggregateOutputType | null
   _max: UserMaxAggregateOutputType | null
@@ -187,9 +187,9 @@ export type UserWhereInput = {
   id?: Prisma.UuidFilter<"User"> | string
   nombre?: Prisma.StringFilter<"User"> | string
   apellido?: Prisma.StringFilter<"User"> | string
-  correo?: Prisma.StringNullableFilter<"User"> | string | null
   contrasena?: Prisma.StringFilter<"User"> | string
   roleid?: Prisma.UuidFilter<"User"> | string
+  correo?: Prisma.StringNullableFilter<"User"> | string | null
   role?: Prisma.XOR<Prisma.RoleScalarRelationFilter, Prisma.RoleWhereInput>
 }
 
@@ -197,9 +197,9 @@ export type UserOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   nombre?: Prisma.SortOrder
   apellido?: Prisma.SortOrder
-  correo?: Prisma.SortOrderInput | Prisma.SortOrder
   contrasena?: Prisma.SortOrder
   roleid?: Prisma.SortOrder
+  correo?: Prisma.SortOrderInput | Prisma.SortOrder
   role?: Prisma.RoleOrderByWithRelationInput
 }
 
@@ -220,9 +220,9 @@ export type UserOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   nombre?: Prisma.SortOrder
   apellido?: Prisma.SortOrder
-  correo?: Prisma.SortOrderInput | Prisma.SortOrder
   contrasena?: Prisma.SortOrder
   roleid?: Prisma.SortOrder
+  correo?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.UserCountOrderByAggregateInput
   _max?: Prisma.UserMaxOrderByAggregateInput
   _min?: Prisma.UserMinOrderByAggregateInput
@@ -235,17 +235,17 @@ export type UserScalarWhereWithAggregatesInput = {
   id?: Prisma.UuidWithAggregatesFilter<"User"> | string
   nombre?: Prisma.StringWithAggregatesFilter<"User"> | string
   apellido?: Prisma.StringWithAggregatesFilter<"User"> | string
-  correo?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
   contrasena?: Prisma.StringWithAggregatesFilter<"User"> | string
   roleid?: Prisma.UuidWithAggregatesFilter<"User"> | string
+  correo?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
 }
 
 export type UserCreateInput = {
   id?: string
   nombre: string
   apellido: string
-  correo?: string | null
   contrasena: string
+  correo?: string | null
   role?: Prisma.RoleCreateNestedOneWithoutUsersInput
 }
 
@@ -253,17 +253,17 @@ export type UserUncheckedCreateInput = {
   id?: string
   nombre: string
   apellido: string
-  correo?: string | null
   contrasena: string
   roleid?: string
+  correo?: string | null
 }
 
 export type UserUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   nombre?: Prisma.StringFieldUpdateOperationsInput | string
   apellido?: Prisma.StringFieldUpdateOperationsInput | string
-  correo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contrasena?: Prisma.StringFieldUpdateOperationsInput | string
+  correo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.RoleUpdateOneRequiredWithoutUsersNestedInput
 }
 
@@ -271,62 +271,62 @@ export type UserUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   nombre?: Prisma.StringFieldUpdateOperationsInput | string
   apellido?: Prisma.StringFieldUpdateOperationsInput | string
-  correo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contrasena?: Prisma.StringFieldUpdateOperationsInput | string
   roleid?: Prisma.StringFieldUpdateOperationsInput | string
+  correo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type UserCreateManyInput = {
   id?: string
   nombre: string
   apellido: string
-  correo?: string | null
   contrasena: string
   roleid?: string
+  correo?: string | null
 }
 
 export type UserUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   nombre?: Prisma.StringFieldUpdateOperationsInput | string
   apellido?: Prisma.StringFieldUpdateOperationsInput | string
-  correo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contrasena?: Prisma.StringFieldUpdateOperationsInput | string
+  correo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type UserUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   nombre?: Prisma.StringFieldUpdateOperationsInput | string
   apellido?: Prisma.StringFieldUpdateOperationsInput | string
-  correo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contrasena?: Prisma.StringFieldUpdateOperationsInput | string
   roleid?: Prisma.StringFieldUpdateOperationsInput | string
+  correo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type UserCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   nombre?: Prisma.SortOrder
   apellido?: Prisma.SortOrder
-  correo?: Prisma.SortOrder
   contrasena?: Prisma.SortOrder
   roleid?: Prisma.SortOrder
+  correo?: Prisma.SortOrder
 }
 
 export type UserMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   nombre?: Prisma.SortOrder
   apellido?: Prisma.SortOrder
-  correo?: Prisma.SortOrder
   contrasena?: Prisma.SortOrder
   roleid?: Prisma.SortOrder
+  correo?: Prisma.SortOrder
 }
 
 export type UserMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   nombre?: Prisma.SortOrder
   apellido?: Prisma.SortOrder
-  correo?: Prisma.SortOrder
   contrasena?: Prisma.SortOrder
   roleid?: Prisma.SortOrder
+  correo?: Prisma.SortOrder
 }
 
 export type UserListRelationFilter = {
@@ -393,16 +393,16 @@ export type UserCreateWithoutRoleInput = {
   id?: string
   nombre: string
   apellido: string
-  correo?: string | null
   contrasena: string
+  correo?: string | null
 }
 
 export type UserUncheckedCreateWithoutRoleInput = {
   id?: string
   nombre: string
   apellido: string
-  correo?: string | null
   contrasena: string
+  correo?: string | null
 }
 
 export type UserCreateOrConnectWithoutRoleInput = {
@@ -438,41 +438,41 @@ export type UserScalarWhereInput = {
   id?: Prisma.UuidFilter<"User"> | string
   nombre?: Prisma.StringFilter<"User"> | string
   apellido?: Prisma.StringFilter<"User"> | string
-  correo?: Prisma.StringNullableFilter<"User"> | string | null
   contrasena?: Prisma.StringFilter<"User"> | string
   roleid?: Prisma.UuidFilter<"User"> | string
+  correo?: Prisma.StringNullableFilter<"User"> | string | null
 }
 
 export type UserCreateManyRoleInput = {
   id?: string
   nombre: string
   apellido: string
-  correo?: string | null
   contrasena: string
+  correo?: string | null
 }
 
 export type UserUpdateWithoutRoleInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   nombre?: Prisma.StringFieldUpdateOperationsInput | string
   apellido?: Prisma.StringFieldUpdateOperationsInput | string
-  correo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contrasena?: Prisma.StringFieldUpdateOperationsInput | string
+  correo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type UserUncheckedUpdateWithoutRoleInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   nombre?: Prisma.StringFieldUpdateOperationsInput | string
   apellido?: Prisma.StringFieldUpdateOperationsInput | string
-  correo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contrasena?: Prisma.StringFieldUpdateOperationsInput | string
+  correo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type UserUncheckedUpdateManyWithoutRoleInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   nombre?: Prisma.StringFieldUpdateOperationsInput | string
   apellido?: Prisma.StringFieldUpdateOperationsInput | string
-  correo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contrasena?: Prisma.StringFieldUpdateOperationsInput | string
+  correo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 
@@ -481,9 +481,9 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   id?: boolean
   nombre?: boolean
   apellido?: boolean
-  correo?: boolean
   contrasena?: boolean
   roleid?: boolean
+  correo?: boolean
   role?: boolean | Prisma.RoleDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
@@ -491,9 +491,9 @@ export type UserSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   id?: boolean
   nombre?: boolean
   apellido?: boolean
-  correo?: boolean
   contrasena?: boolean
   roleid?: boolean
+  correo?: boolean
   role?: boolean | Prisma.RoleDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
@@ -501,9 +501,9 @@ export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   id?: boolean
   nombre?: boolean
   apellido?: boolean
-  correo?: boolean
   contrasena?: boolean
   roleid?: boolean
+  correo?: boolean
   role?: boolean | Prisma.RoleDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
@@ -511,12 +511,12 @@ export type UserSelectScalar = {
   id?: boolean
   nombre?: boolean
   apellido?: boolean
-  correo?: boolean
   contrasena?: boolean
   roleid?: boolean
+  correo?: boolean
 }
 
-export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "nombre" | "apellido" | "correo" | "contrasena" | "roleid", ExtArgs["result"]["user"]>
+export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "nombre" | "apellido" | "contrasena" | "roleid" | "correo", ExtArgs["result"]["user"]>
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   role?: boolean | Prisma.RoleDefaultArgs<ExtArgs>
 }
@@ -536,9 +536,9 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     id: string
     nombre: string
     apellido: string
-    correo: string | null
     contrasena: string
     roleid: string
+    correo: string | null
   }, ExtArgs["result"]["user"]>
   composites: {}
 }
@@ -966,9 +966,9 @@ export interface UserFieldRefs {
   readonly id: Prisma.FieldRef<"User", 'String'>
   readonly nombre: Prisma.FieldRef<"User", 'String'>
   readonly apellido: Prisma.FieldRef<"User", 'String'>
-  readonly correo: Prisma.FieldRef<"User", 'String'>
   readonly contrasena: Prisma.FieldRef<"User", 'String'>
   readonly roleid: Prisma.FieldRef<"User", 'String'>
+  readonly correo: Prisma.FieldRef<"User", 'String'>
 }
     
 

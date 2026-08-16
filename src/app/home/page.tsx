@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { Navbar } from "../components/Navbar";
 
 type TokenPayload = {
   nombre?: string;
@@ -48,7 +49,7 @@ export default function HomePage() {
 
   function handleLogout() {
     localStorage.clear();
-    router.push("/login");
+    router.replace("/login");
   }
 
   if (!payload) {
@@ -57,6 +58,8 @@ export default function HomePage() {
 
   return (
     <main className="home-shell">
+      <Navbar onLogout={handleLogout} />
+
       <section className="home-content">
         <h1>nombre_tienda</h1>
         <p>
@@ -70,10 +73,6 @@ export default function HomePage() {
           <button type="button">Cerrar caja</button>
         </nav>
       </section>
-
-      <button className="logout-button" type="button" onClick={handleLogout}>
-        Cerrar sesión
-      </button>
     </main>
   );
 }

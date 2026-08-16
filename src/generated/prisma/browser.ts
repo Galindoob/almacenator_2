@@ -27,3 +27,23 @@ export type User = Prisma.UserModel
  * 
  */
 export type Role = Prisma.RoleModel
+/**
+ * Model Marca
+ * 
+ */
+export type Marca = Prisma.MarcaModel
+/**
+ * Model Categoria
+ * 
+ */
+export type Categoria = Prisma.CategoriaModel
+/**
+ * Model Unidad
+ * 
+ */
+export type Unidad = Prisma.UnidadModel
+/**
+ * Model Producto
+ * 
+ */
+export type Producto = Prisma.ProductoModel
