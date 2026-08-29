@@ -345,7 +345,7 @@ export type movimiento_de_stockScalarWhereWithAggregatesInput = {
 
 export type movimiento_de_stockCreateInput = {
   id?: string
-  fecha: Date | string
+  fecha?: Date | string
   costo_sin_iva: number
   costo_con_iva: number
   cantidad: number
@@ -358,7 +358,7 @@ export type movimiento_de_stockCreateInput = {
 
 export type movimiento_de_stockUncheckedCreateInput = {
   id?: string
-  fecha: Date | string
+  fecha?: Date | string
   costo_sin_iva: number
   costo_con_iva: number
   cantidad: number
@@ -397,7 +397,7 @@ export type movimiento_de_stockUncheckedUpdateInput = {
 
 export type movimiento_de_stockCreateManyInput = {
   id?: string
-  fecha: Date | string
+  fecha?: Date | string
   costo_sin_iva: number
   costo_con_iva: number
   cantidad: number
@@ -587,7 +587,7 @@ export type DateTimeFieldUpdateOperationsInput = {
 
 export type movimiento_de_stockCreateWithoutUsersInput = {
   id?: string
-  fecha: Date | string
+  fecha?: Date | string
   costo_sin_iva: number
   costo_con_iva: number
   cantidad: number
@@ -599,7 +599,7 @@ export type movimiento_de_stockCreateWithoutUsersInput = {
 
 export type movimiento_de_stockUncheckedCreateWithoutUsersInput = {
   id?: string
-  fecha: Date | string
+  fecha?: Date | string
   costo_sin_iva: number
   costo_con_iva: number
   cantidad: number
@@ -653,7 +653,7 @@ export type movimiento_de_stockScalarWhereInput = {
 
 export type movimiento_de_stockCreateWithoutProductosInput = {
   id?: string
-  fecha: Date | string
+  fecha?: Date | string
   costo_sin_iva: number
   costo_con_iva: number
   cantidad: number
@@ -665,7 +665,7 @@ export type movimiento_de_stockCreateWithoutProductosInput = {
 
 export type movimiento_de_stockUncheckedCreateWithoutProductosInput = {
   id?: string
-  fecha: Date | string
+  fecha?: Date | string
   costo_sin_iva: number
   costo_con_iva: number
   cantidad: number
@@ -703,7 +703,7 @@ export type movimiento_de_stockUpdateManyWithWhereWithoutProductosInput = {
 
 export type movimiento_de_stockCreateManyUsersInput = {
   id?: string
-  fecha: Date | string
+  fecha?: Date | string
   costo_sin_iva: number
   costo_con_iva: number
   cantidad: number
@@ -751,7 +751,7 @@ export type movimiento_de_stockUncheckedUpdateManyWithoutUsersInput = {
 
 export type movimiento_de_stockCreateManyProductosInput = {
   id?: string
-  fecha: Date | string
+  fecha?: Date | string
   costo_sin_iva: number
   costo_con_iva: number
   cantidad: number

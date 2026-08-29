@@ -79,7 +79,7 @@ model Producto {
 /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
 model movimiento_de_stock {
   id             String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  fecha          DateTime @db.Date
+  fecha          DateTime @default(now()) @db.Timestamp(6)
   costo_sin_iva  Int
   costo_con_iva  Int
   cantidad       Int

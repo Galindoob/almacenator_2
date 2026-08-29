@@ -477,6 +477,14 @@ body {
   padding: 18px;
 }
 
+.product-search-row {
+  align-items: stretch;
+  display: grid;
+  gap: 10px;
+  grid-template-columns: minmax(0, 1fr) 46px;
+  margin-bottom: 14px;
+}
+
 .product-search {
   background: #ffffff;
   border: 1px solid var(--grey-color);
@@ -484,10 +492,30 @@ body {
   color: var(--foreground);
   font: inherit;
   min-height: 46px;
-  margin-bottom: 14px;
   outline: none;
   padding: 10px 14px;
   width: 100%;
+}
+
+.product-add-button {
+  align-items: center;
+  background: var(--accent-color);
+  border: 0;
+  border-radius: 8px;
+  color: var(--foreground);
+  cursor: pointer;
+  display: inline-flex;
+  font: inherit;
+  font-size: 26px;
+  font-weight: 900;
+  justify-content: center;
+  line-height: 1;
+  min-height: 46px;
+  width: 46px;
+}
+
+.product-add-button:hover {
+  background: var(--accent-hover);
 }
 
 .product-table-wrap {
@@ -574,6 +602,146 @@ body {
   box-shadow: 0 5px 22px rgba(0, 0, 0, 0.04);
   padding: 18px;
   width: 100%;
+}
+
+.product-create-panel {
+  background: #ffffff;
+  border: 1px solid #f7f7f7;
+  border-radius: 8px;
+  box-shadow: 0 5px 22px rgba(0, 0, 0, 0.04);
+  padding: 18px;
+  width: 100%;
+}
+
+.product-create-header h2 {
+  color: var(--foreground);
+  font-size: 26px;
+  font-weight: 900;
+  line-height: 1.15;
+  margin: 0 0 16px;
+}
+
+.product-create-form {
+  display: grid;
+  gap: 14px;
+}
+
+.product-create-form label {
+  color: var(--foreground);
+  display: grid;
+  font-size: 13px;
+  font-weight: 900;
+  gap: 6px;
+}
+
+.required-mark {
+  color: var(--danger-color);
+  font-weight: 900;
+}
+
+.product-create-form input,
+.product-create-form textarea,
+.product-create-form select {
+  background: #ffffff;
+  border: 1px solid var(--grey-color);
+  border-radius: 8px;
+  color: var(--foreground);
+  font: inherit;
+  min-height: 42px;
+  outline: none;
+  padding: 9px 11px;
+  width: 100%;
+}
+
+.product-create-form textarea {
+  min-height: 92px;
+  resize: vertical;
+}
+
+.product-create-form input:focus,
+.product-create-form textarea:focus,
+.product-create-form select:focus {
+  border-color: var(--accent-color);
+  box-shadow: 0 0 0 4px rgba(255, 196, 63, 0.18);
+}
+
+.product-create-form label.is-invalid input,
+.product-create-form label.is-invalid textarea,
+.product-create-form label.is-invalid select,
+.product-create-form label.is-invalid .content-input-wrap {
+  border-color: var(--danger-color);
+  box-shadow: 0 0 0 4px rgba(220, 53, 69, 0.12);
+}
+
+.content-input-wrap {
+  align-items: center;
+  border: 1px solid var(--grey-color);
+  border-radius: 8px;
+  display: grid;
+  gap: 8px;
+  grid-template-columns: minmax(0, 1fr) auto;
+  padding-right: 11px;
+}
+
+.content-input-wrap:focus-within {
+  border-color: var(--accent-color);
+  box-shadow: 0 0 0 4px rgba(255, 196, 63, 0.18);
+}
+
+.content-input-wrap input {
+  border: 0;
+  box-shadow: none !important;
+}
+
+.content-input-wrap span {
+  color: var(--light-dark-color);
+  font-size: 13px;
+  font-weight: 900;
+  min-width: 18px;
+}
+
+.product-create-hint,
+.product-create-message {
+  color: var(--light-dark-color);
+  font-size: 13px;
+  font-weight: 800;
+  margin: -4px 0 0;
+}
+
+.product-create-message.is-error {
+  color: var(--danger-color);
+}
+
+.product-create-message.is-success {
+  color: #218838;
+}
+
+.product-create-prices {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.product-create-submit {
+  background: var(--accent-color);
+  border: 0;
+  border-radius: 8px;
+  color: var(--foreground);
+  cursor: pointer;
+  font: inherit;
+  font-weight: 900;
+  min-height: 46px;
+  padding: 10px 16px;
+  width: max-content;
+}
+
+.product-create-submit:hover {
+  background: var(--accent-hover);
+}
+
+.product-create-submit:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
 }
 
 .product-detail-hero {
@@ -1006,6 +1174,32 @@ body {
   font-weight: 700;
 }
 
+.stock-movements-table td.is-negative {
+  color: var(--danger-color);
+  font-weight: 900;
+}
+
+.movement-reason-icon {
+  align-items: center;
+  background: var(--light-primary-color);
+  border-radius: 8px;
+  color: var(--foreground);
+  display: inline-flex;
+  height: 34px;
+  justify-content: center;
+  width: 34px;
+}
+
+.movement-reason-icon svg {
+  fill: none;
+  height: 20px;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 2;
+  width: 20px;
+}
+
 .product-detail-empty svg {
   color: #9d9d9d;
   margin-bottom: 12px;
@@ -1059,6 +1253,7 @@ body {
   .product-detail-hero,
   .margin-cards,
   .tax-columns,
+  .product-create-prices,
   .inventory-detail-section {
     grid-template-columns: 1fr;
   }

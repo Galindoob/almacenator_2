@@ -14,6 +14,7 @@ type ProductPayload = {
   marcaNombre?: string;
   codigoBarra?: string | null;
   categoriaId?: string;
+  categoriaNombre?: string;
   unidadId?: string;
   contenido?: number | null;
   unidad_medida?: string | null;
@@ -127,6 +128,10 @@ function isPrismaError(error: unknown, code: string) {
   );
 }
 
+function normalizeName(value: string) {
+  return value.trim().toLocaleLowerCase("es-CL");
+}
+
 export const GET = withAuth(async () => {
   try {
     const [productos, marcas, categorias, unidades, unidadesMedida] =
@@ -177,11 +182,16 @@ export const POST = withAuth(async (request) => {
   try {
     const product = (await request.json()) as ProductPayload;
     const marcaNombre = product.marcaNombre?.trim();
+    const categoriaNombre = product.categoriaNombre?.trim();
+    const hasExistingMarca = Boolean(product.marcaId && product.marcaId !== "new");
+    const hasExistingCategoria = Boolean(
+      product.categoriaId && product.categoriaId !== "new",
+    );
 
     if (
       !product.nombre ||
-      (!product.marcaId && !marcaNombre) ||
-      !product.categoriaId ||
+      (!hasExistingMarca && !marcaNombre) ||
+      (!hasExistingCategoria && !categoriaNombre) ||
       !product.unidadId ||
       typeof product.precioVenta !== "number"
     ) {
@@ -195,13 +205,57 @@ export const POST = withAuth(async (request) => {
     }
 
     if (marcaNombre) {
-      const marca = await prisma.marca.upsert({
-        where: { nombre: marcaNombre },
-        create: { nombre: marcaNombre },
-        update: {},
+      const marcas = await prisma.marca.findMany({
+        select: { id: true, nombre: true },
+      });
+      const duplicatedMarca = marcas.find(
+        (marca) => normalizeName(marca.nombre) === normalizeName(marcaNombre),
+      );
+
+      if (duplicatedMarca) {
+        return NextResponse.json(
+          { status: "error", message: "La marca ingresada ya existe." },
+          { status: 409 },
+        );
+      }
+
+      const marca = await prisma.marca.create({
+        data: { nombre: marcaNombre },
         select: { id: true },
       });
       product.marcaId = marca.id;
+    }
+
+    if (product.marcaId === "new") {
+      product.marcaId = undefined;
+    }
+
+    if (categoriaNombre) {
+      const categorias = await prisma.categoria.findMany({
+        select: { id: true, nombreCategoria: true },
+      });
+      const duplicatedCategoria = categorias.find(
+        (categoria) =>
+          normalizeName(categoria.nombreCategoria) ===
+          normalizeName(categoriaNombre),
+      );
+
+      if (duplicatedCategoria) {
+        return NextResponse.json(
+          { status: "error", message: "La categoria ingresada ya existe." },
+          { status: 409 },
+        );
+      }
+
+      const categoria = await prisma.categoria.create({
+        data: { nombreCategoria: categoriaNombre },
+        select: { id: true },
+      });
+      product.categoriaId = categoria.id;
+    }
+
+    if (product.categoriaId === "new") {
+      product.categoriaId = undefined;
     }
 
     const createdProduct = await prisma.producto.create({
