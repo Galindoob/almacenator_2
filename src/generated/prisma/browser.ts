@@ -47,3 +47,13 @@ export type Unidad = Prisma.UnidadModel
  * 
  */
 export type Producto = Prisma.ProductoModel
+/**
+ * Model movimiento_de_stock
+ * This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+ */
+export type movimiento_de_stock = Prisma.movimiento_de_stockModel
+/**
+ * Model unidad_medida
+ * 
+ */
+export type unidad_medida = Prisma.unidad_medidaModel

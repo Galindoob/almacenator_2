@@ -8,13 +8,14 @@ datasource db {
 }
 
 model User {
-  id         String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  nombre     String  @db.VarChar(100)
-  apellido   String  @db.VarChar(100)
-  contrasena String
-  roleid     String  @default(dbgenerated("'28ad34ff-cf2e-4851-a7e7-fffa5d5b53cd'::uuid")) @db.Uuid
-  correo     String? @unique @db.VarChar(255)
-  role       Role    @relation(fields: [roleid], references: [id], map: "fk_users_role")
+  id                  String                @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  nombre              String                @db.VarChar(100)
+  apellido            String                @db.VarChar(100)
+  contrasena          String
+  roleid              String                @default(dbgenerated("'28ad34ff-cf2e-4851-a7e7-fffa5d5b53cd'::uuid")) @db.Uuid
+  correo              String?               @unique @db.VarChar(255)
+  movimiento_de_stock movimiento_de_stock[]
+  role                Role                  @relation(fields: [roleid], references: [id], map: "fk_users_role")
 
   @@map("users")
 }
@@ -52,21 +53,47 @@ model Unidad {
 }
 
 model Producto {
-  id               String    @id @default(dbgenerated("gen_random_uuid()")) @map("id_productos") @db.Uuid
-  nombre           String    @db.VarChar(150)
-  descripcion      String?   @db.VarChar(500)
-  marcaId          String    @map("id_marca") @db.Uuid
-  codigoBarra      String?   @unique @map("codigo_barra") @db.VarChar(100)
-  categoriaId      String    @map("id_categoria") @db.Uuid
-  unidadId         String    @map("id_unidad") @db.Uuid
-  precioVenta      Int       @map("precio_venta")
-  stock            Int       @default(0)
-  fechaVencimiento DateTime? @map("fecha_de_vencimiento") @db.Date
-  urlImagen        String?   @map("url_imagen") @db.VarChar(500)
-  costo            Int       @default(0)
-  categoria        Categoria @relation(fields: [categoriaId], references: [id], map: "fk_productos_categoria")
-  marca            Marca     @relation(fields: [marcaId], references: [id], map: "fk_productos_marca")
-  unidad           Unidad    @relation(fields: [unidadId], references: [id], map: "fk_productos_unidad")
+  id                                                   String                @id @default(dbgenerated("gen_random_uuid()")) @map("id_productos") @db.Uuid
+  nombre                                               String                @db.VarChar(150)
+  descripcion                                          String?               @db.VarChar(500)
+  marcaId                                              String                @map("id_marca") @db.Uuid
+  codigoBarra                                          String?               @unique @map("codigo_barra") @db.VarChar(100)
+  categoriaId                                          String                @map("id_categoria") @db.Uuid
+  unidadId                                             String                @map("id_unidad") @db.Uuid
+  precioVenta                                          Int                   @map("precio_venta")
+  stock                                                Int                   @default(0)
+  fechaVencimiento                                     DateTime?             @map("fecha_de_vencimiento") @db.Date
+  urlImagen                                            String?               @map("url_imagen") @db.VarChar(500)
+  costo                                                Int                   @default(0)
+  contenido                                            Int?
+  unidad_medida                                        String?               @db.Uuid
+  movimiento_de_stock                                  movimiento_de_stock[]
+  categoria                                            Categoria             @relation(fields: [categoriaId], references: [id], map: "fk_productos_categoria")
+  marca                                                Marca                 @relation(fields: [marcaId], references: [id], map: "fk_productos_marca")
+  unidad                                               Unidad                @relation(fields: [unidadId], references: [id], map: "fk_productos_unidad")
+  unidad_medida_productos_unidad_medidaTounidad_medida unidad_medida?        @relation("productos_unidad_medidaTounidad_medida", fields: [unidad_medida], references: [id], onDelete: Restrict, map: "fk_productos_unidad_medida")
 
   @@map("productos")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model movimiento_de_stock {
+  id             String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  fecha          DateTime @db.Date
+  costo_sin_iva  Int
+  costo_con_iva  Int
+  cantidad       Int
+  stock_restante Int
+  usuario        String   @db.Uuid
+  producto       String   @db.Uuid
+  comentario     String?  @db.VarChar(500)
+  tipo           Int      @default(1)
+  productos      Producto @relation(fields: [producto], references: [id], map: "fk_movimiento_stock_producto")
+  users          User     @relation(fields: [usuario], references: [id], map: "fk_movimiento_stock_usuario")
+}
+
+model unidad_medida {
+  id                                               String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  nombre                                           String     @unique @db.VarChar(20)
+  productos_productos_unidad_medidaTounidad_medida Producto[] @relation("productos_unidad_medidaTounidad_medida")
 }

@@ -402,7 +402,9 @@ export const ModelName = {
   Marca: 'Marca',
   Categoria: 'Categoria',
   Unidad: 'Unidad',
-  Producto: 'Producto'
+  Producto: 'Producto',
+  movimiento_de_stock: 'movimiento_de_stock',
+  unidad_medida: 'unidad_medida'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -418,7 +420,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "role" | "marca" | "categoria" | "unidad" | "producto"
+    modelProps: "user" | "role" | "marca" | "categoria" | "unidad" | "producto" | "movimiento_de_stock" | "unidad_medida"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -866,6 +868,154 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    movimiento_de_stock: {
+      payload: Prisma.$movimiento_de_stockPayload<ExtArgs>
+      fields: Prisma.movimiento_de_stockFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.movimiento_de_stockFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$movimiento_de_stockPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.movimiento_de_stockFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$movimiento_de_stockPayload>
+        }
+        findFirst: {
+          args: Prisma.movimiento_de_stockFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$movimiento_de_stockPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.movimiento_de_stockFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$movimiento_de_stockPayload>
+        }
+        findMany: {
+          args: Prisma.movimiento_de_stockFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$movimiento_de_stockPayload>[]
+        }
+        create: {
+          args: Prisma.movimiento_de_stockCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$movimiento_de_stockPayload>
+        }
+        createMany: {
+          args: Prisma.movimiento_de_stockCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.movimiento_de_stockCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$movimiento_de_stockPayload>[]
+        }
+        delete: {
+          args: Prisma.movimiento_de_stockDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$movimiento_de_stockPayload>
+        }
+        update: {
+          args: Prisma.movimiento_de_stockUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$movimiento_de_stockPayload>
+        }
+        deleteMany: {
+          args: Prisma.movimiento_de_stockDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.movimiento_de_stockUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.movimiento_de_stockUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$movimiento_de_stockPayload>[]
+        }
+        upsert: {
+          args: Prisma.movimiento_de_stockUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$movimiento_de_stockPayload>
+        }
+        aggregate: {
+          args: Prisma.Movimiento_de_stockAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateMovimiento_de_stock>
+        }
+        groupBy: {
+          args: Prisma.movimiento_de_stockGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.Movimiento_de_stockGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.movimiento_de_stockCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.Movimiento_de_stockCountAggregateOutputType> | number
+        }
+      }
+    }
+    unidad_medida: {
+      payload: Prisma.$unidad_medidaPayload<ExtArgs>
+      fields: Prisma.unidad_medidaFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.unidad_medidaFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$unidad_medidaPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.unidad_medidaFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$unidad_medidaPayload>
+        }
+        findFirst: {
+          args: Prisma.unidad_medidaFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$unidad_medidaPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.unidad_medidaFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$unidad_medidaPayload>
+        }
+        findMany: {
+          args: Prisma.unidad_medidaFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$unidad_medidaPayload>[]
+        }
+        create: {
+          args: Prisma.unidad_medidaCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$unidad_medidaPayload>
+        }
+        createMany: {
+          args: Prisma.unidad_medidaCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.unidad_medidaCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$unidad_medidaPayload>[]
+        }
+        delete: {
+          args: Prisma.unidad_medidaDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$unidad_medidaPayload>
+        }
+        update: {
+          args: Prisma.unidad_medidaUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$unidad_medidaPayload>
+        }
+        deleteMany: {
+          args: Prisma.unidad_medidaDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.unidad_medidaUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.unidad_medidaUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$unidad_medidaPayload>[]
+        }
+        upsert: {
+          args: Prisma.unidad_medidaUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$unidad_medidaPayload>
+        }
+        aggregate: {
+          args: Prisma.Unidad_medidaAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateUnidad_medida>
+        }
+        groupBy: {
+          args: Prisma.unidad_medidaGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.Unidad_medidaGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.unidad_medidaCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.Unidad_medidaCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -961,10 +1111,36 @@ export const ProductoScalarFieldEnum = {
   stock: 'stock',
   fechaVencimiento: 'fechaVencimiento',
   urlImagen: 'urlImagen',
-  costo: 'costo'
+  costo: 'costo',
+  contenido: 'contenido',
+  unidad_medida: 'unidad_medida'
 } as const
 
 export type ProductoScalarFieldEnum = (typeof ProductoScalarFieldEnum)[keyof typeof ProductoScalarFieldEnum]
+
+
+export const Movimiento_de_stockScalarFieldEnum = {
+  id: 'id',
+  fecha: 'fecha',
+  costo_sin_iva: 'costo_sin_iva',
+  costo_con_iva: 'costo_con_iva',
+  cantidad: 'cantidad',
+  stock_restante: 'stock_restante',
+  usuario: 'usuario',
+  producto: 'producto',
+  comentario: 'comentario',
+  tipo: 'tipo'
+} as const
+
+export type Movimiento_de_stockScalarFieldEnum = (typeof Movimiento_de_stockScalarFieldEnum)[keyof typeof Movimiento_de_stockScalarFieldEnum]
+
+
+export const Unidad_medidaScalarFieldEnum = {
+  id: 'id',
+  nombre: 'nombre'
+} as const
+
+export type Unidad_medidaScalarFieldEnum = (typeof Unidad_medidaScalarFieldEnum)[keyof typeof Unidad_medidaScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -1209,6 +1385,8 @@ export type GlobalOmitConfig = {
   categoria?: Prisma.CategoriaOmit
   unidad?: Prisma.UnidadOmit
   producto?: Prisma.ProductoOmit
+  movimiento_de_stock?: Prisma.movimiento_de_stockOmit
+  unidad_medida?: Prisma.unidad_medidaOmit
 }
 
 /* Types for Logging */

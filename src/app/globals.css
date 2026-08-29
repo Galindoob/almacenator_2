@@ -651,16 +651,37 @@ body {
   padding: 16px;
 }
 
+.inventory-detail-section {
+  grid-template-columns: minmax(160px, 1fr) auto;
+}
+
 .price-summary {
   align-items: center;
   display: flex;
+  gap: 14px;
   justify-content: space-between;
 }
 
-.price-summary strong {
+.price-main-input {
+  color: var(--light-dark-color);
+  display: grid;
+  flex: 1;
+  font-size: 13px;
+  font-weight: 900;
+  gap: 6px;
+}
+
+.price-main-input input {
+  background: #ffffff;
+  border: 1px solid var(--grey-color);
+  border-radius: 8px;
+  font: inherit;
   color: var(--foreground);
   font-size: 26px;
   font-weight: 900;
+  min-height: 44px;
+  padding: 8px 10px;
+  width: 100%;
 }
 
 .price-summary span {
@@ -698,14 +719,14 @@ body {
 
 .margin-cards div,
 .tax-columns > div,
-.inventory-detail-section div {
+.inventory-status {
   background: var(--light-primary-color);
   border-radius: 8px;
   padding: 14px;
 }
 
 .margin-cards span,
-.inventory-detail-section span {
+.inventory-status span {
   color: var(--light-dark-color);
   display: block;
   font-size: 13px;
@@ -714,10 +735,35 @@ body {
 }
 
 .margin-cards strong,
-.inventory-detail-section strong {
+.inventory-status strong {
   color: var(--foreground);
   font-size: 24px;
   font-weight: 900;
+}
+
+.inventory-actions {
+  align-items: stretch;
+  display: grid;
+  gap: 10px;
+  min-width: 190px;
+}
+
+.inventory-actions button {
+  background: #ffffff;
+  border: 1px solid #f7f7f7;
+  border-radius: 8px;
+  box-shadow: 0 5px 22px rgba(0, 0, 0, 0.04);
+  color: var(--foreground);
+  cursor: pointer;
+  font: inherit;
+  font-weight: 900;
+  min-height: 42px;
+  padding: 8px 12px;
+  text-align: left;
+}
+
+.inventory-actions button:hover {
+  background: var(--accent-color);
 }
 
 .tax-columns h3 {
@@ -751,6 +797,213 @@ body {
   color: var(--foreground);
   font-weight: 900;
   margin: 4px 0 0;
+}
+
+.margin-cards strong.is-positive,
+.tax-columns p.is-positive {
+  color: #218838;
+}
+
+.margin-cards strong.is-negative,
+.tax-columns p.is-negative {
+  color: var(--danger-color);
+}
+
+.product-save-button {
+  background: var(--accent-color);
+  border: 0;
+  border-radius: 8px;
+  color: var(--foreground);
+  cursor: pointer;
+  font: inherit;
+  font-weight: 900;
+  min-height: 46px;
+  padding: 10px 16px;
+  width: max-content;
+}
+
+.product-save-button:hover {
+  background: var(--accent-hover);
+}
+
+.product-save-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+}
+
+.product-save-message {
+  color: var(--light-dark-color);
+  font-size: 14px;
+  font-weight: 800;
+  margin: -4px 0 0;
+}
+
+.stock-modal-layer,
+.comment-modal-layer {
+  align-items: center;
+  display: flex;
+  inset: 0;
+  justify-content: center;
+  padding: 18px;
+  position: fixed;
+  z-index: 60;
+}
+
+.comment-modal-layer {
+  z-index: 70;
+}
+
+.stock-modal-backdrop {
+  background: rgba(0, 0, 0, 0.44);
+  border: 0;
+  cursor: pointer;
+  inset: 0;
+  padding: 0;
+  position: absolute;
+}
+
+.stock-modal,
+.comment-modal {
+  background: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 21px 44px rgba(0, 0, 0, 0.18);
+  display: grid;
+  gap: 14px;
+  max-height: calc(100vh - 36px);
+  overflow: auto;
+  padding: 22px;
+  position: relative;
+  width: min(100%, 430px);
+  z-index: 1;
+}
+
+.stock-modal.is-wide {
+  width: min(100%, 980px);
+}
+
+.stock-modal h2,
+.comment-modal h3 {
+  color: var(--foreground);
+  font-size: 20px;
+  font-weight: 900;
+  line-height: 1.2;
+  margin: 0;
+}
+
+.stock-modal label {
+  color: var(--foreground);
+  display: grid;
+  font-size: 13px;
+  font-weight: 900;
+  gap: 6px;
+}
+
+.stock-modal input,
+.stock-modal textarea {
+  background: #ffffff;
+  border: 1px solid var(--grey-color);
+  border-radius: 8px;
+  color: var(--foreground);
+  font: inherit;
+  min-height: 42px;
+  outline: none;
+  padding: 9px 11px;
+  width: 100%;
+}
+
+.stock-modal textarea.stock-comment-input {
+  min-height: 104px;
+  resize: vertical;
+}
+
+.stock-modal input:focus,
+.stock-modal textarea:focus {
+  border-color: var(--accent-color);
+  box-shadow: 0 0 0 4px rgba(255, 196, 63, 0.18);
+}
+
+.stock-modal p,
+.comment-modal p {
+  color: var(--foreground);
+  font-weight: 900;
+  margin: 0;
+}
+
+.stock-modal p.is-negative {
+  color: var(--danger-color);
+}
+
+.stock-modal-message {
+  color: var(--danger-color) !important;
+  font-size: 14px;
+}
+
+.stock-modal-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+.stock-modal-actions button,
+.comment-modal button,
+.stock-movements-table button {
+  background: #ffffff;
+  border: 1px solid #f7f7f7;
+  border-radius: 8px;
+  color: var(--foreground);
+  cursor: pointer;
+  font: inherit;
+  font-weight: 900;
+  min-height: 38px;
+  padding: 8px 12px;
+}
+
+.stock-modal-actions button:last-child {
+  background: var(--accent-color);
+  border-color: var(--accent-color);
+}
+
+.stock-modal-actions button:hover,
+.comment-modal button:hover,
+.stock-movements-table button:hover {
+  background: var(--accent-hover);
+}
+
+.stock-modal-actions button:disabled,
+.stock-movements-table button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.stock-movements-wrap {
+  overflow-x: auto;
+}
+
+.stock-movements-table {
+  border-collapse: collapse;
+  min-width: 850px;
+  width: 100%;
+}
+
+.stock-movements-table th,
+.stock-movements-table td {
+  border-bottom: 1px solid #f7f7f7;
+  padding: 10px;
+  text-align: left;
+  vertical-align: top;
+}
+
+.stock-movements-table th {
+  background: var(--light-primary-color);
+  color: var(--foreground);
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.stock-movements-table td {
+  color: var(--foreground);
+  font-size: 13px;
+  font-weight: 700;
 }
 
 .product-detail-empty svg {
@@ -805,7 +1058,12 @@ body {
 
   .product-detail-hero,
   .margin-cards,
-  .tax-columns {
+  .tax-columns,
+  .inventory-detail-section {
     grid-template-columns: 1fr;
+  }
+
+  .inventory-actions {
+    min-width: 0;
   }
 }

@@ -56,7 +56,9 @@ export const ModelName = {
   Marca: 'Marca',
   Categoria: 'Categoria',
   Unidad: 'Unidad',
-  Producto: 'Producto'
+  Producto: 'Producto',
+  movimiento_de_stock: 'movimiento_de_stock',
+  unidad_medida: 'unidad_medida'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -131,10 +133,36 @@ export const ProductoScalarFieldEnum = {
   stock: 'stock',
   fechaVencimiento: 'fechaVencimiento',
   urlImagen: 'urlImagen',
-  costo: 'costo'
+  costo: 'costo',
+  contenido: 'contenido',
+  unidad_medida: 'unidad_medida'
 } as const
 
 export type ProductoScalarFieldEnum = (typeof ProductoScalarFieldEnum)[keyof typeof ProductoScalarFieldEnum]
+
+
+export const Movimiento_de_stockScalarFieldEnum = {
+  id: 'id',
+  fecha: 'fecha',
+  costo_sin_iva: 'costo_sin_iva',
+  costo_con_iva: 'costo_con_iva',
+  cantidad: 'cantidad',
+  stock_restante: 'stock_restante',
+  usuario: 'usuario',
+  producto: 'producto',
+  comentario: 'comentario',
+  tipo: 'tipo'
+} as const
+
+export type Movimiento_de_stockScalarFieldEnum = (typeof Movimiento_de_stockScalarFieldEnum)[keyof typeof Movimiento_de_stockScalarFieldEnum]
+
+
+export const Unidad_medidaScalarFieldEnum = {
+  id: 'id',
+  nombre: 'nombre'
+} as const
+
+export type Unidad_medidaScalarFieldEnum = (typeof Unidad_medidaScalarFieldEnum)[keyof typeof Unidad_medidaScalarFieldEnum]
 
 
 export const SortOrder = {
