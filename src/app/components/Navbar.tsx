@@ -7,13 +7,39 @@ type NavbarProps = {
   onLogout: () => void;
   showProductTabs?: boolean;
   activeProductTab?: "productos" | "promociones" | "vencimiento";
+  onProductTabChange?: (tab: "productos" | "promociones" | "vencimiento") => void;
+  showExpiringAlert?: boolean;
   showLogout?: boolean;
 };
+
+function StoreIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M4 10h16" />
+      <path d="M5 10l1-5h12l1 5" />
+      <path d="M6 10v9h12v-9" />
+      <path d="M9 19v-5h6v5" />
+      <path d="M4 10c0 1.1.9 2 2 2s2-.9 2-2c0 1.1.9 2 2 2s2-.9 2-2c0 1.1.9 2 2 2s2-.9 2-2c0 1.1.9 2 2 2s2-.9 2-2" />
+    </svg>
+  );
+}
+
+function LogoutIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M10 17l5-5-5-5" />
+      <path d="M15 12H3" />
+      <path d="M14 4h4a3 3 0 0 1 3 3v10a3 3 0 0 1-3 3h-4" />
+    </svg>
+  );
+}
 
 export function Navbar({
   onLogout,
   showProductTabs = false,
   activeProductTab = "productos",
+  onProductTabChange,
+  showExpiringAlert = false,
   showLogout = true,
 }: NavbarProps) {
   const router = useRouter();
@@ -43,6 +69,21 @@ export function Navbar({
 
   function goToProducts() {
     setIsMenuOpen(false);
+    if (onProductTabChange) {
+      onProductTabChange("productos");
+      return;
+    }
+
+    router.push("/producto");
+  }
+
+  function goToExpiringProducts() {
+    setIsMenuOpen(false);
+    if (onProductTabChange) {
+      onProductTabChange("vencimiento");
+      return;
+    }
+
     router.push("/producto");
   }
 
@@ -67,6 +108,16 @@ export function Navbar({
           <span />
         </button>
 
+        <button type="button" className="navbar-brand" onClick={goToHome}>
+          <span className="navbar-brand-icon">
+            <StoreIcon />
+          </span>
+          <span>
+            <strong>nombre_tienda</strong>
+            <small>Tu negocio, mas simple</small>
+          </span>
+        </button>
+
         {showProductTabs ? (
           <nav className="navbar-product-tabs" aria-label="Gestion de producto">
             <button
@@ -77,7 +128,22 @@ export function Navbar({
               Productos
             </button>
             <button type="button">Promociones</button>
-            <button type="button">Productos por vencer</button>
+            <button
+              type="button"
+              className={activeProductTab === "vencimiento" ? "is-active" : ""}
+              onClick={goToExpiringProducts}
+            >
+              Productos por vencer
+              {showExpiringAlert ? (
+                <span
+                  className="expiration-alert-icon navbar-expiration-alert"
+                  aria-label="Hay productos próximos a vencer"
+                  title="Hay productos próximos a vencer"
+                >
+                  !
+                </span>
+              ) : null}
+            </button>
           </nav>
         ) : (
           <div className="navbar-spacer" />
@@ -85,6 +151,7 @@ export function Navbar({
 
         {showLogout ? (
           <button type="button" className="navbar-logout" onClick={handleLogout}>
+            <LogoutIcon />
             Cerrar sesion
           </button>
         ) : null}
@@ -137,7 +204,9 @@ export function Navbar({
                     Productos
                   </button>
                   <button type="button">Promociones</button>
-                  <button type="button">Producto por vencer</button>
+                  <button type="button" onClick={goToExpiringProducts}>
+                    Producto por vencer
+                  </button>
                 </div>
               ) : null}
             </nav>

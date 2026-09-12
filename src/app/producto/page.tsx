@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
 import { Navbar } from "../components/Navbar";
 
 type Producto = {
@@ -17,10 +17,12 @@ type Producto = {
   stock: number;
   costo: number;
   precioVenta: number;
-  fechaVencimiento: string | null;
   urlImagen: string | null;
   unidad: {
     unidad: string;
+  };
+  marca: {
+    nombre: string;
   };
   categoria: {
     nombreCategoria: string;
@@ -28,6 +30,13 @@ type Producto = {
   unidad_medida_productos_unidad_medidaTounidad_medida: {
     nombre: string;
   } | null;
+};
+
+type ExpiringProduct = Producto & {
+  lotes: {
+    fecha_vencimiento: string;
+    cantidad: number;
+  }[];
 };
 
 type Option = {
@@ -57,6 +66,17 @@ type CreateProductForm = {
   unidadMedidaId: string;
   precioVenta: string;
   costo: string;
+};
+
+type EditProductForm = {
+  nombre: string;
+  descripcion: string;
+  marcaId: string;
+  codigoBarra: string;
+  categoriaId: string;
+  unidadId: string;
+  contenido: string;
+  unidadMedidaId: string;
 };
 
 type PriceState = {
@@ -159,6 +179,93 @@ function getMovementQuantity(movement: StockMovement) {
   return movement.cantidad;
 }
 
+function getTodayAtMidnight() {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  return today;
+}
+
+function getTomorrowDateInputValue() {
+  const tomorrow = getTodayAtMidnight();
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  return tomorrow.toISOString().slice(0, 10);
+}
+
+function getExpirationDiffDays(expirationDate: string) {
+  if (!expirationDate) {
+    return null;
+  }
+
+  const today = getTodayAtMidnight();
+  const normalizedExpirationDate = expirationDate.includes("T")
+    ? expirationDate.slice(0, 10)
+    : expirationDate;
+  const expiration = new Date(`${normalizedExpirationDate}T00:00:00`);
+
+  if (Number.isNaN(expiration.getTime())) {
+    return null;
+  }
+
+  return Math.ceil(
+    (expiration.getTime() - today.getTime()) / (1000 * 60 * 60 * 24),
+  );
+}
+
+function isFutureExpirationDate(expirationDate: string) {
+  const diffDays = getExpirationDiffDays(expirationDate);
+  return diffDays !== null && diffDays > 0;
+}
+
+function getExpirationSummary(expirationDate: string) {
+  const diffDays = getExpirationDiffDays(expirationDate);
+
+  if (diffDays === null) {
+    return "";
+  }
+
+  if (diffDays <= 0) {
+    return "la fecha ingresada no es válida";
+  }
+
+  const years = Math.floor(diffDays / 365);
+  const remainingAfterYears = diffDays % 365;
+  const months = Math.floor(remainingAfterYears / 30);
+  const days = remainingAfterYears % 30;
+  const parts: string[] = [];
+
+  if (years > 0) {
+    parts.push(`${years} año${years === 1 ? "" : "s"}`);
+  }
+
+  if (months > 0) {
+    parts.push(`${months} mes${months === 1 ? "" : "es"}`);
+  }
+
+  if (days > 0 || parts.length === 0) {
+    parts.push(`${days} día${days === 1 ? "" : "s"}`);
+  }
+
+  return parts.join(", ");
+}
+
+function isCloseToExpiration(expirationDate: string) {
+  const diffDays = getExpirationDiffDays(expirationDate);
+  return diffDays !== null && diffDays > 0 && diffDays <= 5;
+}
+
+function buildEditForm(producto: Producto): EditProductForm {
+  return {
+    nombre: producto.nombre,
+    descripcion: producto.descripcion ?? "",
+    marcaId: producto.marcaId,
+    codigoBarra: producto.codigoBarra ?? "",
+    categoriaId: producto.categoriaId,
+    unidadId: producto.unidadId,
+    contenido: producto.contenido ? String(producto.contenido) : "",
+    unidadMedidaId: producto.unidad_medida ?? "",
+  };
+}
+
 const initialCreateForm: CreateProductForm = {
   nombre: "",
   descripcion: "",
@@ -185,7 +292,16 @@ function buildInitialPriceState(producto: Producto): PriceState {
 
 export default function ProductoPage() {
   const router = useRouter();
+  const [activeProductTab, setActiveProductTab] = useState<
+    "productos" | "promociones" | "vencimiento"
+  >("productos");
   const [productos, setProductos] = useState<Producto[]>([]);
+  const [expiringProducts, setExpiringProducts] = useState<ExpiringProduct[]>([]);
+  const [isLoadingExpiringProducts, setIsLoadingExpiringProducts] = useState(false);
+  const [expiringProductsError, setExpiringProductsError] = useState("");
+  const [openExpiringProductId, setOpenExpiringProductId] = useState<string | null>(
+    null,
+  );
   const [options, setOptions] = useState<ProductOptions>({
     marcas: [],
     categorias: [],
@@ -205,6 +321,9 @@ export default function ProductoPage() {
   const [saveMessage, setSaveMessage] = useState("");
   const [stockModal, setStockModal] = useState<StockModal>(null);
   const [stockQuantity, setStockQuantity] = useState("");
+  const [stockExpirationDate, setStockExpirationDate] = useState("");
+  const [showStockExpirationConfirm, setShowStockExpirationConfirm] =
+    useState(false);
   const [wasteComment, setWasteComment] = useState("");
   const [stockActionMessage, setStockActionMessage] = useState("");
   const [isSavingStock, setIsSavingStock] = useState(false);
@@ -214,12 +333,64 @@ export default function ProductoPage() {
   const [panelMode, setPanelMode] = useState<"empty" | "detail" | "create">("empty");
   const [createForm, setCreateForm] =
     useState<CreateProductForm>(initialCreateForm);
+  const [createImage, setCreateImage] = useState<File | null>(null);
   const [createMessage, setCreateMessage] = useState("");
   const [createMessageType, setCreateMessageType] = useState<"error" | "success">(
     "error",
   );
   const [createSubmitted, setCreateSubmitted] = useState(false);
   const [isCreatingProduct, setIsCreatingProduct] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [editForm, setEditForm] = useState<EditProductForm | null>(null);
+  const [editImage, setEditImage] = useState<File | null>(null);
+  const [isEditImageRemoved, setIsEditImageRemoved] = useState(false);
+  const [editSubmitted, setEditSubmitted] = useState(false);
+  const [editMessage, setEditMessage] = useState("");
+  const [isSavingEdit, setIsSavingEdit] = useState(false);
+
+  const loadExpiringProducts = useCallback(async () => {
+    const token = localStorage.getItem("jwt");
+
+    if (!token) {
+      router.replace("/login");
+      return;
+    }
+
+    setIsLoadingExpiringProducts(true);
+    setExpiringProductsError("");
+
+    try {
+      const response = await fetch("/api/producto-vencimiento", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const data = (await response.json()) as {
+        status?: "ok" | "error";
+        message?: string;
+        productos?: ExpiringProduct[];
+      };
+
+      if (!response.ok || data.status !== "ok") {
+        if (response.status === 401) {
+          localStorage.removeItem("jwt");
+          router.replace("/login");
+          return;
+        }
+
+        setExpiringProductsError(
+          data.message ?? "No se pudieron cargar los productos por vencer.",
+        );
+        return;
+      }
+
+      setExpiringProducts(data.productos ?? []);
+    } catch {
+      setExpiringProductsError("No se pudo conectar con el servidor.");
+    } finally {
+      setIsLoadingExpiringProducts(false);
+    }
+  }, [router]);
 
   useEffect(() => {
     async function loadProductos() {
@@ -260,6 +431,7 @@ export default function ProductoPage() {
           setOptions(data.opciones);
         }
         setIsLoading(false);
+        loadExpiringProducts();
       } catch {
         setError("No se pudo conectar con el servidor.");
         setIsLoading(false);
@@ -267,11 +439,24 @@ export default function ProductoPage() {
     }
 
     loadProductos();
-  }, [router]);
+  }, [loadExpiringProducts, router]);
 
   function handleLogout() {
     localStorage.clear();
     router.replace("/login");
+  }
+
+  function changeProductTab(tab: "productos" | "promociones" | "vencimiento") {
+    setActiveProductTab(tab);
+    closeStockModal();
+
+    if (tab === "vencimiento") {
+      setSelectedProductId(null);
+      setPanelMode("empty");
+      setPriceState(null);
+      setOpenExpiringProductId(null);
+      loadExpiringProducts();
+    }
   }
 
   const filteredProducts = useMemo(() => {
@@ -286,9 +471,28 @@ export default function ProductoPage() {
     );
   }, [productos, search]);
 
+  const filteredExpiringProducts = useMemo(() => {
+    const query = search.trim().toLowerCase();
+
+    if (!query) {
+      return expiringProducts;
+    }
+
+    return expiringProducts.filter((producto) =>
+      producto.nombre.toLowerCase().includes(query),
+    );
+  }, [expiringProducts, search]);
+
   const selectedProduct = useMemo(
     () => productos.find((producto) => producto.id === selectedProductId) ?? null,
     [productos, selectedProductId],
+  );
+  const hasCloseExpiringProduct = useMemo(
+    () =>
+      expiringProducts.some((producto) =>
+        producto.lotes.some((lote) => isCloseToExpiration(lote.fecha_vencimiento)),
+      ),
+    [expiringProducts],
   );
 
   function selectProduct(producto: Producto) {
@@ -306,6 +510,7 @@ export default function ProductoPage() {
     setPanelMode("create");
     setOpenAccordion(null);
     setCreateForm(initialCreateForm);
+    setCreateImage(null);
     setCreateMessage("");
     setCreateMessageType("error");
     setCreateSubmitted(false);
@@ -325,9 +530,39 @@ export default function ProductoPage() {
     setCreateMessageType("error");
   }
 
+  function openEditModal(producto: Producto) {
+    setEditForm(buildEditForm(producto));
+    setEditImage(null);
+    setIsEditImageRemoved(false);
+    setEditSubmitted(false);
+    setEditMessage("");
+    setIsEditModalOpen(true);
+    closeStockModal();
+  }
+
+  function closeEditModal() {
+    setIsEditModalOpen(false);
+    setEditForm(null);
+    setEditImage(null);
+    setIsEditImageRemoved(false);
+    setEditSubmitted(false);
+    setEditMessage("");
+  }
+
+  function updateEditForm(field: keyof EditProductForm, value: string) {
+    if (field === "contenido" && !isUnsignedIntegerText(value)) {
+      return;
+    }
+
+    setEditForm((current) => (current ? { ...current, [field]: value } : current));
+    setEditMessage("");
+  }
+
   function closeStockModal() {
     setStockModal(null);
     setStockQuantity("");
+    setStockExpirationDate("");
+    setShowStockExpirationConfirm(false);
     setWasteComment("");
     setStockActionMessage("");
     setSelectedComment(null);
@@ -336,6 +571,8 @@ export default function ProductoPage() {
   function openStockModal(type: StockModal) {
     setStockModal(type);
     setStockQuantity("");
+    setStockExpirationDate("");
+    setShowStockExpirationConfirm(false);
     setWasteComment("");
     setStockActionMessage("");
     setSelectedComment(null);
@@ -504,29 +741,38 @@ export default function ProductoPage() {
     setCreateMessage("");
 
     try {
+      const formData = new FormData();
+      formData.append("nombre", createForm.nombre.trim());
+      formData.append("descripcion", createForm.descripcion.trim());
+      if (usesNewBrand) {
+        formData.append("marcaNombre", createForm.marcaNombre.trim());
+      } else {
+        formData.append("marcaId", createForm.marcaId);
+      }
+      formData.append("codigoBarra", createForm.codigoBarra.trim());
+      if (usesNewCategory) {
+        formData.append("categoriaNombre", createForm.categoriaNombre.trim());
+      } else {
+        formData.append("categoriaId", createForm.categoriaId);
+      }
+      formData.append("unidadId", createForm.unidadId);
+      if (needsMeasure) {
+        formData.append("contenido", createForm.contenido);
+        formData.append("unidad_medida", createForm.unidadMedidaId);
+      }
+      formData.append("precioVenta", createForm.precioVenta);
+      formData.append("costo", createForm.costo);
+      formData.append("stock", "0");
+      if (createImage) {
+        formData.append("imagen", createImage);
+      }
+
       const response = await fetch("/api/producto", {
         method: "POST",
         headers: {
-          "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({
-          nombre: createForm.nombre.trim(),
-          descripcion: createForm.descripcion.trim() || null,
-          marcaId: usesNewBrand ? undefined : createForm.marcaId,
-          marcaNombre: usesNewBrand ? createForm.marcaNombre.trim() : undefined,
-          codigoBarra: createForm.codigoBarra.trim() || null,
-          categoriaId: usesNewCategory ? undefined : createForm.categoriaId,
-          categoriaNombre: usesNewCategory
-            ? createForm.categoriaNombre.trim()
-            : undefined,
-          unidadId: createForm.unidadId,
-          contenido: needsMeasure ? Number(createForm.contenido) : null,
-          unidad_medida: needsMeasure ? createForm.unidadMedidaId : null,
-          precioVenta: Number(createForm.precioVenta),
-          costo: Number(createForm.costo),
-          stock: 0,
-        }),
+        body: formData,
       });
       const data = (await response.json()) as {
         status?: "ok" | "error";
@@ -579,6 +825,7 @@ export default function ProductoPage() {
         }));
       }
       setCreateForm(initialCreateForm);
+      setCreateImage(null);
       setCreateMessage("Producto creado correctamente.");
       setCreateMessageType("success");
       setCreateSubmitted(false);
@@ -590,8 +837,113 @@ export default function ProductoPage() {
     }
   }
 
+  function requestAddedStockConfirmation() {
+    if (
+      !isPositiveIntegerText(stockQuantity) ||
+      !isFutureExpirationDate(stockExpirationDate)
+    ) {
+      return;
+    }
+
+    setShowStockExpirationConfirm(true);
+  }
+
+  async function saveEditedProduct() {
+    if (!selectedProduct || !editForm) {
+      return;
+    }
+
+    const selectedUnit = options.unidades.find((unit) => unit.id === editForm.unidadId);
+    const needsMeasure = selectedUnit?.unidad?.toLowerCase() === "por unidad";
+
+    setEditSubmitted(true);
+
+    if (
+      !editForm.nombre.trim() ||
+      !editForm.marcaId ||
+      !editForm.categoriaId ||
+      !editForm.unidadId ||
+      (needsMeasure &&
+        (!isPositiveIntegerText(editForm.contenido) || !editForm.unidadMedidaId))
+    ) {
+      setEditMessage("Completa los datos obligatorios antes de guardar.");
+      return;
+    }
+
+    const token = localStorage.getItem("jwt");
+
+    if (!token) {
+      router.replace("/login");
+      return;
+    }
+
+    setIsSavingEdit(true);
+    setEditMessage("");
+
+    try {
+      const formData = new FormData();
+      formData.append("id", selectedProduct.id);
+      formData.append("nombre", editForm.nombre.trim());
+      formData.append("descripcion", editForm.descripcion.trim());
+      formData.append("marcaId", editForm.marcaId);
+      formData.append("codigoBarra", editForm.codigoBarra.trim());
+      formData.append("categoriaId", editForm.categoriaId);
+      formData.append("unidadId", editForm.unidadId);
+      if (needsMeasure) {
+        formData.append("contenido", editForm.contenido);
+        formData.append("unidad_medida", editForm.unidadMedidaId);
+      }
+      if (isEditImageRemoved || editImage) {
+        formData.append("removeImage", "true");
+      }
+      if (editImage) {
+        formData.append("imagen", editImage);
+      }
+
+      const response = await fetch("/api/producto", {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: formData,
+      });
+      const data = (await response.json()) as {
+        status?: "ok" | "error";
+        message?: string;
+        producto?: Producto;
+      };
+
+      if (!response.ok || data.status !== "ok" || !data.producto) {
+        if (response.status === 401) {
+          localStorage.removeItem("jwt");
+          router.replace("/login");
+          return;
+        }
+
+        setEditMessage(data.message ?? "No se pudo actualizar el producto.");
+        return;
+      }
+
+      setProductos((current) =>
+        current.map((producto) =>
+          producto.id === data.producto?.id ? data.producto : producto,
+        ),
+      );
+      setPriceState(buildInitialPriceState(data.producto));
+      closeEditModal();
+    } catch {
+      setEditMessage("No se pudo conectar con el servidor.");
+    } finally {
+      setIsSavingEdit(false);
+    }
+  }
+
   async function saveAddedStock() {
-    if (!selectedProduct || !isPositiveIntegerText(stockQuantity)) {
+    if (
+      !selectedProduct ||
+      !isPositiveIntegerText(stockQuantity) ||
+      !isFutureExpirationDate(stockExpirationDate)
+    ) {
       return;
     }
 
@@ -623,6 +975,7 @@ export default function ProductoPage() {
           stock_restante: nextStock,
           comentario: null,
           tipo: 2,
+          fecha_vencimiento: stockExpirationDate,
         }),
       });
       const data = (await response.json()) as {
@@ -649,6 +1002,8 @@ export default function ProductoPage() {
             : producto,
         ),
       );
+      await loadExpiringProducts();
+      setShowStockExpirationConfirm(false);
       closeStockModal();
     } catch {
       setStockActionMessage("No se pudo conectar con el servidor.");
@@ -719,6 +1074,7 @@ export default function ProductoPage() {
             : producto,
         ),
       );
+      await loadExpiringProducts();
       closeStockModal();
     } catch {
       setStockActionMessage("No se pudo conectar con el servidor.");
@@ -795,13 +1151,27 @@ export default function ProductoPage() {
       <Navbar
         onLogout={handleLogout}
         showProductTabs
-        activeProductTab="productos"
+        activeProductTab={activeProductTab}
+        onProductTabChange={changeProductTab}
+        showExpiringAlert={hasCloseExpiringProduct}
         showLogout={false}
       />
 
-      <section className="product-view-layout">
+      <section
+        className={
+          activeProductTab === "vencimiento"
+            ? "product-view-layout is-expiring-view"
+            : "product-view-layout"
+        }
+      >
         <div className="product-list-panel">
-          <div className="product-search-row">
+          <div
+            className={
+              activeProductTab === "productos"
+                ? "product-search-row"
+                : "product-search-row is-full"
+            }
+          >
             <input
               className="product-search"
               type="search"
@@ -809,21 +1179,41 @@ export default function ProductoPage() {
               value={search}
               onChange={(event) => setSearch(event.target.value)}
             />
-            <button
-              className="product-add-button"
-              type="button"
-              aria-label="Agregar producto"
-              title="Agregar producto"
-              onClick={openCreateProductPanel}
-            >
-              +
-            </button>
+            {activeProductTab === "productos" ? (
+              <button
+                className="product-add-button"
+                type="button"
+                aria-label="Agregar producto"
+                title="Agregar producto"
+                onClick={openCreateProductPanel}
+              >
+                +
+              </button>
+            ) : null}
           </div>
 
-          {isLoading ? <p className="product-empty">Cargando productos...</p> : null}
-          {error ? <p className="product-error">{error}</p> : null}
+          {activeProductTab === "vencimiento" ? (
+            <ExpiringProductsTable
+              products={filteredExpiringProducts}
+              isLoading={isLoadingExpiringProducts}
+              error={expiringProductsError}
+              openProductId={openExpiringProductId}
+              onToggleProduct={(productId) =>
+                setOpenExpiringProductId((current) =>
+                  current === productId ? null : productId,
+                )
+              }
+            />
+          ) : null}
 
-          {!isLoading && !error ? (
+          {activeProductTab === "productos" && isLoading ? (
+            <p className="product-empty">Cargando productos...</p>
+          ) : null}
+          {activeProductTab === "productos" && error ? (
+            <p className="product-error">{error}</p>
+          ) : null}
+
+          {activeProductTab === "productos" && !isLoading && !error ? (
             <div className="product-table-wrap">
               <table className="product-table">
                 <thead>
@@ -857,6 +1247,7 @@ export default function ProductoPage() {
                           <img src={imageUrl} alt={producto.nombre} />
                           <div>
                             <strong>{producto.nombre}</strong>
+                            <span>Marca: {producto.marca.nombre}</span>
                             <span>{getProductContentLabel(producto)}</span>
                             <span>Tipo de venta: {producto.unidad.unidad}</span>
                             <span>Categoria: {producto.categoria.nombreCategoria}</span>
@@ -874,7 +1265,7 @@ export default function ProductoPage() {
           ) : null}
         </div>
 
-        {panelMode === "create" ? (
+        {activeProductTab === "vencimiento" ? null : panelMode === "create" ? (
           <ProductCreatePanel
             form={createForm}
             options={options}
@@ -884,6 +1275,8 @@ export default function ProductoPage() {
             isCreating={isCreatingProduct}
             onChange={updateCreateForm}
             onSubmit={createProduct}
+            image={createImage}
+            onImageChange={setCreateImage}
           />
         ) : selectedProduct && priceState ? (
           <ProductDetail
@@ -898,6 +1291,7 @@ export default function ProductoPage() {
             saveMessage={saveMessage}
             onSave={saveProductPrices}
             onOpenStockModal={openStockModal}
+            onEdit={openEditModal}
           />
         ) : (
           <aside className="product-detail-empty">
@@ -924,21 +1318,187 @@ export default function ProductoPage() {
           product={selectedProduct}
           modal={stockModal}
           quantity={stockQuantity}
+          expirationDate={stockExpirationDate}
           comment={wasteComment}
           message={stockActionMessage}
           isSaving={isSavingStock}
           movements={movements}
           isLoadingMovements={isLoadingMovements}
           selectedComment={selectedComment}
+          showExpirationConfirm={showStockExpirationConfirm}
           onQuantityChange={updateStockQuantity}
+          onExpirationDateChange={setStockExpirationDate}
           onCommentChange={setWasteComment}
           onClose={closeStockModal}
-          onConfirmAdd={saveAddedStock}
+          onConfirmAdd={requestAddedStockConfirmation}
+          onBackFromExpirationConfirm={() => setShowStockExpirationConfirm(false)}
+          onAcceptExpirationConfirm={saveAddedStock}
           onConfirmWaste={saveWasteStock}
           onShowComment={setSelectedComment}
         />
       ) : null}
+
+      {selectedProduct && editForm && isEditModalOpen ? (
+        <ProductEditModal
+          product={selectedProduct}
+          form={editForm}
+          options={options}
+          image={editImage}
+          isImageRemoved={isEditImageRemoved}
+          submitted={editSubmitted}
+          message={editMessage}
+          isSaving={isSavingEdit}
+          onChange={updateEditForm}
+          onImageChange={setEditImage}
+          onRemoveImage={() => {
+            setIsEditImageRemoved(true);
+            setEditImage(null);
+          }}
+          onClose={closeEditModal}
+          onSave={saveEditedProduct}
+        />
+      ) : null}
     </main>
+  );
+}
+
+type ExpiringProductsTableProps = {
+  products: ExpiringProduct[];
+  isLoading: boolean;
+  error: string;
+  openProductId: string | null;
+  onToggleProduct: (productId: string) => void;
+};
+
+function ExpiringProductsTable({
+  products,
+  isLoading,
+  error,
+  openProductId,
+  onToggleProduct,
+}: ExpiringProductsTableProps) {
+  if (isLoading) {
+    return <p className="product-empty">Cargando productos por vencer...</p>;
+  }
+
+  if (error) {
+    return <p className="product-error">{error}</p>;
+  }
+
+  return (
+    <div className="product-table-wrap">
+      <table className="product-table expiring-products-table">
+        <thead>
+          <tr>
+            <th>Nombre</th>
+            <th>Stock total</th>
+          </tr>
+        </thead>
+        <tbody>
+          {products.map((producto) => {
+            const imageUrl = producto.urlImagen || "/generic-product.svg";
+            const isOpen = openProductId === producto.id;
+            const hasCloseLot = producto.lotes.some((lote) =>
+              isCloseToExpiration(lote.fecha_vencimiento),
+            );
+
+            return (
+              <Fragment key={producto.id}>
+                <tr
+                  className={isOpen ? "is-selected" : ""}
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => onToggleProduct(producto.id)}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter" || event.key === " ") {
+                      event.preventDefault();
+                      onToggleProduct(producto.id);
+                    }
+                  }}
+                >
+                  <td>
+                    <div className="product-name-cell">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={imageUrl} alt={producto.nombre} />
+                      <div>
+                        <strong className="product-name-title">
+                          {producto.nombre}
+                          {hasCloseLot ? (
+                            <span
+                              className="expiration-alert-icon"
+                              aria-label="Producto próximo a vencer"
+                              title="Producto próximo a vencer"
+                            >
+                              !
+                            </span>
+                          ) : null}
+                        </strong>
+                        <span>Marca: {producto.marca.nombre}</span>
+                        <span>{getProductContentLabel(producto)}</span>
+                        <span>Tipo de venta: {producto.unidad.unidad}</span>
+                        <span>Categoria: {producto.categoria.nombreCategoria}</span>
+                      </div>
+                    </div>
+                  </td>
+                  <td>{producto.stock}</td>
+                </tr>
+                {isOpen ? (
+                  <tr className="expiring-lots-row">
+                    <td colSpan={2}>
+                      <div className="expiring-lots-list">
+                        {producto.lotes.length > 0 ? (
+                          producto.lotes.map((lote, index) => {
+                            const isCloseLot = isCloseToExpiration(
+                              lote.fecha_vencimiento,
+                            );
+
+                            return (
+                              <div
+                                className="expiring-lot-item"
+                                key={`${producto.id}-${lote.fecha_vencimiento}`}
+                              >
+                                <strong className="product-name-title">
+                                  Lote {index + 1}
+                                  {isCloseLot ? (
+                                    <span
+                                      className="expiration-alert-icon"
+                                      aria-label="Lote próximo a vencer"
+                                      title="Lote próximo a vencer"
+                                    >
+                                      !
+                                    </span>
+                                  ) : null}
+                                </strong>
+                                <span>Cantidad {lote.cantidad}</span>
+                                <span>
+                                  Vencen en{" "}
+                                  {new Date(
+                                    lote.fecha_vencimiento,
+                                  ).toLocaleDateString("es-CL")}
+                                </span>
+                              </div>
+                            );
+                          })
+                        ) : (
+                          <p className="product-empty">
+                            Sin instancias registradas para este producto.
+                          </p>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                ) : null}
+              </Fragment>
+            );
+          })}
+          {products.length === 0 ? (
+            <tr>
+              <td colSpan={2}>Sin productos con stock para mostrar.</td>
+            </tr>
+          ) : null}
+        </tbody>
+      </table>
+    </div>
   );
 }
 
@@ -948,8 +1508,10 @@ type ProductCreatePanelProps = {
   message: string;
   messageType: "error" | "success";
   submitted: boolean;
+  image: File | null;
   isCreating: boolean;
   onChange: (field: keyof CreateProductForm, value: string) => void;
+  onImageChange: (value: File | null) => void;
   onSubmit: () => void;
 };
 
@@ -959,8 +1521,10 @@ function ProductCreatePanel({
   message,
   messageType,
   submitted,
+  image,
   isCreating,
   onChange,
+  onImageChange,
   onSubmit,
 }: ProductCreatePanelProps) {
   const selectedUnit = options.unidades.find((unit) => unit.id === form.unidadId);
@@ -1056,6 +1620,18 @@ function ProductCreatePanel({
             value={form.codigoBarra}
             onChange={(event) => onChange("codigoBarra", event.target.value)}
           />
+        </label>
+
+        <label>
+          Imagen del producto
+          <input
+            type="file"
+            accept="image/*"
+            onChange={(event) =>
+              onImageChange(event.target.files?.item(0) ?? null)
+            }
+          />
+          {image ? <span className="product-image-name">{image.name}</span> : null}
         </label>
 
         <label className={isMissing("categoriaId") ? "is-invalid" : ""}>
@@ -1177,6 +1753,236 @@ function ProductCreatePanel({
   );
 }
 
+type ProductEditModalProps = {
+  product: Producto;
+  form: EditProductForm;
+  options: ProductOptions;
+  image: File | null;
+  isImageRemoved: boolean;
+  submitted: boolean;
+  message: string;
+  isSaving: boolean;
+  onChange: (field: keyof EditProductForm, value: string) => void;
+  onImageChange: (value: File | null) => void;
+  onRemoveImage: () => void;
+  onClose: () => void;
+  onSave: () => void;
+};
+
+function ProductEditModal({
+  product,
+  form,
+  options,
+  image,
+  isImageRemoved,
+  submitted,
+  message,
+  isSaving,
+  onChange,
+  onImageChange,
+  onRemoveImage,
+  onClose,
+  onSave,
+}: ProductEditModalProps) {
+  const selectedUnit = options.unidades.find((unit) => unit.id === form.unidadId);
+  const selectedMeasure = options.unidadesMedida.find(
+    (measure) => measure.id === form.unidadMedidaId,
+  );
+  const needsMeasure = selectedUnit?.unidad?.toLowerCase() === "por unidad";
+  const previewUrl = useMemo(
+    () => (image ? URL.createObjectURL(image) : null),
+    [image],
+  );
+  const visibleImage = image
+    ? previewUrl
+    : isImageRemoved
+      ? null
+      : product.urlImagen;
+  const isMissing = (field: keyof EditProductForm) => {
+    if (!submitted) {
+      return false;
+    }
+
+    if (field === "contenido") {
+      return needsMeasure && !isPositiveIntegerText(form.contenido);
+    }
+
+    if (field === "unidadMedidaId") {
+      return needsMeasure && !form.unidadMedidaId;
+    }
+
+    return !form[field].trim();
+  };
+
+  useEffect(() => {
+    return () => {
+      if (previewUrl) {
+        URL.revokeObjectURL(previewUrl);
+      }
+    };
+  }, [previewUrl]);
+
+  return (
+    <div className="stock-modal-layer" role="presentation">
+      <button
+        className="stock-modal-backdrop"
+        type="button"
+        aria-label="Cerrar modal"
+        onClick={onClose}
+      />
+      <section className="product-edit-modal" role="dialog" aria-modal="true">
+        <h2>Editar producto</h2>
+
+        <div className="product-create-form">
+          <label className={isMissing("nombre") ? "is-invalid" : ""}>
+            Nombre del producto <span className="required-mark">*</span>
+            <input
+              type="text"
+              value={form.nombre}
+              onChange={(event) => onChange("nombre", event.target.value)}
+            />
+          </label>
+
+          <label>
+            Descripcion
+            <textarea
+              value={form.descripcion}
+              onChange={(event) => onChange("descripcion", event.target.value)}
+            />
+          </label>
+
+          <label className={isMissing("marcaId") ? "is-invalid" : ""}>
+            Marca <span className="required-mark">*</span>
+            <select
+              value={form.marcaId}
+              onChange={(event) => onChange("marcaId", event.target.value)}
+            >
+              <option value="">Selecciona una marca</option>
+              {options.marcas.map((marca) => (
+                <option key={marca.id} value={marca.id}>
+                  {marca.nombre}
+                </option>
+              ))}
+            </select>
+          </label>
+
+          <label>
+            Codigo de barra
+            <input
+              type="text"
+              value={form.codigoBarra}
+              onChange={(event) => onChange("codigoBarra", event.target.value)}
+            />
+          </label>
+
+          <div className="product-edit-image-field">
+            <span>Imagen del producto</span>
+            {visibleImage ? (
+              <div className="product-edit-image-preview">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={visibleImage} alt={form.nombre || product.nombre} />
+                <button type="button" onClick={onRemoveImage}>
+                  Eliminar
+                </button>
+              </div>
+            ) : (
+              <label>
+                Subir imagen
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(event) =>
+                    onImageChange(event.target.files?.item(0) ?? null)
+                  }
+                />
+                {image ? (
+                  <span className="product-image-name">{image.name}</span>
+                ) : null}
+              </label>
+            )}
+          </div>
+
+          <label className={isMissing("categoriaId") ? "is-invalid" : ""}>
+            Categoria <span className="required-mark">*</span>
+            <select
+              value={form.categoriaId}
+              onChange={(event) => onChange("categoriaId", event.target.value)}
+            >
+              <option value="">Selecciona una categoria</option>
+              {options.categorias.map((categoria) => (
+                <option key={categoria.id} value={categoria.id}>
+                  {categoria.nombreCategoria}
+                </option>
+              ))}
+            </select>
+          </label>
+
+          <label className={isMissing("unidadId") ? "is-invalid" : ""}>
+            Como se vende? <span className="required-mark">*</span>
+            <select
+              value={form.unidadId}
+              onChange={(event) => onChange("unidadId", event.target.value)}
+            >
+              <option value="">Selecciona una opcion</option>
+              {options.unidades.map((unidad) => (
+                <option key={unidad.id} value={unidad.id}>
+                  {unidad.unidad}
+                </option>
+              ))}
+            </select>
+          </label>
+
+          {needsMeasure ? (
+            <>
+              <label className={isMissing("unidadMedidaId") ? "is-invalid" : ""}>
+                Unidad de medida <span className="required-mark">*</span>
+                <select
+                  value={form.unidadMedidaId}
+                  onChange={(event) =>
+                    onChange("unidadMedidaId", event.target.value)
+                  }
+                >
+                  <option value="">Selecciona una unidad</option>
+                  {options.unidadesMedida.map((unidadMedida) => (
+                    <option key={unidadMedida.id} value={unidadMedida.id}>
+                      {unidadMedida.nombre}
+                    </option>
+                  ))}
+                </select>
+              </label>
+
+              <label className={isMissing("contenido") ? "is-invalid" : ""}>
+                Contenido <span className="required-mark">*</span>
+                <div className="content-input-wrap">
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    pattern="[1-9][0-9]*"
+                    value={form.contenido}
+                    onChange={(event) => onChange("contenido", event.target.value)}
+                  />
+                  <span>{selectedMeasure?.nombre ?? ""}</span>
+                </div>
+              </label>
+            </>
+          ) : null}
+
+          {message ? <p className="product-create-message is-error">{message}</p> : null}
+
+          <div className="stock-modal-actions">
+            <button type="button" onClick={onClose}>
+              Cancelar
+            </button>
+            <button type="button" disabled={isSaving} onClick={onSave}>
+              {isSaving ? "Guardando..." : "Guardar"}
+            </button>
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+}
+
 type ProductDetailProps = {
   product: Producto;
   priceState: PriceState;
@@ -1198,6 +2004,7 @@ type ProductDetailProps = {
   saveMessage: string;
   onSave: () => void;
   onOpenStockModal: (type: StockModal) => void;
+  onEdit: (product: Producto) => void;
 };
 
 function ProductDetail({
@@ -1212,6 +2019,7 @@ function ProductDetail({
   saveMessage,
   onSave,
   onOpenStockModal,
+  onEdit,
 }: ProductDetailProps) {
   const imageUrl = product.urlImagen || "/generic-product.svg";
   const minPrice = Math.max(priceState.costoSinIva, 0);
@@ -1236,8 +2044,23 @@ function ProductDetail({
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src={imageUrl} alt={product.nombre} />
         <div>
-          <h2>{product.nombre}</h2>
+          <div className="product-detail-title-row">
+            <h2>{product.nombre}</h2>
+            <button
+              className="product-edit-button"
+              type="button"
+              aria-label="Editar producto"
+              title="Editar producto"
+              onClick={() => onEdit(product)}
+            >
+              <svg aria-hidden="true" viewBox="0 0 24 24">
+                <path d="M12 20h9" />
+                <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z" />
+              </svg>
+            </button>
+          </div>
           <p>{product.descripcion || "Sin descripcion"}</p>
+          <span>Marca: {product.marca.nombre}</span>
           <span>Categoria: {product.categoria.nombreCategoria}</span>
           <span>Tipo de venta: {product.unidad.unidad}</span>
         </div>
@@ -1424,16 +2247,21 @@ type StockModalViewProps = {
   product: Producto;
   modal: StockModal;
   quantity: string;
+  expirationDate: string;
   comment: string;
   message: string;
   isSaving: boolean;
   movements: StockMovement[];
   isLoadingMovements: boolean;
   selectedComment: string | null;
+  showExpirationConfirm: boolean;
   onQuantityChange: (value: string) => void;
+  onExpirationDateChange: (value: string) => void;
   onCommentChange: (value: string) => void;
   onClose: () => void;
   onConfirmAdd: () => void;
+  onBackFromExpirationConfirm: () => void;
+  onAcceptExpirationConfirm: () => void;
   onConfirmWaste: () => void;
   onShowComment: (value: string | null) => void;
 };
@@ -1442,16 +2270,21 @@ function StockModalView({
   product,
   modal,
   quantity,
+  expirationDate,
   comment,
   message,
   isSaving,
   movements,
   isLoadingMovements,
   selectedComment,
+  showExpirationConfirm,
   onQuantityChange,
+  onExpirationDateChange,
   onCommentChange,
   onClose,
   onConfirmAdd,
+  onBackFromExpirationConfirm,
+  onAcceptExpirationConfirm,
   onConfirmWaste,
   onShowComment,
 }: StockModalViewProps) {
@@ -1462,8 +2295,13 @@ function StockModalView({
   const parsedQuantity = isPositiveIntegerText(quantity) ? Number(quantity) : 0;
   const addedStock = product.stock + parsedQuantity;
   const remainingStock = product.stock - parsedQuantity;
-  const canConfirmAdd = parsedQuantity > 0 && !isSaving;
+  const canConfirmAdd =
+    parsedQuantity > 0 && isFutureExpirationDate(expirationDate) && !isSaving;
   const canConfirmWaste = parsedQuantity > 0 && remainingStock >= 0 && !isSaving;
+  const expirationSummary = getExpirationSummary(expirationDate);
+  const minExpirationDate = getTomorrowDateInputValue();
+  const hasInvalidExpirationDate =
+    Boolean(expirationDate) && !isFutureExpirationDate(expirationDate);
 
   return (
     <div className="stock-modal-layer" role="presentation">
@@ -1478,9 +2316,21 @@ function StockModalView({
         role="dialog"
         aria-modal="true"
       >
+        <button
+          className="stock-modal-close-button"
+          type="button"
+          aria-label="Cerrar modal"
+          onClick={onClose}
+        >
+          x
+        </button>
         {modal === "add" ? (
           <>
             <h2>Agregar stock de {product.nombre}</h2>
+            <p className="stock-lot-alert">
+              se asume que la cantidad ingresada es un lote y comparte fecha de
+              vencimiento
+            </p>
             <label>
               Cantidad
               <input
@@ -1490,6 +2340,27 @@ function StockModalView({
                 value={quantity}
                 onChange={(event) => onQuantityChange(event.target.value)}
               />
+            </label>
+            <label>
+              Fecha de vencimiento
+              <span
+                className={`date-input-wrap${expirationDate ? " has-value" : ""}`}
+              >
+                {!expirationDate ? (
+                  <span className="date-placeholder">Ej: 31-12-2026</span>
+                ) : null}
+                <input
+                  type="date"
+                  min={minExpirationDate}
+                  value={expirationDate}
+                  onChange={(event) => onExpirationDateChange(event.target.value)}
+                />
+              </span>
+              {hasInvalidExpirationDate ? (
+                <span className="date-error">
+                  Debe ser una fecha posterior a hoy.
+                </span>
+              ) : null}
             </label>
             <p>Tu nuevo stock será: {addedStock}</p>
             {message ? <p className="stock-modal-message">{message}</p> : null}
@@ -1620,11 +2491,6 @@ function StockModalView({
                 </table>
               </div>
             ) : null}
-            <div className="stock-modal-actions">
-              <button type="button" onClick={onClose}>
-                Cerrar
-              </button>
-            </div>
           </>
         ) : null}
 
@@ -1642,6 +2508,33 @@ function StockModalView({
               <button type="button" onClick={() => onShowComment(null)}>
                 Cerrar
               </button>
+            </section>
+          </div>
+        ) : null}
+
+        {showExpirationConfirm && modal === "add" ? (
+          <div className="comment-modal-layer" role="presentation">
+            <button
+              className="stock-modal-backdrop"
+              type="button"
+              aria-label="Volver"
+              onClick={onBackFromExpirationConfirm}
+            />
+            <section className="comment-modal" role="dialog" aria-modal="true">
+              <h3>El producto vencerá en:</h3>
+              <p>{expirationSummary}</p>
+              <div className="stock-modal-actions">
+                <button type="button" onClick={onBackFromExpirationConfirm}>
+                  Volver
+                </button>
+                <button
+                  type="button"
+                  disabled={isSaving}
+                  onClick={onAcceptExpirationConfirm}
+                >
+                  {isSaving ? "Guardando..." : "OK"}
+                </button>
+              </div>
             </section>
           </div>
         ) : null}

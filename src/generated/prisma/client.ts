@@ -81,3 +81,8 @@ export type movimiento_de_stock = Prisma.movimiento_de_stockModel
  * 
  */
 export type unidad_medida = Prisma.unidad_medidaModel
+/**
+ * Model instancia_producto
+ * 
+ */
+export type instancia_producto = Prisma.instancia_productoModel

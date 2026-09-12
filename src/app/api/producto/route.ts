@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { v2 as cloudinary, type UploadApiResponse } from "cloudinary";
 import { prisma } from "@/lib/db";
 import { withAuth } from "@/lib/auth";
 import type {
@@ -20,7 +21,6 @@ type ProductPayload = {
   unidad_medida?: string | null;
   precioVenta?: number;
   stock?: number;
-  fechaVencimiento?: string | Date | null;
   urlImagen?: string | null;
   costo?: number;
 };
@@ -37,12 +37,16 @@ const productSelect = {
   unidad_medida: true,
   precioVenta: true,
   stock: true,
-  fechaVencimiento: true,
   urlImagen: true,
   costo: true,
   unidad: {
     select: {
       unidad: true,
+    },
+  },
+  marca: {
+    select: {
+      nombre: true,
     },
   },
   categoria: {
@@ -77,12 +81,6 @@ function buildProductCreateData(
         ? Math.round(product.precioVenta)
         : 0,
     stock: typeof product.stock === "number" ? Math.round(product.stock) : undefined,
-    fechaVencimiento:
-      product.fechaVencimiento === undefined
-        ? undefined
-        : product.fechaVencimiento
-          ? new Date(product.fechaVencimiento)
-          : null,
     urlImagen: product.urlImagen,
     costo: typeof product.costo === "number" ? Math.round(product.costo) : undefined,
   };
@@ -108,12 +106,6 @@ function buildProductUpdateData(
         ? Math.round(product.precioVenta)
         : undefined,
     stock: typeof product.stock === "number" ? Math.round(product.stock) : undefined,
-    fechaVencimiento:
-      product.fechaVencimiento === undefined
-        ? undefined
-        : product.fechaVencimiento
-          ? new Date(product.fechaVencimiento)
-          : null,
     urlImagen: product.urlImagen,
     costo: typeof product.costo === "number" ? Math.round(product.costo) : undefined,
   };
@@ -130,6 +122,146 @@ function isPrismaError(error: unknown, code: string) {
 
 function normalizeName(value: string) {
   return value.trim().toLocaleLowerCase("es-CL");
+}
+
+function getFormString(formData: FormData, key: string) {
+  const value = formData.get(key);
+  return typeof value === "string" ? value : undefined;
+}
+
+function getFormNumber(formData: FormData, key: string) {
+  const value = getFormString(formData, key);
+
+  if (!value) {
+    return undefined;
+  }
+
+  const numberValue = Number(value);
+  return Number.isFinite(numberValue) ? numberValue : undefined;
+}
+
+function getOptionalFormString(formData: FormData, key: string) {
+  const value = getFormString(formData, key)?.trim();
+  return value ? value : null;
+}
+
+function parseProductFormData(formData: FormData): {
+  product: ProductPayload;
+  imageFile: FormDataEntryValue | null;
+  removeImage: boolean;
+} {
+  return {
+    product: {
+      id: getFormString(formData, "id"),
+      nombre: getFormString(formData, "nombre"),
+      descripcion: getOptionalFormString(formData, "descripcion"),
+      marcaId: getFormString(formData, "marcaId"),
+      marcaNombre: getFormString(formData, "marcaNombre"),
+      codigoBarra: getOptionalFormString(formData, "codigoBarra"),
+      categoriaId: getFormString(formData, "categoriaId"),
+      categoriaNombre: getFormString(formData, "categoriaNombre"),
+      unidadId: getFormString(formData, "unidadId"),
+      contenido: getFormNumber(formData, "contenido") ?? null,
+      unidad_medida: getOptionalFormString(formData, "unidad_medida"),
+      precioVenta: getFormNumber(formData, "precioVenta"),
+      costo: getFormNumber(formData, "costo"),
+      stock: getFormNumber(formData, "stock"),
+    },
+    imageFile: formData.get("imagen"),
+    removeImage: getFormString(formData, "removeImage") === "true",
+  };
+}
+
+function configureCloudinary() {
+  const cloudName =
+    process.env.CLOUDINARY_CLOUD_NAME ??
+    process.env.CLOUDINARY_PROJECT_NAME ??
+    process.env.CLOUDINARY_NAME;
+  const apiKey = process.env.CLOUDINARY_API_KEY ?? process.env.CLOUDINARY_KEY;
+  const apiSecret =
+    process.env.CLOUDINARY_API_SECRET ??
+    process.env.CLOUDINARY_SECRET_KEY ??
+    process.env.CLOUDINARY_SECRET;
+
+  if (!cloudName || !apiKey || !apiSecret) {
+    throw new Error("Cloudinary no está configurado.");
+  }
+
+  cloudinary.config({
+    cloud_name: cloudName,
+    api_key: apiKey,
+    api_secret: apiSecret,
+  });
+}
+
+async function uploadProductImage(imageFile: FormDataEntryValue | null) {
+  if (!(imageFile instanceof File) || imageFile.size === 0) {
+    return null;
+  }
+
+  if (!imageFile.type.startsWith("image/")) {
+    throw new Error("El archivo seleccionado debe ser una imagen.");
+  }
+
+  configureCloudinary();
+
+  const bytes = await imageFile.arrayBuffer();
+  const buffer = Buffer.from(bytes);
+
+  return new Promise<string>((resolve, reject) => {
+    const upload = cloudinary.uploader.upload_stream(
+      {
+        folder: "almacenator/productos",
+        resource_type: "image",
+      },
+      (error, result?: UploadApiResponse) => {
+        if (error || !result?.secure_url) {
+          reject(error ?? new Error("Cloudinary no retornó una URL."));
+          return;
+        }
+
+        resolve(result.secure_url);
+      },
+    );
+
+    upload.end(buffer);
+  });
+}
+
+function getCloudinaryPublicId(imageUrl: string) {
+  try {
+    const pathname = new URL(imageUrl).pathname;
+    const uploadMarker = "/upload/";
+    const uploadIndex = pathname.indexOf(uploadMarker);
+
+    if (uploadIndex === -1) {
+      return null;
+    }
+
+    const pathAfterUpload = pathname.slice(uploadIndex + uploadMarker.length);
+    const withoutVersion = pathAfterUpload.replace(/^v\d+\//, "");
+    const withoutExtension = withoutVersion.replace(/\.[^/.]+$/, "");
+
+    return decodeURIComponent(withoutExtension);
+  } catch {
+    return null;
+  }
+}
+
+async function deleteProductImage(imageUrl: string | null | undefined) {
+  if (!imageUrl) {
+    return;
+  }
+
+  const publicId = getCloudinaryPublicId(imageUrl);
+
+  if (!publicId) {
+    return;
+  }
+
+  configureCloudinary();
+
+  await cloudinary.uploader.destroy(publicId, { resource_type: "image" });
 }
 
 export const GET = withAuth(async () => {
@@ -180,7 +312,12 @@ export const GET = withAuth(async () => {
 
 export const POST = withAuth(async (request) => {
   try {
-    const product = (await request.json()) as ProductPayload;
+    const contentType = request.headers.get("content-type") ?? "";
+    const imageRequest = contentType.includes("multipart/form-data");
+    const parsed = imageRequest
+      ? parseProductFormData(await request.formData())
+      : { product: (await request.json()) as ProductPayload, imageFile: null };
+    const product = parsed.product;
     const marcaNombre = product.marcaNombre?.trim();
     const categoriaNombre = product.categoriaNombre?.trim();
     const hasExistingMarca = Boolean(product.marcaId && product.marcaId !== "new");
@@ -258,6 +395,11 @@ export const POST = withAuth(async (request) => {
       product.categoriaId = undefined;
     }
 
+    const imageUrl = await uploadProductImage(parsed.imageFile);
+    if (imageUrl) {
+      product.urlImagen = imageUrl;
+    }
+
     const createdProduct = await prisma.producto.create({
       data: buildProductCreateData(product),
       select: productSelect,
@@ -283,7 +425,12 @@ export const POST = withAuth(async (request) => {
 
 export const PUT = withAuth(async (request) => {
   try {
-    const product = (await request.json()) as ProductPayload;
+    const contentType = request.headers.get("content-type") ?? "";
+    const imageRequest = contentType.includes("multipart/form-data");
+    const parsed = imageRequest
+      ? parseProductFormData(await request.formData())
+      : { product: (await request.json()) as ProductPayload, imageFile: null, removeImage: false };
+    const product = parsed.product;
 
     if (!product.id) {
       return NextResponse.json(
@@ -292,11 +439,35 @@ export const PUT = withAuth(async (request) => {
       );
     }
 
+    const currentProduct = imageRequest
+      ? await prisma.producto.findUnique({
+          where: { id: product.id },
+          select: { urlImagen: true },
+        })
+      : null;
+
+    const imageUrl = await uploadProductImage(parsed.imageFile);
+    const shouldClearImage = parsed.removeImage || Boolean(imageUrl);
+
+    if (imageUrl) {
+      product.urlImagen = imageUrl;
+    } else if (parsed.removeImage) {
+      product.urlImagen = null;
+    }
+
     const updatedProduct = await prisma.producto.update({
       where: { id: product.id },
       data: buildProductUpdateData(product),
       select: productSelect,
     });
+
+    if (shouldClearImage && currentProduct?.urlImagen) {
+      try {
+        await deleteProductImage(currentProduct.urlImagen);
+      } catch (cloudinaryError) {
+        console.error("Error eliminando imagen anterior de Cloudinary:", cloudinaryError);
+      }
+    }
 
     return NextResponse.json({ status: "ok", producto: updatedProduct });
   } catch (error) {

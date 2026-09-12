@@ -58,7 +58,8 @@ export const ModelName = {
   Unidad: 'Unidad',
   Producto: 'Producto',
   movimiento_de_stock: 'movimiento_de_stock',
-  unidad_medida: 'unidad_medida'
+  unidad_medida: 'unidad_medida',
+  instancia_producto: 'instancia_producto'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -131,7 +132,6 @@ export const ProductoScalarFieldEnum = {
   unidadId: 'unidadId',
   precioVenta: 'precioVenta',
   stock: 'stock',
-  fechaVencimiento: 'fechaVencimiento',
   urlImagen: 'urlImagen',
   costo: 'costo',
   contenido: 'contenido',
@@ -163,6 +163,15 @@ export const Unidad_medidaScalarFieldEnum = {
 } as const
 
 export type Unidad_medidaScalarFieldEnum = (typeof Unidad_medidaScalarFieldEnum)[keyof typeof Unidad_medidaScalarFieldEnum]
+
+
+export const Instancia_productoScalarFieldEnum = {
+  id_instancia: 'id_instancia',
+  id_producto: 'id_producto',
+  fecha_vencimiento: 'fecha_vencimiento'
+} as const
+
+export type Instancia_productoScalarFieldEnum = (typeof Instancia_productoScalarFieldEnum)[keyof typeof Instancia_productoScalarFieldEnum]
 
 
 export const SortOrder = {
