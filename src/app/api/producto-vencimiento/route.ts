@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { withAuth } from "@/lib/auth";
+import { AuthenticatedRequest, withAuth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 
 const expiringProductSelect = {
@@ -38,6 +38,73 @@ const expiringProductSelect = {
   },
 } as const;
 
+type DeleteLotPayload = {
+  productoId?: string;
+  fecha_vencimiento?: string;
+};
+
+function parseExpirationDate(value: unknown) {
+  if (typeof value !== "string" || !value) {
+    return null;
+  }
+
+  const isoDate = value.slice(0, 10);
+  const date = new Date(`${isoDate}T00:00:00`);
+
+  return Number.isNaN(date.getTime()) ? null : date;
+}
+
+function isExpiredOrToday(date: Date) {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  return date.getTime() <= today.getTime();
+}
+
+type ProductWithPackaging = {
+  id: string;
+  empaque: string | null;
+  empaque_productos_empaqueToempaque: { nombre_empaque: string } | null;
+};
+
+async function attachPackagingToProducts<T extends { id: string }>(
+  products: T[],
+) {
+  if (products.length === 0) {
+    return [] as (T & ProductWithPackaging)[];
+  }
+
+  const productIds = products.map((product) => product.id);
+  const rows = await prisma.$queryRaw<
+    {
+      id: string;
+      empaque: string | null;
+      nombre_empaque: string | null;
+    }[]
+  >`
+    SELECT
+      p.id_productos::text AS id,
+      p.empaque::text AS empaque,
+      e.nombre_empaque
+    FROM productos p
+    LEFT JOIN empaque e ON e.id_empaque = p.empaque
+    WHERE p.id_productos = ANY(${productIds}::uuid[])
+  `;
+  const packagingByProduct = new Map(rows.map((row) => [row.id, row]));
+
+  return products.map((product) => {
+    const packaging = packagingByProduct.get(product.id);
+
+    return {
+      ...product,
+      empaque: packaging?.empaque ?? null,
+      empaque_productos_empaqueToempaque: packaging?.nombre_empaque
+        ? { nombre_empaque: packaging.nombre_empaque }
+        : null,
+    };
+  });
+}
+
 export const GET = withAuth(async () => {
   try {
     const [productos, groupedLots] = await Promise.all([
@@ -74,9 +141,11 @@ export const GET = withAuth(async () => {
       lotsByProduct.set(lot.id_producto, currentLots);
     }
 
+    const productsWithPackaging = await attachPackagingToProducts(productos);
+
     return NextResponse.json({
       status: "ok",
-      productos: productos.map((producto) => ({
+      productos: productsWithPackaging.map((producto) => ({
         ...producto,
         lotes: lotsByProduct.get(producto.id) ?? [],
       })),
@@ -86,6 +155,100 @@ export const GET = withAuth(async () => {
 
     return NextResponse.json(
       { status: "error", message: "No se pudieron cargar los productos por vencer." },
+      { status: 500 },
+    );
+  }
+});
+
+export const DELETE = withAuth(async (request: AuthenticatedRequest) => {
+  try {
+    const payload = (await request.json()) as DeleteLotPayload;
+    const expirationDate = parseExpirationDate(payload.fecha_vencimiento);
+
+    if (!payload.productoId || !expirationDate) {
+      return NextResponse.json(
+        { status: "error", message: "Debe enviar el producto y la fecha del lote." },
+        { status: 400 },
+      );
+    }
+
+    if (!isExpiredOrToday(expirationDate)) {
+      return NextResponse.json(
+        {
+          status: "error",
+          message: "Solo se pueden eliminar lotes vencidos o que vencen hoy.",
+        },
+        { status: 400 },
+      );
+    }
+
+    const result = await prisma.$transaction(async (tx) => {
+      const [producto, lotCount] = await Promise.all([
+        tx.producto.findUnique({
+          where: { id: payload.productoId },
+          select: { id: true, stock: true },
+        }),
+        tx.instancia_producto.count({
+          where: {
+            id_producto: payload.productoId,
+            fecha_vencimiento: expirationDate,
+          },
+        }),
+      ]);
+
+      if (!producto) {
+        throw new Error("PRODUCT_NOT_FOUND");
+      }
+
+      if (lotCount < 1) {
+        throw new Error("LOT_NOT_FOUND");
+      }
+
+      await tx.instancia_producto.deleteMany({
+        where: {
+          id_producto: payload.productoId,
+          fecha_vencimiento: expirationDate,
+        },
+      });
+
+      const updatedProduct = await tx.producto.update({
+        where: { id: payload.productoId },
+        data: {
+          stock: Math.max(0, producto.stock - lotCount),
+        },
+        select: {
+          id: true,
+          stock: true,
+        },
+      });
+
+      return { producto: updatedProduct, deletedCount: lotCount };
+    });
+
+    return NextResponse.json({
+      status: "ok",
+      producto: result.producto,
+      deletedCount: result.deletedCount,
+    });
+  } catch (error) {
+    console.error("Error eliminando lote vencido:", error);
+
+    if (error instanceof Error && error.message === "PRODUCT_NOT_FOUND") {
+      return NextResponse.json(
+        { status: "error", message: "Producto no encontrado." },
+        { status: 404 },
+      );
+    }
+
+    if (error instanceof Error && error.message === "LOT_NOT_FOUND") {
+      return NextResponse.json(
+        { status: "error", message: "No se encontró el lote seleccionado." },
+        { status: 404 },
+      );
+    }
+
+    return NextResponse.json(
+      { status: "error", message: "No se pudo eliminar el lote." },
       { status: 500 },
     );
   }

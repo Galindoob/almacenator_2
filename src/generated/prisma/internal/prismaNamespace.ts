@@ -405,7 +405,10 @@ export const ModelName = {
   Producto: 'Producto',
   movimiento_de_stock: 'movimiento_de_stock',
   unidad_medida: 'unidad_medida',
-  instancia_producto: 'instancia_producto'
+  instancia_producto: 'instancia_producto',
+  empaque: 'empaque',
+  apertura_caja: 'apertura_caja',
+  historia_caja: 'historia_caja'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -421,7 +424,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "role" | "marca" | "categoria" | "unidad" | "producto" | "movimiento_de_stock" | "unidad_medida" | "instancia_producto"
+    modelProps: "user" | "role" | "marca" | "categoria" | "unidad" | "producto" | "movimiento_de_stock" | "unidad_medida" | "instancia_producto" | "empaque" | "apertura_caja" | "historia_caja"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1091,6 +1094,228 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    empaque: {
+      payload: Prisma.$empaquePayload<ExtArgs>
+      fields: Prisma.empaqueFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.empaqueFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$empaquePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.empaqueFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$empaquePayload>
+        }
+        findFirst: {
+          args: Prisma.empaqueFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$empaquePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.empaqueFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$empaquePayload>
+        }
+        findMany: {
+          args: Prisma.empaqueFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$empaquePayload>[]
+        }
+        create: {
+          args: Prisma.empaqueCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$empaquePayload>
+        }
+        createMany: {
+          args: Prisma.empaqueCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.empaqueCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$empaquePayload>[]
+        }
+        delete: {
+          args: Prisma.empaqueDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$empaquePayload>
+        }
+        update: {
+          args: Prisma.empaqueUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$empaquePayload>
+        }
+        deleteMany: {
+          args: Prisma.empaqueDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.empaqueUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.empaqueUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$empaquePayload>[]
+        }
+        upsert: {
+          args: Prisma.empaqueUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$empaquePayload>
+        }
+        aggregate: {
+          args: Prisma.EmpaqueAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateEmpaque>
+        }
+        groupBy: {
+          args: Prisma.empaqueGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.EmpaqueGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.empaqueCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.EmpaqueCountAggregateOutputType> | number
+        }
+      }
+    }
+    apertura_caja: {
+      payload: Prisma.$apertura_cajaPayload<ExtArgs>
+      fields: Prisma.apertura_cajaFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.apertura_cajaFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$apertura_cajaPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.apertura_cajaFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$apertura_cajaPayload>
+        }
+        findFirst: {
+          args: Prisma.apertura_cajaFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$apertura_cajaPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.apertura_cajaFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$apertura_cajaPayload>
+        }
+        findMany: {
+          args: Prisma.apertura_cajaFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$apertura_cajaPayload>[]
+        }
+        create: {
+          args: Prisma.apertura_cajaCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$apertura_cajaPayload>
+        }
+        createMany: {
+          args: Prisma.apertura_cajaCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.apertura_cajaCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$apertura_cajaPayload>[]
+        }
+        delete: {
+          args: Prisma.apertura_cajaDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$apertura_cajaPayload>
+        }
+        update: {
+          args: Prisma.apertura_cajaUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$apertura_cajaPayload>
+        }
+        deleteMany: {
+          args: Prisma.apertura_cajaDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.apertura_cajaUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.apertura_cajaUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$apertura_cajaPayload>[]
+        }
+        upsert: {
+          args: Prisma.apertura_cajaUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$apertura_cajaPayload>
+        }
+        aggregate: {
+          args: Prisma.Apertura_cajaAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateApertura_caja>
+        }
+        groupBy: {
+          args: Prisma.apertura_cajaGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.Apertura_cajaGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.apertura_cajaCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.Apertura_cajaCountAggregateOutputType> | number
+        }
+      }
+    }
+    historia_caja: {
+      payload: Prisma.$historia_cajaPayload<ExtArgs>
+      fields: Prisma.historia_cajaFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.historia_cajaFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$historia_cajaPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.historia_cajaFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$historia_cajaPayload>
+        }
+        findFirst: {
+          args: Prisma.historia_cajaFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$historia_cajaPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.historia_cajaFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$historia_cajaPayload>
+        }
+        findMany: {
+          args: Prisma.historia_cajaFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$historia_cajaPayload>[]
+        }
+        create: {
+          args: Prisma.historia_cajaCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$historia_cajaPayload>
+        }
+        createMany: {
+          args: Prisma.historia_cajaCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.historia_cajaCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$historia_cajaPayload>[]
+        }
+        delete: {
+          args: Prisma.historia_cajaDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$historia_cajaPayload>
+        }
+        update: {
+          args: Prisma.historia_cajaUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$historia_cajaPayload>
+        }
+        deleteMany: {
+          args: Prisma.historia_cajaDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.historia_cajaUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.historia_cajaUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$historia_cajaPayload>[]
+        }
+        upsert: {
+          args: Prisma.historia_cajaUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$historia_cajaPayload>
+        }
+        aggregate: {
+          args: Prisma.Historia_cajaAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateHistoria_caja>
+        }
+        groupBy: {
+          args: Prisma.historia_cajaGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.Historia_cajaGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.historia_cajaCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.Historia_cajaCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -1187,7 +1412,8 @@ export const ProductoScalarFieldEnum = {
   urlImagen: 'urlImagen',
   costo: 'costo',
   contenido: 'contenido',
-  unidad_medida: 'unidad_medida'
+  unidad_medida: 'unidad_medida',
+  empaque: 'empaque'
 } as const
 
 export type ProductoScalarFieldEnum = (typeof ProductoScalarFieldEnum)[keyof typeof ProductoScalarFieldEnum]
@@ -1224,6 +1450,47 @@ export const Instancia_productoScalarFieldEnum = {
 } as const
 
 export type Instancia_productoScalarFieldEnum = (typeof Instancia_productoScalarFieldEnum)[keyof typeof Instancia_productoScalarFieldEnum]
+
+
+export const EmpaqueScalarFieldEnum = {
+  id_empaque: 'id_empaque',
+  nombre_empaque: 'nombre_empaque'
+} as const
+
+export type EmpaqueScalarFieldEnum = (typeof EmpaqueScalarFieldEnum)[keyof typeof EmpaqueScalarFieldEnum]
+
+
+export const Apertura_cajaScalarFieldEnum = {
+  id_apertura: 'id_apertura',
+  id_usuario_apertura: 'id_usuario_apertura',
+  horario_apertura: 'horario_apertura',
+  horario_cierre: 'horario_cierre',
+  venta_boleta: 'venta_boleta',
+  venta_factura: 'venta_factura',
+  venta_debito: 'venta_debito',
+  venta_credito: 'venta_credito',
+  venta_efectivo: 'venta_efectivo',
+  total_debito: 'total_debito',
+  total_credito: 'total_credito',
+  total_efectivo: 'total_efectivo',
+  saldo_apertura: 'saldo_apertura',
+  saldo_cierre: 'saldo_cierre',
+  diferencia: 'diferencia',
+  saldo_esperado: 'saldo_esperado'
+} as const
+
+export type Apertura_cajaScalarFieldEnum = (typeof Apertura_cajaScalarFieldEnum)[keyof typeof Apertura_cajaScalarFieldEnum]
+
+
+export const Historia_cajaScalarFieldEnum = {
+  id_caja: 'id_caja',
+  fecha_registro: 'fecha_registro',
+  diferencia: 'diferencia',
+  saldo_apertura: 'saldo_apertura',
+  saldo_cierre: 'saldo_cierre'
+} as const
+
+export type Historia_cajaScalarFieldEnum = (typeof Historia_cajaScalarFieldEnum)[keyof typeof Historia_cajaScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -1471,6 +1738,9 @@ export type GlobalOmitConfig = {
   movimiento_de_stock?: Prisma.movimiento_de_stockOmit
   unidad_medida?: Prisma.unidad_medidaOmit
   instancia_producto?: Prisma.instancia_productoOmit
+  empaque?: Prisma.empaqueOmit
+  apertura_caja?: Prisma.apertura_cajaOmit
+  historia_caja?: Prisma.historia_cajaOmit
 }
 
 /* Types for Logging */

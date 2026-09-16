@@ -14,6 +14,7 @@ model User {
   contrasena          String
   roleid              String                @default(dbgenerated("'28ad34ff-cf2e-4851-a7e7-fffa5d5b53cd'::uuid")) @db.Uuid
   correo              String?               @unique @db.VarChar(255)
+  apertura_caja       apertura_caja[]
   movimiento_de_stock movimiento_de_stock[]
   role                Role                  @relation(fields: [roleid], references: [id], map: "fk_users_role")
 
@@ -66,9 +67,11 @@ model Producto {
   costo                                                Int                   @default(0)
   contenido                                            Int?
   unidad_medida                                        String?               @db.Uuid
+  empaque                                              String?               @db.Uuid
   instancia_producto                                   instancia_producto[]
   movimiento_de_stock                                  movimiento_de_stock[]
   categoria                                            Categoria             @relation(fields: [categoriaId], references: [id], map: "fk_productos_categoria")
+  empaque_productos_empaqueToempaque                   empaque?              @relation("productos_empaqueToempaque", fields: [empaque], references: [id_empaque], onDelete: Restrict, map: "fk_productos_empaque")
   marca                                                Marca                 @relation(fields: [marcaId], references: [id], map: "fk_productos_marca")
   unidad                                               Unidad                @relation(fields: [unidadId], references: [id], map: "fk_productos_unidad")
   unidad_medida_productos_unidad_medidaTounidad_medida unidad_medida?        @relation("productos_unidad_medidaTounidad_medida", fields: [unidad_medida], references: [id], onDelete: Restrict, map: "fk_productos_unidad_medida")
@@ -103,4 +106,43 @@ model instancia_producto {
   id_producto       String   @db.Uuid
   fecha_vencimiento DateTime @db.Timestamp(6)
   productos         Producto @relation(fields: [id_producto], references: [id], map: "fk_instancia_producto_producto")
+}
+
+model empaque {
+  id_empaque                           String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  nombre_empaque                       String     @unique @db.VarChar(100)
+  productos_productos_empaqueToempaque Producto[] @relation("productos_empaqueToempaque")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model apertura_caja {
+  id_apertura         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  id_usuario_apertura String    @db.Uuid
+  horario_apertura    DateTime  @default(now()) @db.Timestamp(6)
+  horario_cierre      DateTime? @db.Timestamp(6)
+  venta_boleta        Int       @default(0)
+  venta_factura       Int       @default(0)
+  venta_debito        Int       @default(0)
+  venta_credito       Int       @default(0)
+  venta_efectivo      Int       @default(0)
+  total_debito        Int       @default(0)
+  total_credito       Int       @default(0)
+  total_efectivo      Int       @default(0)
+  saldo_apertura      Int       @default(0)
+  saldo_cierre        Int?
+  diferencia          Int?
+  saldo_esperado      Int       @default(0)
+  venta_transferencia Int       @default(0)
+  total_transferencia Int       @default(0)
+  total               Int       @default(0)
+  users               User      @relation(fields: [id_usuario_apertura], references: [id], map: "fk_apertura_caja_usuario")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model historia_caja {
+  id_caja        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  fecha_registro DateTime @default(now()) @db.Timestamp(6)
+  diferencia     Int      @default(0)
+  saldo_apertura Int      @default(0)
+  saldo_cierre   Int      @default(0)
 }

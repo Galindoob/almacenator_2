@@ -17,6 +17,8 @@ type ProductPayload = {
   categoriaId?: string;
   categoriaNombre?: string;
   unidadId?: string;
+  empaque?: string | null;
+  empaqueNombre?: string;
   contenido?: number | null;
   unidad_medida?: string | null;
   precioVenta?: number;
@@ -161,6 +163,8 @@ function parseProductFormData(formData: FormData): {
       categoriaId: getFormString(formData, "categoriaId"),
       categoriaNombre: getFormString(formData, "categoriaNombre"),
       unidadId: getFormString(formData, "unidadId"),
+      empaque: getOptionalFormString(formData, "empaque"),
+      empaqueNombre: getFormString(formData, "empaqueNombre"),
       contenido: getFormNumber(formData, "contenido") ?? null,
       unidad_medida: getOptionalFormString(formData, "unidad_medida"),
       precioVenta: getFormNumber(formData, "precioVenta"),
@@ -264,9 +268,102 @@ async function deleteProductImage(imageUrl: string | null | undefined) {
   await cloudinary.uploader.destroy(publicId, { resource_type: "image" });
 }
 
+type ProductWithPackaging = {
+  id: string;
+  empaque: string | null;
+  empaque_productos_empaqueToempaque: { nombre_empaque: string } | null;
+};
+
+type PackagingOption = {
+  id: string;
+  id_empaque: string;
+  nombre_empaque: string;
+};
+
+async function getPackagingOptions() {
+  return prisma.$queryRaw<PackagingOption[]>`
+    SELECT
+      id_empaque::text AS id,
+      id_empaque::text AS id_empaque,
+      nombre_empaque
+    FROM empaque
+    ORDER BY nombre_empaque ASC
+  `;
+}
+
+async function attachPackagingToProducts<T extends { id: string }>(
+  products: T[],
+) {
+  if (products.length === 0) {
+    return [] as (T & ProductWithPackaging)[];
+  }
+
+  const productIds = products.map((product) => product.id);
+  const rows = await prisma.$queryRaw<
+    {
+      id: string;
+      empaque: string | null;
+      nombre_empaque: string | null;
+    }[]
+  >`
+    SELECT
+      p.id_productos::text AS id,
+      p.empaque::text AS empaque,
+      e.nombre_empaque
+    FROM productos p
+    LEFT JOIN empaque e ON e.id_empaque = p.empaque
+    WHERE p.id_productos = ANY(${productIds}::uuid[])
+  `;
+  const packagingByProduct = new Map(rows.map((row) => [row.id, row]));
+
+  return products.map((product) => {
+    const packaging = packagingByProduct.get(product.id);
+
+    return {
+      ...product,
+      empaque: packaging?.empaque ?? null,
+      empaque_productos_empaqueToempaque: packaging?.nombre_empaque
+        ? { nombre_empaque: packaging.nombre_empaque }
+        : null,
+    };
+  });
+}
+
+async function createPackaging(nombreEmpaque: string) {
+  const [createdPackaging] = await prisma.$queryRaw<{ id_empaque: string }[]>`
+    INSERT INTO empaque (nombre_empaque)
+    VALUES (${nombreEmpaque})
+    RETURNING id_empaque::text AS id_empaque
+  `;
+
+  return createdPackaging;
+}
+
+async function setProductPackaging(productId: string, packagingId: string | null) {
+  await prisma.$executeRaw`
+    UPDATE productos
+    SET empaque = ${packagingId}::uuid
+    WHERE id_productos = ${productId}::uuid
+  `;
+}
+
+async function getProductWithPackaging(productId: string) {
+  const product = await prisma.producto.findUnique({
+    where: { id: productId },
+    select: productSelect,
+  });
+
+  if (!product) {
+    return null;
+  }
+
+  const [productWithPackaging] = await attachPackagingToProducts([product]);
+  return productWithPackaging;
+}
+
 export const GET = withAuth(async () => {
   try {
-    const [productos, marcas, categorias, unidades, unidadesMedida] =
+    const [productos, marcas, categorias, unidades, unidadesMedida, empaques] =
       await Promise.all([
         prisma.producto.findMany({
           orderBy: { nombre: "asc" },
@@ -288,16 +385,19 @@ export const GET = withAuth(async () => {
           orderBy: { nombre: "asc" },
           select: { id: true, nombre: true },
         }),
+        getPackagingOptions(),
       ]);
+    const productsWithPackaging = await attachPackagingToProducts(productos);
 
     return NextResponse.json({
       status: "ok",
-      productos,
+      productos: productsWithPackaging,
       opciones: {
         marcas,
         categorias,
         unidades,
         unidadesMedida,
+        empaques,
       },
     });
   } catch (error) {
@@ -320,15 +420,18 @@ export const POST = withAuth(async (request) => {
     const product = parsed.product;
     const marcaNombre = product.marcaNombre?.trim();
     const categoriaNombre = product.categoriaNombre?.trim();
+    const empaqueNombre = product.empaqueNombre?.trim();
     const hasExistingMarca = Boolean(product.marcaId && product.marcaId !== "new");
     const hasExistingCategoria = Boolean(
       product.categoriaId && product.categoriaId !== "new",
     );
+    const hasExistingEmpaque = Boolean(product.empaque && product.empaque !== "new");
 
     if (
       !product.nombre ||
       (!hasExistingMarca && !marcaNombre) ||
       (!hasExistingCategoria && !categoriaNombre) ||
+      (!hasExistingEmpaque && !empaqueNombre) ||
       !product.unidadId ||
       typeof product.precioVenta !== "number"
     ) {
@@ -395,15 +498,42 @@ export const POST = withAuth(async (request) => {
       product.categoriaId = undefined;
     }
 
+    if (empaqueNombre) {
+      const empaques = await getPackagingOptions();
+      const duplicatedEmpaque = empaques.find(
+        (empaque) =>
+          normalizeName(empaque.nombre_empaque) === normalizeName(empaqueNombre),
+      );
+
+      if (duplicatedEmpaque) {
+        return NextResponse.json(
+          { status: "error", message: "El empaque ingresado ya existe." },
+          { status: 409 },
+        );
+      }
+
+      const empaque = await createPackaging(empaqueNombre);
+      product.empaque = empaque.id_empaque;
+    }
+
+    if (product.empaque === "new") {
+      product.empaque = undefined;
+    }
+
     const imageUrl = await uploadProductImage(parsed.imageFile);
     if (imageUrl) {
       product.urlImagen = imageUrl;
     }
 
-    const createdProduct = await prisma.producto.create({
+    const createdProductBase = await prisma.producto.create({
       data: buildProductCreateData(product),
       select: productSelect,
     });
+    if (product.empaque) {
+      await setProductPackaging(createdProductBase.id, product.empaque);
+    }
+    const createdProduct =
+      (await getProductWithPackaging(createdProductBase.id)) ?? createdProductBase;
 
     return NextResponse.json({ status: "ok", producto: createdProduct });
   } catch (error) {
@@ -455,11 +585,14 @@ export const PUT = withAuth(async (request) => {
       product.urlImagen = null;
     }
 
-    const updatedProduct = await prisma.producto.update({
+    const updatedProductBase = await prisma.producto.update({
       where: { id: product.id },
       data: buildProductUpdateData(product),
       select: productSelect,
     });
+    await setProductPackaging(updatedProductBase.id, product.empaque ?? null);
+    const updatedProduct =
+      (await getProductWithPackaging(updatedProductBase.id)) ?? updatedProductBase;
 
     if (shouldClearImage && currentProduct?.urlImagen) {
       try {

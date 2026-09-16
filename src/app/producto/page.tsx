@@ -12,6 +12,7 @@ type Producto = {
   codigoBarra: string | null;
   categoriaId: string;
   unidadId: string;
+  empaque: string | null;
   contenido: number | null;
   unidad_medida: string | null;
   stock: number;
@@ -27,6 +28,9 @@ type Producto = {
   categoria: {
     nombreCategoria: string;
   };
+  empaque_productos_empaqueToempaque: {
+    nombre_empaque: string;
+  } | null;
   unidad_medida_productos_unidad_medidaTounidad_medida: {
     nombre: string;
   } | null;
@@ -44,6 +48,8 @@ type Option = {
   nombre?: string;
   nombreCategoria?: string;
   unidad?: string;
+  id_empaque?: string;
+  nombre_empaque?: string;
 };
 
 type ProductOptions = {
@@ -51,6 +57,7 @@ type ProductOptions = {
   categorias: Option[];
   unidades: Option[];
   unidadesMedida: Option[];
+  empaques: Option[];
 };
 
 type CreateProductForm = {
@@ -62,6 +69,8 @@ type CreateProductForm = {
   categoriaId: string;
   categoriaNombre: string;
   unidadId: string;
+  empaqueId: string;
+  empaqueNombre: string;
   contenido: string;
   unidadMedidaId: string;
   precioVenta: string;
@@ -75,6 +84,7 @@ type EditProductForm = {
   codigoBarra: string;
   categoriaId: string;
   unidadId: string;
+  empaqueId: string;
   contenido: string;
   unidadMedidaId: string;
 };
@@ -101,6 +111,13 @@ type StockMovement = {
     nombre: string;
     apellido: string;
   };
+};
+
+type PendingLotDeletion = {
+  productId: string;
+  productName: string;
+  expirationDate: string;
+  quantity: number;
 };
 
 function roundCurrency(value: number) {
@@ -253,6 +270,11 @@ function isCloseToExpiration(expirationDate: string) {
   return diffDays !== null && diffDays > 0 && diffDays <= 5;
 }
 
+function isExpiredOrToday(expirationDate: string) {
+  const diffDays = getExpirationDiffDays(expirationDate);
+  return diffDays !== null && diffDays <= 0;
+}
+
 function buildEditForm(producto: Producto): EditProductForm {
   return {
     nombre: producto.nombre,
@@ -261,6 +283,7 @@ function buildEditForm(producto: Producto): EditProductForm {
     codigoBarra: producto.codigoBarra ?? "",
     categoriaId: producto.categoriaId,
     unidadId: producto.unidadId,
+    empaqueId: producto.empaque ?? "",
     contenido: producto.contenido ? String(producto.contenido) : "",
     unidadMedidaId: producto.unidad_medida ?? "",
   };
@@ -275,6 +298,8 @@ const initialCreateForm: CreateProductForm = {
   categoriaId: "",
   categoriaNombre: "",
   unidadId: "",
+  empaqueId: "",
+  empaqueNombre: "",
   contenido: "",
   unidadMedidaId: "",
   precioVenta: "",
@@ -302,11 +327,16 @@ export default function ProductoPage() {
   const [openExpiringProductId, setOpenExpiringProductId] = useState<string | null>(
     null,
   );
+  const [pendingLotDeletion, setPendingLotDeletion] =
+    useState<PendingLotDeletion | null>(null);
+  const [isDeletingLot, setIsDeletingLot] = useState(false);
+  const [deleteLotMessage, setDeleteLotMessage] = useState("");
   const [options, setOptions] = useState<ProductOptions>({
     marcas: [],
     categorias: [],
     unidades: [],
     unidadesMedida: [],
+    empaques: [],
   });
   const [search, setSearch] = useState("");
   const [isLoading, setIsLoading] = useState(true);
@@ -449,6 +479,8 @@ export default function ProductoPage() {
   function changeProductTab(tab: "productos" | "promociones" | "vencimiento") {
     setActiveProductTab(tab);
     closeStockModal();
+    setPendingLotDeletion(null);
+    setDeleteLotMessage("");
 
     if (tab === "vencimiento") {
       setSelectedProductId(null);
@@ -686,8 +718,12 @@ export default function ProductoPage() {
     const needsMeasure = selectedUnit?.unidad?.toLowerCase() === "por unidad";
     const usesNewBrand = createForm.marcaId === "new";
     const usesNewCategory = createForm.categoriaId === "new";
+    const usesNewPackaging = createForm.empaqueId === "new";
     const normalizedBrandName = createForm.marcaNombre.trim().toLocaleLowerCase("es-CL");
     const normalizedCategoryName = createForm.categoriaNombre
+      .trim()
+      .toLocaleLowerCase("es-CL");
+    const normalizedPackagingName = createForm.empaqueNombre
       .trim()
       .toLocaleLowerCase("es-CL");
     const brandAlreadyExists = options.marcas.some(
@@ -698,6 +734,11 @@ export default function ProductoPage() {
         categoria.nombreCategoria?.trim().toLocaleLowerCase("es-CL") ===
         normalizedCategoryName,
     );
+    const packagingAlreadyExists = options.empaques.some(
+      (empaque) =>
+        empaque.nombre_empaque?.trim().toLocaleLowerCase("es-CL") ===
+        normalizedPackagingName,
+    );
 
     setCreateSubmitted(true);
 
@@ -706,6 +747,8 @@ export default function ProductoPage() {
       (!createForm.marcaId || (usesNewBrand && !createForm.marcaNombre.trim())) ||
       (!createForm.categoriaId ||
         (usesNewCategory && !createForm.categoriaNombre.trim())) ||
+      (!createForm.empaqueId ||
+        (usesNewPackaging && !createForm.empaqueNombre.trim())) ||
       !createForm.unidadId ||
       !isPositiveIntegerText(createForm.precioVenta) ||
       !isPositiveIntegerText(createForm.costo) ||
@@ -726,6 +769,12 @@ export default function ProductoPage() {
 
     if (usesNewCategory && categoryAlreadyExists) {
       setCreateMessage("La categoria ingresada ya existe. Seleccionala desde la lista.");
+      setCreateMessageType("error");
+      return;
+    }
+
+    if (usesNewPackaging && packagingAlreadyExists) {
+      setCreateMessage("El empaque ingresado ya existe. Seleccionalo desde la lista.");
       setCreateMessageType("error");
       return;
     }
@@ -754,6 +803,11 @@ export default function ProductoPage() {
         formData.append("categoriaNombre", createForm.categoriaNombre.trim());
       } else {
         formData.append("categoriaId", createForm.categoriaId);
+      }
+      if (usesNewPackaging) {
+        formData.append("empaqueNombre", createForm.empaqueNombre.trim());
+      } else {
+        formData.append("empaque", createForm.empaqueId);
       }
       formData.append("unidadId", createForm.unidadId);
       if (needsMeasure) {
@@ -824,6 +878,23 @@ export default function ProductoPage() {
             ),
         }));
       }
+      if (usesNewPackaging) {
+        setOptions((current) => ({
+          ...current,
+          empaques: [
+            ...current.empaques,
+            {
+              id: data.producto?.empaque ?? "",
+              id_empaque: data.producto?.empaque ?? "",
+              nombre_empaque: createForm.empaqueNombre.trim(),
+            },
+          ]
+            .filter((empaque) => empaque.id_empaque)
+            .sort((a, b) =>
+              (a.nombre_empaque ?? "").localeCompare(b.nombre_empaque ?? ""),
+            ),
+        }));
+      }
       setCreateForm(initialCreateForm);
       setCreateImage(null);
       setCreateMessage("Producto creado correctamente.");
@@ -862,6 +933,7 @@ export default function ProductoPage() {
       !editForm.nombre.trim() ||
       !editForm.marcaId ||
       !editForm.categoriaId ||
+      !editForm.empaqueId ||
       !editForm.unidadId ||
       (needsMeasure &&
         (!isPositiveIntegerText(editForm.contenido) || !editForm.unidadMedidaId))
@@ -888,6 +960,7 @@ export default function ProductoPage() {
       formData.append("marcaId", editForm.marcaId);
       formData.append("codigoBarra", editForm.codigoBarra.trim());
       formData.append("categoriaId", editForm.categoriaId);
+      formData.append("empaque", editForm.empaqueId);
       formData.append("unidadId", editForm.unidadId);
       if (needsMeasure) {
         formData.append("contenido", editForm.contenido);
@@ -1083,6 +1156,67 @@ export default function ProductoPage() {
     }
   }
 
+  async function deleteExpiredLot() {
+    if (!pendingLotDeletion) {
+      return;
+    }
+
+    const token = localStorage.getItem("jwt");
+
+    if (!token) {
+      router.replace("/login");
+      return;
+    }
+
+    setIsDeletingLot(true);
+    setDeleteLotMessage("");
+
+    try {
+      const response = await fetch("/api/producto-vencimiento", {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          productoId: pendingLotDeletion.productId,
+          fecha_vencimiento: pendingLotDeletion.expirationDate,
+        }),
+      });
+      const data = (await response.json()) as {
+        status?: "ok" | "error";
+        message?: string;
+        producto?: { id: string; stock: number };
+        deletedCount?: number;
+      };
+
+      if (!response.ok || data.status !== "ok" || !data.producto) {
+        if (response.status === 401) {
+          localStorage.removeItem("jwt");
+          router.replace("/login");
+          return;
+        }
+
+        setDeleteLotMessage(data.message ?? "No se pudo eliminar el lote.");
+        return;
+      }
+
+      setProductos((current) =>
+        current.map((producto) =>
+          producto.id === data.producto?.id
+            ? { ...producto, stock: data.producto.stock }
+            : producto,
+        ),
+      );
+      await loadExpiringProducts();
+      setPendingLotDeletion(null);
+    } catch {
+      setDeleteLotMessage("No se pudo conectar con el servidor.");
+    } finally {
+      setIsDeletingLot(false);
+    }
+  }
+
   async function loadMovements(productId: string) {
     const token = localStorage.getItem("jwt");
 
@@ -1203,6 +1337,7 @@ export default function ProductoPage() {
                   current === productId ? null : productId,
                 )
               }
+              onRequestDeleteLot={setPendingLotDeletion}
             />
           ) : null}
 
@@ -1251,6 +1386,11 @@ export default function ProductoPage() {
                             <span>{getProductContentLabel(producto)}</span>
                             <span>Tipo de venta: {producto.unidad.unidad}</span>
                             <span>Categoria: {producto.categoria.nombreCategoria}</span>
+                            <span>
+                              Tipo de empaque:{" "}
+                              {producto.empaque_productos_empaqueToempaque
+                                ?.nombre_empaque ?? "Sin empaque"}
+                            </span>
                           </div>
                         </div>
                       </td>
@@ -1358,6 +1498,21 @@ export default function ProductoPage() {
           onSave={saveEditedProduct}
         />
       ) : null}
+
+      {pendingLotDeletion ? (
+        <DeleteExpiredLotModal
+          lot={pendingLotDeletion}
+          message={deleteLotMessage}
+          isDeleting={isDeletingLot}
+          onClose={() => {
+            if (!isDeletingLot) {
+              setPendingLotDeletion(null);
+              setDeleteLotMessage("");
+            }
+          }}
+          onConfirm={deleteExpiredLot}
+        />
+      ) : null}
     </main>
   );
 }
@@ -1368,6 +1523,7 @@ type ExpiringProductsTableProps = {
   error: string;
   openProductId: string | null;
   onToggleProduct: (productId: string) => void;
+  onRequestDeleteLot: (lot: PendingLotDeletion) => void;
 };
 
 function ExpiringProductsTable({
@@ -1376,6 +1532,7 @@ function ExpiringProductsTable({
   error,
   openProductId,
   onToggleProduct,
+  onRequestDeleteLot,
 }: ExpiringProductsTableProps) {
   if (isLoading) {
     return <p className="product-empty">Cargando productos por vencer...</p>;
@@ -1437,6 +1594,11 @@ function ExpiringProductsTable({
                         <span>{getProductContentLabel(producto)}</span>
                         <span>Tipo de venta: {producto.unidad.unidad}</span>
                         <span>Categoria: {producto.categoria.nombreCategoria}</span>
+                        <span>
+                          Tipo de empaque:{" "}
+                          {producto.empaque_productos_empaqueToempaque
+                            ?.nombre_empaque ?? "Sin empaque"}
+                        </span>
                       </div>
                     </div>
                   </td>
@@ -1449,6 +1611,9 @@ function ExpiringProductsTable({
                         {producto.lotes.length > 0 ? (
                           producto.lotes.map((lote, index) => {
                             const isCloseLot = isCloseToExpiration(
+                              lote.fecha_vencimiento,
+                            );
+                            const canDeleteLot = isExpiredOrToday(
                               lote.fecha_vencimiento,
                             );
 
@@ -1476,6 +1641,25 @@ function ExpiringProductsTable({
                                     lote.fecha_vencimiento,
                                   ).toLocaleDateString("es-CL")}
                                 </span>
+                                {canDeleteLot ? (
+                                  <button
+                                    className="expired-lot-delete-button"
+                                    type="button"
+                                    aria-label={`Eliminar lote ${index + 1}`}
+                                    title="Eliminar lote vencido"
+                                    onClick={(event) => {
+                                      event.stopPropagation();
+                                      onRequestDeleteLot({
+                                        productId: producto.id,
+                                        productName: producto.nombre,
+                                        expirationDate: lote.fecha_vencimiento,
+                                        quantity: lote.cantidad,
+                                      });
+                                    }}
+                                  >
+                                    x
+                                  </button>
+                                ) : null}
                               </div>
                             );
                           })
@@ -1498,6 +1682,155 @@ function ExpiringProductsTable({
           ) : null}
         </tbody>
       </table>
+    </div>
+  );
+}
+
+type DeleteExpiredLotModalProps = {
+  lot: PendingLotDeletion;
+  message: string;
+  isDeleting: boolean;
+  onClose: () => void;
+  onConfirm: () => void;
+};
+
+function DeleteExpiredLotModal({
+  lot,
+  message,
+  isDeleting,
+  onClose,
+  onConfirm,
+}: DeleteExpiredLotModalProps) {
+  return (
+    <div className="stock-modal-layer" role="presentation">
+      <button
+        className="stock-modal-backdrop"
+        type="button"
+        aria-label="Cerrar confirmación"
+        onClick={onClose}
+        disabled={isDeleting}
+      />
+
+      <section
+        className="stock-modal delete-expired-lot-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="delete-expired-lot-title"
+      >
+        <h2 id="delete-expired-lot-title">Eliminar lote vencido</h2>
+        <p>
+          ¿Estas seguro de eliminar este lote de {lot.productName}? Se eliminaran{" "}
+          {lot.quantity} producto{lot.quantity === 1 ? "" : "s"} del lote y se
+          descontaran del stock.
+        </p>
+        <p className="delete-expired-lot-date">
+          Fecha de vencimiento:{" "}
+          {new Date(lot.expirationDate).toLocaleDateString("es-CL")}
+        </p>
+        {message ? <p className="stock-modal-message">{message}</p> : null}
+        <div className="stock-modal-actions">
+          <button type="button" onClick={onClose} disabled={isDeleting}>
+            Cancelar
+          </button>
+          <button type="button" onClick={onConfirm} disabled={isDeleting}>
+            {isDeleting ? "Eliminando..." : "Eliminar lote"}
+          </button>
+        </div>
+      </section>
+    </div>
+  );
+}
+
+type SearchableSelectOption = {
+  value: string;
+  label: string;
+};
+
+type SearchableSelectProps = {
+  value: string;
+  placeholder: string;
+  searchPlaceholder: string;
+  options: SearchableSelectOption[];
+  onChange: (value: string) => void;
+};
+
+function SearchableSelect({
+  value,
+  placeholder,
+  searchPlaceholder,
+  options,
+  onChange,
+}: SearchableSelectProps) {
+  const [isOpen, setIsOpen] = useState(false);
+  const [query, setQuery] = useState("");
+  const selectedOption = options.find((option) => option.value === value);
+  const filteredOptions = options.filter((option) =>
+    option.label.toLocaleLowerCase("es-CL").includes(
+      query.trim().toLocaleLowerCase("es-CL"),
+    ),
+  );
+
+  return (
+    <div
+      className="searchable-select"
+      onBlur={(event) => {
+        const nextFocusedElement = event.relatedTarget;
+
+        if (
+          nextFocusedElement instanceof Node &&
+          event.currentTarget.contains(nextFocusedElement)
+        ) {
+          return;
+        }
+
+        setIsOpen(false);
+      }}
+    >
+      <button
+        type="button"
+        className="searchable-select-control"
+        aria-expanded={isOpen}
+        onClick={() => {
+          setIsOpen((current) => !current);
+          setQuery("");
+        }}
+      >
+        <span>{selectedOption?.label ?? placeholder}</span>
+        <span aria-hidden="true">v</span>
+      </button>
+
+      {isOpen ? (
+        <div className="searchable-select-menu">
+          <input
+            type="search"
+            value={query}
+            placeholder={searchPlaceholder}
+            onChange={(event) => setQuery(event.target.value)}
+            onMouseDown={(event) => event.stopPropagation()}
+          />
+          <div className="searchable-select-options">
+            {filteredOptions.length > 0 ? (
+              filteredOptions.map((option) => (
+                <button
+                  type="button"
+                  key={option.value}
+                  className={option.value === value ? "is-selected" : ""}
+                  onMouseDown={(event) => event.preventDefault()}
+                  onClick={() => {
+                    onChange(option.value);
+                    setQuery("");
+                    setIsOpen(false);
+                  }}
+                >
+                  {option.label}
+                </button>
+              ))
+            ) : (
+              <p>Sin opciones</p>
+            )}
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }
@@ -1534,6 +1867,7 @@ function ProductCreatePanel({
   const needsMeasure = selectedUnit?.unidad?.toLowerCase() === "por unidad";
   const usesNewBrand = form.marcaId === "new";
   const usesNewCategory = form.categoriaId === "new";
+  const usesNewPackaging = form.empaqueId === "new";
   const isMissing = (field: keyof CreateProductForm) => {
     if (!submitted) {
       return false;
@@ -1545,6 +1879,10 @@ function ProductCreatePanel({
 
     if (field === "categoriaNombre") {
       return usesNewCategory && !form.categoriaNombre.trim();
+    }
+
+    if (field === "empaqueNombre") {
+      return usesNewPackaging && !form.empaqueNombre.trim();
     }
 
     if (field === "contenido") {
@@ -1588,18 +1926,19 @@ function ProductCreatePanel({
 
         <label className={isMissing("marcaId") ? "is-invalid" : ""}>
           Marca <span className="required-mark">*</span>
-          <select
+          <SearchableSelect
             value={form.marcaId}
-            onChange={(event) => onChange("marcaId", event.target.value)}
-          >
-            <option value="">Selecciona una marca</option>
-            {options.marcas.map((marca) => (
-              <option key={marca.id} value={marca.id}>
-                {marca.nombre}
-              </option>
-            ))}
-            <option value="new">Agregar marca</option>
-          </select>
+            placeholder="Selecciona una marca"
+            searchPlaceholder="Buscar marca"
+            options={[
+              ...options.marcas.map((marca) => ({
+                value: marca.id,
+                label: marca.nombre ?? "",
+              })),
+              { value: "new", label: "Agregar marca" },
+            ]}
+            onChange={(nextValue) => onChange("marcaId", nextValue)}
+          />
         </label>
 
         {usesNewBrand ? (
@@ -1636,18 +1975,19 @@ function ProductCreatePanel({
 
         <label className={isMissing("categoriaId") ? "is-invalid" : ""}>
           Categoria <span className="required-mark">*</span>
-          <select
+          <SearchableSelect
             value={form.categoriaId}
-            onChange={(event) => onChange("categoriaId", event.target.value)}
-          >
-            <option value="">Selecciona una categoria</option>
-            {options.categorias.map((categoria) => (
-              <option key={categoria.id} value={categoria.id}>
-                {categoria.nombreCategoria}
-              </option>
-            ))}
-            <option value="new">Agregar categoria</option>
-          </select>
+            placeholder="Selecciona una categoria"
+            searchPlaceholder="Buscar categoria"
+            options={[
+              ...options.categorias.map((categoria) => ({
+                value: categoria.id,
+                label: categoria.nombreCategoria ?? "",
+              })),
+              { value: "new", label: "Agregar categoria" },
+            ]}
+            onChange={(nextValue) => onChange("categoriaId", nextValue)}
+          />
         </label>
 
         {usesNewCategory ? (
@@ -1661,36 +2001,62 @@ function ProductCreatePanel({
           </label>
         ) : null}
 
+        <label className={isMissing("empaqueId") ? "is-invalid" : ""}>
+          Tipo de empaque <span className="required-mark">*</span>
+          <SearchableSelect
+            value={form.empaqueId}
+            placeholder="Selecciona un empaque"
+            searchPlaceholder="Buscar empaque"
+            options={[
+              ...options.empaques.map((empaque) => ({
+                value: empaque.id_empaque ?? empaque.id,
+                label: empaque.nombre_empaque ?? "",
+              })),
+              { value: "new", label: "Agregar empaque" },
+            ]}
+            onChange={(nextValue) => onChange("empaqueId", nextValue)}
+          />
+        </label>
+
+        {usesNewPackaging ? (
+          <label className={isMissing("empaqueNombre") ? "is-invalid" : ""}>
+            Nombre de empaque <span className="required-mark">*</span>
+            <input
+              type="text"
+              value={form.empaqueNombre}
+              onChange={(event) => onChange("empaqueNombre", event.target.value)}
+            />
+          </label>
+        ) : null}
+
         <label className={isMissing("unidadId") ? "is-invalid" : ""}>
           Como se vende? <span className="required-mark">*</span>
-          <select
+          <SearchableSelect
             value={form.unidadId}
-            onChange={(event) => onChange("unidadId", event.target.value)}
-          >
-            <option value="">Selecciona una opcion</option>
-            {options.unidades.map((unidad) => (
-              <option key={unidad.id} value={unidad.id}>
-                {unidad.unidad}
-              </option>
-            ))}
-          </select>
+            placeholder="Selecciona una opcion"
+            searchPlaceholder="Buscar opcion"
+            options={options.unidades.map((unidad) => ({
+              value: unidad.id,
+              label: unidad.unidad ?? "",
+            }))}
+            onChange={(nextValue) => onChange("unidadId", nextValue)}
+          />
         </label>
 
         {needsMeasure ? (
           <>
             <label className={isMissing("unidadMedidaId") ? "is-invalid" : ""}>
               Unidad de medida <span className="required-mark">*</span>
-              <select
+              <SearchableSelect
                 value={form.unidadMedidaId}
-                onChange={(event) => onChange("unidadMedidaId", event.target.value)}
-              >
-                <option value="">Selecciona una unidad</option>
-                {options.unidadesMedida.map((unidadMedida) => (
-                  <option key={unidadMedida.id} value={unidadMedida.id}>
-                    {unidadMedida.nombre}
-                  </option>
-                ))}
-              </select>
+                placeholder="Selecciona una unidad"
+                searchPlaceholder="Buscar unidad"
+                options={options.unidadesMedida.map((unidadMedida) => ({
+                  value: unidadMedida.id,
+                  label: unidadMedida.nombre ?? "",
+                }))}
+                onChange={(nextValue) => onChange("unidadMedidaId", nextValue)}
+              />
             </label>
 
             <label className={isMissing("contenido") ? "is-invalid" : ""}>
@@ -1853,17 +2219,16 @@ function ProductEditModal({
 
           <label className={isMissing("marcaId") ? "is-invalid" : ""}>
             Marca <span className="required-mark">*</span>
-            <select
+            <SearchableSelect
               value={form.marcaId}
-              onChange={(event) => onChange("marcaId", event.target.value)}
-            >
-              <option value="">Selecciona una marca</option>
-              {options.marcas.map((marca) => (
-                <option key={marca.id} value={marca.id}>
-                  {marca.nombre}
-                </option>
-              ))}
-            </select>
+              placeholder="Selecciona una marca"
+              searchPlaceholder="Buscar marca"
+              options={options.marcas.map((marca) => ({
+                value: marca.id,
+                label: marca.nombre ?? "",
+              }))}
+              onChange={(nextValue) => onChange("marcaId", nextValue)}
+            />
           </label>
 
           <label>
@@ -1904,51 +2269,60 @@ function ProductEditModal({
 
           <label className={isMissing("categoriaId") ? "is-invalid" : ""}>
             Categoria <span className="required-mark">*</span>
-            <select
+            <SearchableSelect
               value={form.categoriaId}
-              onChange={(event) => onChange("categoriaId", event.target.value)}
-            >
-              <option value="">Selecciona una categoria</option>
-              {options.categorias.map((categoria) => (
-                <option key={categoria.id} value={categoria.id}>
-                  {categoria.nombreCategoria}
-                </option>
-              ))}
-            </select>
+              placeholder="Selecciona una categoria"
+              searchPlaceholder="Buscar categoria"
+              options={options.categorias.map((categoria) => ({
+                value: categoria.id,
+                label: categoria.nombreCategoria ?? "",
+              }))}
+              onChange={(nextValue) => onChange("categoriaId", nextValue)}
+            />
+          </label>
+
+          <label className={isMissing("empaqueId") ? "is-invalid" : ""}>
+            Tipo de empaque <span className="required-mark">*</span>
+            <SearchableSelect
+              value={form.empaqueId}
+              placeholder="Selecciona un empaque"
+              searchPlaceholder="Buscar empaque"
+              options={options.empaques.map((empaque) => ({
+                value: empaque.id_empaque ?? empaque.id,
+                label: empaque.nombre_empaque ?? "",
+              }))}
+              onChange={(nextValue) => onChange("empaqueId", nextValue)}
+            />
           </label>
 
           <label className={isMissing("unidadId") ? "is-invalid" : ""}>
             Como se vende? <span className="required-mark">*</span>
-            <select
+            <SearchableSelect
               value={form.unidadId}
-              onChange={(event) => onChange("unidadId", event.target.value)}
-            >
-              <option value="">Selecciona una opcion</option>
-              {options.unidades.map((unidad) => (
-                <option key={unidad.id} value={unidad.id}>
-                  {unidad.unidad}
-                </option>
-              ))}
-            </select>
+              placeholder="Selecciona una opcion"
+              searchPlaceholder="Buscar opcion"
+              options={options.unidades.map((unidad) => ({
+                value: unidad.id,
+                label: unidad.unidad ?? "",
+              }))}
+              onChange={(nextValue) => onChange("unidadId", nextValue)}
+            />
           </label>
 
           {needsMeasure ? (
             <>
               <label className={isMissing("unidadMedidaId") ? "is-invalid" : ""}>
                 Unidad de medida <span className="required-mark">*</span>
-                <select
+                <SearchableSelect
                   value={form.unidadMedidaId}
-                  onChange={(event) =>
-                    onChange("unidadMedidaId", event.target.value)
-                  }
-                >
-                  <option value="">Selecciona una unidad</option>
-                  {options.unidadesMedida.map((unidadMedida) => (
-                    <option key={unidadMedida.id} value={unidadMedida.id}>
-                      {unidadMedida.nombre}
-                    </option>
-                  ))}
-                </select>
+                  placeholder="Selecciona una unidad"
+                  searchPlaceholder="Buscar unidad"
+                  options={options.unidadesMedida.map((unidadMedida) => ({
+                    value: unidadMedida.id,
+                    label: unidadMedida.nombre ?? "",
+                  }))}
+                  onChange={(nextValue) => onChange("unidadMedidaId", nextValue)}
+                />
               </label>
 
               <label className={isMissing("contenido") ? "is-invalid" : ""}>
@@ -2062,6 +2436,11 @@ function ProductDetail({
           <p>{product.descripcion || "Sin descripcion"}</p>
           <span>Marca: {product.marca.nombre}</span>
           <span>Categoria: {product.categoria.nombreCategoria}</span>
+          <span>
+            Tipo de empaque:{" "}
+            {product.empaque_productos_empaqueToempaque?.nombre_empaque ??
+              "Sin empaque"}
+          </span>
           <span>Tipo de venta: {product.unidad.unidad}</span>
         </div>
       </div>

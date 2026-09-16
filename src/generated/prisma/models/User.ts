@@ -190,6 +190,7 @@ export type UserWhereInput = {
   contrasena?: Prisma.StringFilter<"User"> | string
   roleid?: Prisma.UuidFilter<"User"> | string
   correo?: Prisma.StringNullableFilter<"User"> | string | null
+  apertura_caja?: Prisma.Apertura_cajaListRelationFilter
   movimiento_de_stock?: Prisma.Movimiento_de_stockListRelationFilter
   role?: Prisma.XOR<Prisma.RoleScalarRelationFilter, Prisma.RoleWhereInput>
 }
@@ -201,6 +202,7 @@ export type UserOrderByWithRelationInput = {
   contrasena?: Prisma.SortOrder
   roleid?: Prisma.SortOrder
   correo?: Prisma.SortOrderInput | Prisma.SortOrder
+  apertura_caja?: Prisma.apertura_cajaOrderByRelationAggregateInput
   movimiento_de_stock?: Prisma.movimiento_de_stockOrderByRelationAggregateInput
   role?: Prisma.RoleOrderByWithRelationInput
 }
@@ -215,6 +217,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   apellido?: Prisma.StringFilter<"User"> | string
   contrasena?: Prisma.StringFilter<"User"> | string
   roleid?: Prisma.UuidFilter<"User"> | string
+  apertura_caja?: Prisma.Apertura_cajaListRelationFilter
   movimiento_de_stock?: Prisma.Movimiento_de_stockListRelationFilter
   role?: Prisma.XOR<Prisma.RoleScalarRelationFilter, Prisma.RoleWhereInput>
 }, "id" | "correo">
@@ -249,6 +252,7 @@ export type UserCreateInput = {
   apellido: string
   contrasena: string
   correo?: string | null
+  apertura_caja?: Prisma.apertura_cajaCreateNestedManyWithoutUsersInput
   movimiento_de_stock?: Prisma.movimiento_de_stockCreateNestedManyWithoutUsersInput
   role?: Prisma.RoleCreateNestedOneWithoutUsersInput
 }
@@ -260,6 +264,7 @@ export type UserUncheckedCreateInput = {
   contrasena: string
   roleid?: string
   correo?: string | null
+  apertura_caja?: Prisma.apertura_cajaUncheckedCreateNestedManyWithoutUsersInput
   movimiento_de_stock?: Prisma.movimiento_de_stockUncheckedCreateNestedManyWithoutUsersInput
 }
 
@@ -269,6 +274,7 @@ export type UserUpdateInput = {
   apellido?: Prisma.StringFieldUpdateOperationsInput | string
   contrasena?: Prisma.StringFieldUpdateOperationsInput | string
   correo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  apertura_caja?: Prisma.apertura_cajaUpdateManyWithoutUsersNestedInput
   movimiento_de_stock?: Prisma.movimiento_de_stockUpdateManyWithoutUsersNestedInput
   role?: Prisma.RoleUpdateOneRequiredWithoutUsersNestedInput
 }
@@ -280,6 +286,7 @@ export type UserUncheckedUpdateInput = {
   contrasena?: Prisma.StringFieldUpdateOperationsInput | string
   roleid?: Prisma.StringFieldUpdateOperationsInput | string
   correo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  apertura_caja?: Prisma.apertura_cajaUncheckedUpdateManyWithoutUsersNestedInput
   movimiento_de_stock?: Prisma.movimiento_de_stockUncheckedUpdateManyWithoutUsersNestedInput
 }
 
@@ -415,12 +422,27 @@ export type UserUpdateOneRequiredWithoutMovimiento_de_stockNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutMovimiento_de_stockInput, Prisma.UserUpdateWithoutMovimiento_de_stockInput>, Prisma.UserUncheckedUpdateWithoutMovimiento_de_stockInput>
 }
 
+export type UserCreateNestedOneWithoutApertura_cajaInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutApertura_cajaInput, Prisma.UserUncheckedCreateWithoutApertura_cajaInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutApertura_cajaInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutApertura_cajaNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutApertura_cajaInput, Prisma.UserUncheckedCreateWithoutApertura_cajaInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutApertura_cajaInput
+  upsert?: Prisma.UserUpsertWithoutApertura_cajaInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutApertura_cajaInput, Prisma.UserUpdateWithoutApertura_cajaInput>, Prisma.UserUncheckedUpdateWithoutApertura_cajaInput>
+}
+
 export type UserCreateWithoutRoleInput = {
   id?: string
   nombre: string
   apellido: string
   contrasena: string
   correo?: string | null
+  apertura_caja?: Prisma.apertura_cajaCreateNestedManyWithoutUsersInput
   movimiento_de_stock?: Prisma.movimiento_de_stockCreateNestedManyWithoutUsersInput
 }
 
@@ -430,6 +452,7 @@ export type UserUncheckedCreateWithoutRoleInput = {
   apellido: string
   contrasena: string
   correo?: string | null
+  apertura_caja?: Prisma.apertura_cajaUncheckedCreateNestedManyWithoutUsersInput
   movimiento_de_stock?: Prisma.movimiento_de_stockUncheckedCreateNestedManyWithoutUsersInput
 }
 
@@ -477,6 +500,7 @@ export type UserCreateWithoutMovimiento_de_stockInput = {
   apellido: string
   contrasena: string
   correo?: string | null
+  apertura_caja?: Prisma.apertura_cajaCreateNestedManyWithoutUsersInput
   role?: Prisma.RoleCreateNestedOneWithoutUsersInput
 }
 
@@ -487,6 +511,7 @@ export type UserUncheckedCreateWithoutMovimiento_de_stockInput = {
   contrasena: string
   roleid?: string
   correo?: string | null
+  apertura_caja?: Prisma.apertura_cajaUncheckedCreateNestedManyWithoutUsersInput
 }
 
 export type UserCreateOrConnectWithoutMovimiento_de_stockInput = {
@@ -511,6 +536,7 @@ export type UserUpdateWithoutMovimiento_de_stockInput = {
   apellido?: Prisma.StringFieldUpdateOperationsInput | string
   contrasena?: Prisma.StringFieldUpdateOperationsInput | string
   correo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  apertura_caja?: Prisma.apertura_cajaUpdateManyWithoutUsersNestedInput
   role?: Prisma.RoleUpdateOneRequiredWithoutUsersNestedInput
 }
 
@@ -521,6 +547,63 @@ export type UserUncheckedUpdateWithoutMovimiento_de_stockInput = {
   contrasena?: Prisma.StringFieldUpdateOperationsInput | string
   roleid?: Prisma.StringFieldUpdateOperationsInput | string
   correo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  apertura_caja?: Prisma.apertura_cajaUncheckedUpdateManyWithoutUsersNestedInput
+}
+
+export type UserCreateWithoutApertura_cajaInput = {
+  id?: string
+  nombre: string
+  apellido: string
+  contrasena: string
+  correo?: string | null
+  movimiento_de_stock?: Prisma.movimiento_de_stockCreateNestedManyWithoutUsersInput
+  role?: Prisma.RoleCreateNestedOneWithoutUsersInput
+}
+
+export type UserUncheckedCreateWithoutApertura_cajaInput = {
+  id?: string
+  nombre: string
+  apellido: string
+  contrasena: string
+  roleid?: string
+  correo?: string | null
+  movimiento_de_stock?: Prisma.movimiento_de_stockUncheckedCreateNestedManyWithoutUsersInput
+}
+
+export type UserCreateOrConnectWithoutApertura_cajaInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutApertura_cajaInput, Prisma.UserUncheckedCreateWithoutApertura_cajaInput>
+}
+
+export type UserUpsertWithoutApertura_cajaInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutApertura_cajaInput, Prisma.UserUncheckedUpdateWithoutApertura_cajaInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutApertura_cajaInput, Prisma.UserUncheckedCreateWithoutApertura_cajaInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutApertura_cajaInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutApertura_cajaInput, Prisma.UserUncheckedUpdateWithoutApertura_cajaInput>
+}
+
+export type UserUpdateWithoutApertura_cajaInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  nombre?: Prisma.StringFieldUpdateOperationsInput | string
+  apellido?: Prisma.StringFieldUpdateOperationsInput | string
+  contrasena?: Prisma.StringFieldUpdateOperationsInput | string
+  correo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  movimiento_de_stock?: Prisma.movimiento_de_stockUpdateManyWithoutUsersNestedInput
+  role?: Prisma.RoleUpdateOneRequiredWithoutUsersNestedInput
+}
+
+export type UserUncheckedUpdateWithoutApertura_cajaInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  nombre?: Prisma.StringFieldUpdateOperationsInput | string
+  apellido?: Prisma.StringFieldUpdateOperationsInput | string
+  contrasena?: Prisma.StringFieldUpdateOperationsInput | string
+  roleid?: Prisma.StringFieldUpdateOperationsInput | string
+  correo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  movimiento_de_stock?: Prisma.movimiento_de_stockUncheckedUpdateManyWithoutUsersNestedInput
 }
 
 export type UserCreateManyRoleInput = {
@@ -537,6 +620,7 @@ export type UserUpdateWithoutRoleInput = {
   apellido?: Prisma.StringFieldUpdateOperationsInput | string
   contrasena?: Prisma.StringFieldUpdateOperationsInput | string
   correo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  apertura_caja?: Prisma.apertura_cajaUpdateManyWithoutUsersNestedInput
   movimiento_de_stock?: Prisma.movimiento_de_stockUpdateManyWithoutUsersNestedInput
 }
 
@@ -546,6 +630,7 @@ export type UserUncheckedUpdateWithoutRoleInput = {
   apellido?: Prisma.StringFieldUpdateOperationsInput | string
   contrasena?: Prisma.StringFieldUpdateOperationsInput | string
   correo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  apertura_caja?: Prisma.apertura_cajaUncheckedUpdateManyWithoutUsersNestedInput
   movimiento_de_stock?: Prisma.movimiento_de_stockUncheckedUpdateManyWithoutUsersNestedInput
 }
 
@@ -563,10 +648,12 @@ export type UserUncheckedUpdateManyWithoutRoleInput = {
  */
 
 export type UserCountOutputType = {
+  apertura_caja: number
   movimiento_de_stock: number
 }
 
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  apertura_caja?: boolean | UserCountOutputTypeCountApertura_cajaArgs
   movimiento_de_stock?: boolean | UserCountOutputTypeCountMovimiento_de_stockArgs
 }
 
@@ -578,6 +665,13 @@ export type UserCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensi
    * Select specific fields to fetch from the UserCountOutputType
    */
   select?: Prisma.UserCountOutputTypeSelect<ExtArgs> | null
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountApertura_cajaArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.apertura_cajaWhereInput
 }
 
 /**
@@ -595,6 +689,7 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   contrasena?: boolean
   roleid?: boolean
   correo?: boolean
+  apertura_caja?: boolean | Prisma.User$apertura_cajaArgs<ExtArgs>
   movimiento_de_stock?: boolean | Prisma.User$movimiento_de_stockArgs<ExtArgs>
   role?: boolean | Prisma.RoleDefaultArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
@@ -631,6 +726,7 @@ export type UserSelectScalar = {
 
 export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "nombre" | "apellido" | "contrasena" | "roleid" | "correo", ExtArgs["result"]["user"]>
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  apertura_caja?: boolean | Prisma.User$apertura_cajaArgs<ExtArgs>
   movimiento_de_stock?: boolean | Prisma.User$movimiento_de_stockArgs<ExtArgs>
   role?: boolean | Prisma.RoleDefaultArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
@@ -645,6 +741,7 @@ export type UserIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensi
 export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "User"
   objects: {
+    apertura_caja: Prisma.$apertura_cajaPayload<ExtArgs>[]
     movimiento_de_stock: Prisma.$movimiento_de_stockPayload<ExtArgs>[]
     role: Prisma.$RolePayload<ExtArgs>
   }
@@ -1049,6 +1146,7 @@ readonly fields: UserFieldRefs;
  */
 export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
+  apertura_caja<T extends Prisma.User$apertura_cajaArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$apertura_cajaArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$apertura_cajaPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   movimiento_de_stock<T extends Prisma.User$movimiento_de_stockArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$movimiento_de_stockArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$movimiento_de_stockPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   role<T extends Prisma.RoleDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.RoleDefaultArgs<ExtArgs>>): Prisma.Prisma__RoleClient<runtime.Types.Result.GetResult<Prisma.$RolePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   /**
@@ -1484,6 +1582,30 @@ export type UserDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Internal
    * Limit how many Users to delete.
    */
   limit?: number
+}
+
+/**
+ * User.apertura_caja
+ */
+export type User$apertura_cajaArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the apertura_caja
+   */
+  select?: Prisma.apertura_cajaSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the apertura_caja
+   */
+  omit?: Prisma.apertura_cajaOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.apertura_cajaInclude<ExtArgs> | null
+  where?: Prisma.apertura_cajaWhereInput
+  orderBy?: Prisma.apertura_cajaOrderByWithRelationInput | Prisma.apertura_cajaOrderByWithRelationInput[]
+  cursor?: Prisma.apertura_cajaWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.Apertura_cajaScalarFieldEnum | Prisma.Apertura_cajaScalarFieldEnum[]
 }
 
 /**

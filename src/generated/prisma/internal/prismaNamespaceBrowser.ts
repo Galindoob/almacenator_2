@@ -59,7 +59,10 @@ export const ModelName = {
   Producto: 'Producto',
   movimiento_de_stock: 'movimiento_de_stock',
   unidad_medida: 'unidad_medida',
-  instancia_producto: 'instancia_producto'
+  instancia_producto: 'instancia_producto',
+  empaque: 'empaque',
+  apertura_caja: 'apertura_caja',
+  historia_caja: 'historia_caja'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -135,7 +138,8 @@ export const ProductoScalarFieldEnum = {
   urlImagen: 'urlImagen',
   costo: 'costo',
   contenido: 'contenido',
-  unidad_medida: 'unidad_medida'
+  unidad_medida: 'unidad_medida',
+  empaque: 'empaque'
 } as const
 
 export type ProductoScalarFieldEnum = (typeof ProductoScalarFieldEnum)[keyof typeof ProductoScalarFieldEnum]
@@ -172,6 +176,47 @@ export const Instancia_productoScalarFieldEnum = {
 } as const
 
 export type Instancia_productoScalarFieldEnum = (typeof Instancia_productoScalarFieldEnum)[keyof typeof Instancia_productoScalarFieldEnum]
+
+
+export const EmpaqueScalarFieldEnum = {
+  id_empaque: 'id_empaque',
+  nombre_empaque: 'nombre_empaque'
+} as const
+
+export type EmpaqueScalarFieldEnum = (typeof EmpaqueScalarFieldEnum)[keyof typeof EmpaqueScalarFieldEnum]
+
+
+export const Apertura_cajaScalarFieldEnum = {
+  id_apertura: 'id_apertura',
+  id_usuario_apertura: 'id_usuario_apertura',
+  horario_apertura: 'horario_apertura',
+  horario_cierre: 'horario_cierre',
+  venta_boleta: 'venta_boleta',
+  venta_factura: 'venta_factura',
+  venta_debito: 'venta_debito',
+  venta_credito: 'venta_credito',
+  venta_efectivo: 'venta_efectivo',
+  total_debito: 'total_debito',
+  total_credito: 'total_credito',
+  total_efectivo: 'total_efectivo',
+  saldo_apertura: 'saldo_apertura',
+  saldo_cierre: 'saldo_cierre',
+  diferencia: 'diferencia',
+  saldo_esperado: 'saldo_esperado'
+} as const
+
+export type Apertura_cajaScalarFieldEnum = (typeof Apertura_cajaScalarFieldEnum)[keyof typeof Apertura_cajaScalarFieldEnum]
+
+
+export const Historia_cajaScalarFieldEnum = {
+  id_caja: 'id_caja',
+  fecha_registro: 'fecha_registro',
+  diferencia: 'diferencia',
+  saldo_apertura: 'saldo_apertura',
+  saldo_cierre: 'saldo_cierre'
+} as const
+
+export type Historia_cajaScalarFieldEnum = (typeof Historia_cajaScalarFieldEnum)[keyof typeof Historia_cajaScalarFieldEnum]
 
 
 export const SortOrder = {

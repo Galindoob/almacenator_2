@@ -86,3 +86,18 @@ export type unidad_medida = Prisma.unidad_medidaModel
  * 
  */
 export type instancia_producto = Prisma.instancia_productoModel
+/**
+ * Model empaque
+ * 
+ */
+export type empaque = Prisma.empaqueModel
+/**
+ * Model apertura_caja
+ * This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+ */
+export type apertura_caja = Prisma.apertura_cajaModel
+/**
+ * Model historia_caja
+ * This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+ */
+export type historia_caja = Prisma.historia_cajaModel
