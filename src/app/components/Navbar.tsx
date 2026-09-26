@@ -87,6 +87,11 @@ export function Navbar({
     router.push("/producto");
   }
 
+  function goToProviders() {
+    setIsMenuOpen(false);
+    router.push("/proveedores");
+  }
+
   function handleLogout() {
     setIsMenuOpen(false);
     onLogout();
@@ -209,6 +214,9 @@ export function Navbar({
                   </button>
                 </div>
               ) : null}
+              <button type="button" onClick={goToProviders}>
+                Proveedores
+              </button>
             </nav>
           </aside>
         </div>

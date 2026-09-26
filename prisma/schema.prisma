@@ -68,11 +68,13 @@ model Producto {
   contenido                                            Int?
   unidad_medida                                        String?               @db.Uuid
   empaque                                              String?               @db.Uuid
+  id_proveedor                                         String?               @db.Uuid
   instancia_producto                                   instancia_producto[]
   movimiento_de_stock                                  movimiento_de_stock[]
   categoria                                            Categoria             @relation(fields: [categoriaId], references: [id], map: "fk_productos_categoria")
   empaque_productos_empaqueToempaque                   empaque?              @relation("productos_empaqueToempaque", fields: [empaque], references: [id_empaque], onDelete: Restrict, map: "fk_productos_empaque")
   marca                                                Marca                 @relation(fields: [marcaId], references: [id], map: "fk_productos_marca")
+  proveedores                                          proveedores?          @relation(fields: [id_proveedor], references: [id_proveedor], map: "fk_productos_proveedor")
   unidad                                               Unidad                @relation(fields: [unidadId], references: [id], map: "fk_productos_unidad")
   unidad_medida_productos_unidad_medidaTounidad_medida unidad_medida?        @relation("productos_unidad_medidaTounidad_medida", fields: [unidad_medida], references: [id], onDelete: Restrict, map: "fk_productos_unidad_medida")
 
@@ -145,4 +147,14 @@ model historia_caja {
   diferencia     Int      @default(0)
   saldo_apertura Int      @default(0)
   saldo_cierre   Int      @default(0)
+}
+
+model proveedores {
+  id_proveedor    String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  nombre          String     @db.VarChar(150)
+  nombre_vendedor String?    @db.VarChar(150)
+  correo_contacto String?    @db.VarChar(255)
+  telefono        String?    @db.VarChar(50)
+  url_imagen      String?    @db.VarChar(500)
+  productos       Producto[]
 }

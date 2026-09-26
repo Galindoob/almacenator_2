@@ -24,7 +24,7 @@ export * as $Enums from './enums'
 export * from "./enums"
 /**
  * ## Prisma Client
- * 
+ *
  * Type-safe database client for TypeScript
  * @example
  * ```
@@ -101,3 +101,8 @@ export type apertura_caja = Prisma.apertura_cajaModel
  * This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
  */
 export type historia_caja = Prisma.historia_cajaModel
+/**
+ * Model proveedores
+ *
+ */
+export type proveedores = Prisma.proveedoresModel

@@ -6,7 +6,7 @@
 /*
  * This file should be your main import to use Prisma-related types and utilities in a browser. 
  * Use it to get access to models, enums, and input types.
- * 
+ *
  * This file does not contain a `PrismaClient` class, nor several other helpers that are intended as server-side only.
  * See `client.ts` for the standard, server-side entry point.
  *
@@ -77,3 +77,8 @@ export type apertura_caja = Prisma.apertura_cajaModel
  * This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
  */
 export type historia_caja = Prisma.historia_cajaModel
+/**
+ * Model proveedores
+ *
+ */
+export type proveedores = Prisma.proveedoresModel

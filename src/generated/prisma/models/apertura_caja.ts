@@ -39,6 +39,9 @@ export type Apertura_cajaAvgAggregateOutputType = {
   saldo_cierre: number | null
   diferencia: number | null
   saldo_esperado: number | null
+  venta_transferencia: number | null
+  total_transferencia: number | null
+  total: number | null
 }
 
 export type Apertura_cajaSumAggregateOutputType = {
@@ -54,6 +57,9 @@ export type Apertura_cajaSumAggregateOutputType = {
   saldo_cierre: number | null
   diferencia: number | null
   saldo_esperado: number | null
+  venta_transferencia: number | null
+  total_transferencia: number | null
+  total: number | null
 }
 
 export type Apertura_cajaMinAggregateOutputType = {
@@ -73,6 +79,9 @@ export type Apertura_cajaMinAggregateOutputType = {
   saldo_cierre: number | null
   diferencia: number | null
   saldo_esperado: number | null
+  venta_transferencia: number | null
+  total_transferencia: number | null
+  total: number | null
 }
 
 export type Apertura_cajaMaxAggregateOutputType = {
@@ -92,6 +101,9 @@ export type Apertura_cajaMaxAggregateOutputType = {
   saldo_cierre: number | null
   diferencia: number | null
   saldo_esperado: number | null
+  venta_transferencia: number | null
+  total_transferencia: number | null
+  total: number | null
 }
 
 export type Apertura_cajaCountAggregateOutputType = {
@@ -111,6 +123,9 @@ export type Apertura_cajaCountAggregateOutputType = {
   saldo_cierre: number
   diferencia: number
   saldo_esperado: number
+  venta_transferencia: number
+  total_transferencia: number
+  total: number
   _all: number
 }
 
@@ -128,6 +143,9 @@ export type Apertura_cajaAvgAggregateInputType = {
   saldo_cierre?: true
   diferencia?: true
   saldo_esperado?: true
+  venta_transferencia?: true
+  total_transferencia?: true
+  total?: true
 }
 
 export type Apertura_cajaSumAggregateInputType = {
@@ -143,6 +161,9 @@ export type Apertura_cajaSumAggregateInputType = {
   saldo_cierre?: true
   diferencia?: true
   saldo_esperado?: true
+  venta_transferencia?: true
+  total_transferencia?: true
+  total?: true
 }
 
 export type Apertura_cajaMinAggregateInputType = {
@@ -162,6 +183,9 @@ export type Apertura_cajaMinAggregateInputType = {
   saldo_cierre?: true
   diferencia?: true
   saldo_esperado?: true
+  venta_transferencia?: true
+  total_transferencia?: true
+  total?: true
 }
 
 export type Apertura_cajaMaxAggregateInputType = {
@@ -181,6 +205,9 @@ export type Apertura_cajaMaxAggregateInputType = {
   saldo_cierre?: true
   diferencia?: true
   saldo_esperado?: true
+  venta_transferencia?: true
+  total_transferencia?: true
+  total?: true
 }
 
 export type Apertura_cajaCountAggregateInputType = {
@@ -200,6 +227,9 @@ export type Apertura_cajaCountAggregateInputType = {
   saldo_cierre?: true
   diferencia?: true
   saldo_esperado?: true
+  venta_transferencia?: true
+  total_transferencia?: true
+  total?: true
   _all?: true
 }
 
@@ -305,7 +335,10 @@ export type Apertura_cajaGroupByOutputType = {
   saldo_apertura: number
   saldo_cierre: number | null
   diferencia: number | null
-  saldo_esperado: number | null
+  saldo_esperado: number
+  venta_transferencia: number
+  total_transferencia: number
+  total: number
   _count: Apertura_cajaCountAggregateOutputType | null
   _avg: Apertura_cajaAvgAggregateOutputType | null
   _sum: Apertura_cajaSumAggregateOutputType | null
@@ -347,7 +380,10 @@ export type apertura_cajaWhereInput = {
   saldo_apertura?: Prisma.IntFilter<"apertura_caja"> | number
   saldo_cierre?: Prisma.IntNullableFilter<"apertura_caja"> | number | null
   diferencia?: Prisma.IntNullableFilter<"apertura_caja"> | number | null
-  saldo_esperado?: Prisma.IntNullableFilter<"apertura_caja"> | number | null
+  saldo_esperado?: Prisma.IntFilter<"apertura_caja"> | number
+  venta_transferencia?: Prisma.IntFilter<"apertura_caja"> | number
+  total_transferencia?: Prisma.IntFilter<"apertura_caja"> | number
+  total?: Prisma.IntFilter<"apertura_caja"> | number
   users?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
 }
 
@@ -367,7 +403,10 @@ export type apertura_cajaOrderByWithRelationInput = {
   saldo_apertura?: Prisma.SortOrder
   saldo_cierre?: Prisma.SortOrderInput | Prisma.SortOrder
   diferencia?: Prisma.SortOrderInput | Prisma.SortOrder
-  saldo_esperado?: Prisma.SortOrderInput | Prisma.SortOrder
+  saldo_esperado?: Prisma.SortOrder
+  venta_transferencia?: Prisma.SortOrder
+  total_transferencia?: Prisma.SortOrder
+  total?: Prisma.SortOrder
   users?: Prisma.UserOrderByWithRelationInput
 }
 
@@ -390,7 +429,10 @@ export type apertura_cajaWhereUniqueInput = Prisma.AtLeast<{
   saldo_apertura?: Prisma.IntFilter<"apertura_caja"> | number
   saldo_cierre?: Prisma.IntNullableFilter<"apertura_caja"> | number | null
   diferencia?: Prisma.IntNullableFilter<"apertura_caja"> | number | null
-  saldo_esperado?: Prisma.IntNullableFilter<"apertura_caja"> | number | null
+  saldo_esperado?: Prisma.IntFilter<"apertura_caja"> | number
+  venta_transferencia?: Prisma.IntFilter<"apertura_caja"> | number
+  total_transferencia?: Prisma.IntFilter<"apertura_caja"> | number
+  total?: Prisma.IntFilter<"apertura_caja"> | number
   users?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
 }, "id_apertura">
 
@@ -410,7 +452,10 @@ export type apertura_cajaOrderByWithAggregationInput = {
   saldo_apertura?: Prisma.SortOrder
   saldo_cierre?: Prisma.SortOrderInput | Prisma.SortOrder
   diferencia?: Prisma.SortOrderInput | Prisma.SortOrder
-  saldo_esperado?: Prisma.SortOrderInput | Prisma.SortOrder
+  saldo_esperado?: Prisma.SortOrder
+  venta_transferencia?: Prisma.SortOrder
+  total_transferencia?: Prisma.SortOrder
+  total?: Prisma.SortOrder
   _count?: Prisma.apertura_cajaCountOrderByAggregateInput
   _avg?: Prisma.apertura_cajaAvgOrderByAggregateInput
   _max?: Prisma.apertura_cajaMaxOrderByAggregateInput
@@ -437,7 +482,10 @@ export type apertura_cajaScalarWhereWithAggregatesInput = {
   saldo_apertura?: Prisma.IntWithAggregatesFilter<"apertura_caja"> | number
   saldo_cierre?: Prisma.IntNullableWithAggregatesFilter<"apertura_caja"> | number | null
   diferencia?: Prisma.IntNullableWithAggregatesFilter<"apertura_caja"> | number | null
-  saldo_esperado?: Prisma.IntNullableWithAggregatesFilter<"apertura_caja"> | number | null
+  saldo_esperado?: Prisma.IntWithAggregatesFilter<"apertura_caja"> | number
+  venta_transferencia?: Prisma.IntWithAggregatesFilter<"apertura_caja"> | number
+  total_transferencia?: Prisma.IntWithAggregatesFilter<"apertura_caja"> | number
+  total?: Prisma.IntWithAggregatesFilter<"apertura_caja"> | number
 }
 
 export type apertura_cajaCreateInput = {
@@ -455,7 +503,10 @@ export type apertura_cajaCreateInput = {
   saldo_apertura?: number
   saldo_cierre?: number | null
   diferencia?: number | null
-  saldo_esperado?: number | null
+  saldo_esperado?: number
+  venta_transferencia?: number
+  total_transferencia?: number
+  total?: number
   users: Prisma.UserCreateNestedOneWithoutApertura_cajaInput
 }
 
@@ -475,7 +526,10 @@ export type apertura_cajaUncheckedCreateInput = {
   saldo_apertura?: number
   saldo_cierre?: number | null
   diferencia?: number | null
-  saldo_esperado?: number | null
+  saldo_esperado?: number
+  venta_transferencia?: number
+  total_transferencia?: number
+  total?: number
 }
 
 export type apertura_cajaUpdateInput = {
@@ -493,7 +547,10 @@ export type apertura_cajaUpdateInput = {
   saldo_apertura?: Prisma.IntFieldUpdateOperationsInput | number
   saldo_cierre?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   diferencia?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  saldo_esperado?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  saldo_esperado?: Prisma.IntFieldUpdateOperationsInput | number
+  venta_transferencia?: Prisma.IntFieldUpdateOperationsInput | number
+  total_transferencia?: Prisma.IntFieldUpdateOperationsInput | number
+  total?: Prisma.IntFieldUpdateOperationsInput | number
   users?: Prisma.UserUpdateOneRequiredWithoutApertura_cajaNestedInput
 }
 
@@ -513,7 +570,10 @@ export type apertura_cajaUncheckedUpdateInput = {
   saldo_apertura?: Prisma.IntFieldUpdateOperationsInput | number
   saldo_cierre?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   diferencia?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  saldo_esperado?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  saldo_esperado?: Prisma.IntFieldUpdateOperationsInput | number
+  venta_transferencia?: Prisma.IntFieldUpdateOperationsInput | number
+  total_transferencia?: Prisma.IntFieldUpdateOperationsInput | number
+  total?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
 export type apertura_cajaCreateManyInput = {
@@ -532,7 +592,10 @@ export type apertura_cajaCreateManyInput = {
   saldo_apertura?: number
   saldo_cierre?: number | null
   diferencia?: number | null
-  saldo_esperado?: number | null
+  saldo_esperado?: number
+  venta_transferencia?: number
+  total_transferencia?: number
+  total?: number
 }
 
 export type apertura_cajaUpdateManyMutationInput = {
@@ -550,7 +613,10 @@ export type apertura_cajaUpdateManyMutationInput = {
   saldo_apertura?: Prisma.IntFieldUpdateOperationsInput | number
   saldo_cierre?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   diferencia?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  saldo_esperado?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  saldo_esperado?: Prisma.IntFieldUpdateOperationsInput | number
+  venta_transferencia?: Prisma.IntFieldUpdateOperationsInput | number
+  total_transferencia?: Prisma.IntFieldUpdateOperationsInput | number
+  total?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
 export type apertura_cajaUncheckedUpdateManyInput = {
@@ -569,7 +635,10 @@ export type apertura_cajaUncheckedUpdateManyInput = {
   saldo_apertura?: Prisma.IntFieldUpdateOperationsInput | number
   saldo_cierre?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   diferencia?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  saldo_esperado?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  saldo_esperado?: Prisma.IntFieldUpdateOperationsInput | number
+  venta_transferencia?: Prisma.IntFieldUpdateOperationsInput | number
+  total_transferencia?: Prisma.IntFieldUpdateOperationsInput | number
+  total?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
 export type Apertura_cajaListRelationFilter = {
@@ -599,6 +668,9 @@ export type apertura_cajaCountOrderByAggregateInput = {
   saldo_cierre?: Prisma.SortOrder
   diferencia?: Prisma.SortOrder
   saldo_esperado?: Prisma.SortOrder
+  venta_transferencia?: Prisma.SortOrder
+  total_transferencia?: Prisma.SortOrder
+  total?: Prisma.SortOrder
 }
 
 export type apertura_cajaAvgOrderByAggregateInput = {
@@ -614,6 +686,9 @@ export type apertura_cajaAvgOrderByAggregateInput = {
   saldo_cierre?: Prisma.SortOrder
   diferencia?: Prisma.SortOrder
   saldo_esperado?: Prisma.SortOrder
+  venta_transferencia?: Prisma.SortOrder
+  total_transferencia?: Prisma.SortOrder
+  total?: Prisma.SortOrder
 }
 
 export type apertura_cajaMaxOrderByAggregateInput = {
@@ -633,6 +708,9 @@ export type apertura_cajaMaxOrderByAggregateInput = {
   saldo_cierre?: Prisma.SortOrder
   diferencia?: Prisma.SortOrder
   saldo_esperado?: Prisma.SortOrder
+  venta_transferencia?: Prisma.SortOrder
+  total_transferencia?: Prisma.SortOrder
+  total?: Prisma.SortOrder
 }
 
 export type apertura_cajaMinOrderByAggregateInput = {
@@ -652,6 +730,9 @@ export type apertura_cajaMinOrderByAggregateInput = {
   saldo_cierre?: Prisma.SortOrder
   diferencia?: Prisma.SortOrder
   saldo_esperado?: Prisma.SortOrder
+  venta_transferencia?: Prisma.SortOrder
+  total_transferencia?: Prisma.SortOrder
+  total?: Prisma.SortOrder
 }
 
 export type apertura_cajaSumOrderByAggregateInput = {
@@ -667,6 +748,9 @@ export type apertura_cajaSumOrderByAggregateInput = {
   saldo_cierre?: Prisma.SortOrder
   diferencia?: Prisma.SortOrder
   saldo_esperado?: Prisma.SortOrder
+  venta_transferencia?: Prisma.SortOrder
+  total_transferencia?: Prisma.SortOrder
+  total?: Prisma.SortOrder
 }
 
 export type apertura_cajaCreateNestedManyWithoutUsersInput = {
@@ -730,7 +814,10 @@ export type apertura_cajaCreateWithoutUsersInput = {
   saldo_apertura?: number
   saldo_cierre?: number | null
   diferencia?: number | null
-  saldo_esperado?: number | null
+  saldo_esperado?: number
+  venta_transferencia?: number
+  total_transferencia?: number
+  total?: number
 }
 
 export type apertura_cajaUncheckedCreateWithoutUsersInput = {
@@ -748,7 +835,10 @@ export type apertura_cajaUncheckedCreateWithoutUsersInput = {
   saldo_apertura?: number
   saldo_cierre?: number | null
   diferencia?: number | null
-  saldo_esperado?: number | null
+  saldo_esperado?: number
+  venta_transferencia?: number
+  total_transferencia?: number
+  total?: number
 }
 
 export type apertura_cajaCreateOrConnectWithoutUsersInput = {
@@ -796,7 +886,10 @@ export type apertura_cajaScalarWhereInput = {
   saldo_apertura?: Prisma.IntFilter<"apertura_caja"> | number
   saldo_cierre?: Prisma.IntNullableFilter<"apertura_caja"> | number | null
   diferencia?: Prisma.IntNullableFilter<"apertura_caja"> | number | null
-  saldo_esperado?: Prisma.IntNullableFilter<"apertura_caja"> | number | null
+  saldo_esperado?: Prisma.IntFilter<"apertura_caja"> | number
+  venta_transferencia?: Prisma.IntFilter<"apertura_caja"> | number
+  total_transferencia?: Prisma.IntFilter<"apertura_caja"> | number
+  total?: Prisma.IntFilter<"apertura_caja"> | number
 }
 
 export type apertura_cajaCreateManyUsersInput = {
@@ -814,7 +907,10 @@ export type apertura_cajaCreateManyUsersInput = {
   saldo_apertura?: number
   saldo_cierre?: number | null
   diferencia?: number | null
-  saldo_esperado?: number | null
+  saldo_esperado?: number
+  venta_transferencia?: number
+  total_transferencia?: number
+  total?: number
 }
 
 export type apertura_cajaUpdateWithoutUsersInput = {
@@ -832,7 +928,10 @@ export type apertura_cajaUpdateWithoutUsersInput = {
   saldo_apertura?: Prisma.IntFieldUpdateOperationsInput | number
   saldo_cierre?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   diferencia?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  saldo_esperado?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  saldo_esperado?: Prisma.IntFieldUpdateOperationsInput | number
+  venta_transferencia?: Prisma.IntFieldUpdateOperationsInput | number
+  total_transferencia?: Prisma.IntFieldUpdateOperationsInput | number
+  total?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
 export type apertura_cajaUncheckedUpdateWithoutUsersInput = {
@@ -850,7 +949,10 @@ export type apertura_cajaUncheckedUpdateWithoutUsersInput = {
   saldo_apertura?: Prisma.IntFieldUpdateOperationsInput | number
   saldo_cierre?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   diferencia?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  saldo_esperado?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  saldo_esperado?: Prisma.IntFieldUpdateOperationsInput | number
+  venta_transferencia?: Prisma.IntFieldUpdateOperationsInput | number
+  total_transferencia?: Prisma.IntFieldUpdateOperationsInput | number
+  total?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
 export type apertura_cajaUncheckedUpdateManyWithoutUsersInput = {
@@ -868,7 +970,10 @@ export type apertura_cajaUncheckedUpdateManyWithoutUsersInput = {
   saldo_apertura?: Prisma.IntFieldUpdateOperationsInput | number
   saldo_cierre?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   diferencia?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  saldo_esperado?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  saldo_esperado?: Prisma.IntFieldUpdateOperationsInput | number
+  venta_transferencia?: Prisma.IntFieldUpdateOperationsInput | number
+  total_transferencia?: Prisma.IntFieldUpdateOperationsInput | number
+  total?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
 
@@ -890,6 +995,9 @@ export type apertura_cajaSelect<ExtArgs extends runtime.Types.Extensions.Interna
   saldo_cierre?: boolean
   diferencia?: boolean
   saldo_esperado?: boolean
+  venta_transferencia?: boolean
+  total_transferencia?: boolean
+  total?: boolean
   users?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["apertura_caja"]>
 
@@ -910,6 +1018,9 @@ export type apertura_cajaSelectCreateManyAndReturn<ExtArgs extends runtime.Types
   saldo_cierre?: boolean
   diferencia?: boolean
   saldo_esperado?: boolean
+  venta_transferencia?: boolean
+  total_transferencia?: boolean
+  total?: boolean
   users?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["apertura_caja"]>
 
@@ -930,6 +1041,9 @@ export type apertura_cajaSelectUpdateManyAndReturn<ExtArgs extends runtime.Types
   saldo_cierre?: boolean
   diferencia?: boolean
   saldo_esperado?: boolean
+  venta_transferencia?: boolean
+  total_transferencia?: boolean
+  total?: boolean
   users?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["apertura_caja"]>
 
@@ -950,9 +1064,12 @@ export type apertura_cajaSelectScalar = {
   saldo_cierre?: boolean
   diferencia?: boolean
   saldo_esperado?: boolean
+  venta_transferencia?: boolean
+  total_transferencia?: boolean
+  total?: boolean
 }
 
-export type apertura_cajaOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id_apertura" | "id_usuario_apertura" | "horario_apertura" | "horario_cierre" | "venta_boleta" | "venta_factura" | "venta_debito" | "venta_credito" | "venta_efectivo" | "total_debito" | "total_credito" | "total_efectivo" | "saldo_apertura" | "saldo_cierre" | "diferencia" | "saldo_esperado", ExtArgs["result"]["apertura_caja"]>
+export type apertura_cajaOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id_apertura" | "id_usuario_apertura" | "horario_apertura" | "horario_cierre" | "venta_boleta" | "venta_factura" | "venta_debito" | "venta_credito" | "venta_efectivo" | "total_debito" | "total_credito" | "total_efectivo" | "saldo_apertura" | "saldo_cierre" | "diferencia" | "saldo_esperado" | "venta_transferencia" | "total_transferencia" | "total", ExtArgs["result"]["apertura_caja"]>
 export type apertura_cajaInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   users?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
@@ -984,7 +1101,10 @@ export type $apertura_cajaPayload<ExtArgs extends runtime.Types.Extensions.Inter
     saldo_apertura: number
     saldo_cierre: number | null
     diferencia: number | null
-    saldo_esperado: number | null
+    saldo_esperado: number
+    venta_transferencia: number
+    total_transferencia: number
+    total: number
   }, ExtArgs["result"]["apertura_caja"]>
   composites: {}
 }
@@ -1425,6 +1545,9 @@ export interface apertura_cajaFieldRefs {
   readonly saldo_cierre: Prisma.FieldRef<"apertura_caja", 'Int'>
   readonly diferencia: Prisma.FieldRef<"apertura_caja", 'Int'>
   readonly saldo_esperado: Prisma.FieldRef<"apertura_caja", 'Int'>
+  readonly venta_transferencia: Prisma.FieldRef<"apertura_caja", 'Int'>
+  readonly total_transferencia: Prisma.FieldRef<"apertura_caja", 'Int'>
+  readonly total: Prisma.FieldRef<"apertura_caja", 'Int'>
 }
     
 

@@ -19,6 +19,7 @@ type ProductPayload = {
   unidadId?: string;
   empaque?: string | null;
   empaqueNombre?: string;
+  id_proveedor?: string | null;
   contenido?: number | null;
   unidad_medida?: string | null;
   precioVenta?: number;
@@ -165,6 +166,7 @@ function parseProductFormData(formData: FormData): {
       unidadId: getFormString(formData, "unidadId"),
       empaque: getOptionalFormString(formData, "empaque"),
       empaqueNombre: getFormString(formData, "empaqueNombre"),
+      id_proveedor: getOptionalFormString(formData, "id_proveedor"),
       contenido: getFormNumber(formData, "contenido") ?? null,
       unidad_medida: getOptionalFormString(formData, "unidad_medida"),
       precioVenta: getFormNumber(formData, "precioVenta"),
@@ -271,13 +273,21 @@ async function deleteProductImage(imageUrl: string | null | undefined) {
 type ProductWithPackaging = {
   id: string;
   empaque: string | null;
+  id_proveedor: string | null;
   empaque_productos_empaqueToempaque: { nombre_empaque: string } | null;
+  proveedores: { nombre: string } | null;
 };
 
 type PackagingOption = {
   id: string;
   id_empaque: string;
   nombre_empaque: string;
+};
+
+type ProviderOption = {
+  id: string;
+  id_proveedor: string;
+  nombre: string;
 };
 
 async function getPackagingOptions() {
@@ -288,6 +298,17 @@ async function getPackagingOptions() {
       nombre_empaque
     FROM empaque
     ORDER BY nombre_empaque ASC
+  `;
+}
+
+async function getProviderOptions() {
+  return prisma.$queryRaw<ProviderOption[]>`
+    SELECT
+      id_proveedor::text AS id,
+      id_proveedor::text AS id_proveedor,
+      nombre
+    FROM proveedores
+    ORDER BY nombre ASC
   `;
 }
 
@@ -304,14 +325,19 @@ async function attachPackagingToProducts<T extends { id: string }>(
       id: string;
       empaque: string | null;
       nombre_empaque: string | null;
+      id_proveedor: string | null;
+      proveedor_nombre: string | null;
     }[]
   >`
     SELECT
       p.id_productos::text AS id,
       p.empaque::text AS empaque,
-      e.nombre_empaque
+      e.nombre_empaque,
+      p.id_proveedor::text AS id_proveedor,
+      pr.nombre AS proveedor_nombre
     FROM productos p
     LEFT JOIN empaque e ON e.id_empaque = p.empaque
+    LEFT JOIN proveedores pr ON pr.id_proveedor = p.id_proveedor
     WHERE p.id_productos = ANY(${productIds}::uuid[])
   `;
   const packagingByProduct = new Map(rows.map((row) => [row.id, row]));
@@ -322,8 +348,12 @@ async function attachPackagingToProducts<T extends { id: string }>(
     return {
       ...product,
       empaque: packaging?.empaque ?? null,
+      id_proveedor: packaging?.id_proveedor ?? null,
       empaque_productos_empaqueToempaque: packaging?.nombre_empaque
         ? { nombre_empaque: packaging.nombre_empaque }
+        : null,
+      proveedores: packaging?.proveedor_nombre
+        ? { nombre: packaging.proveedor_nombre }
         : null,
     };
   });
@@ -347,6 +377,14 @@ async function setProductPackaging(productId: string, packagingId: string | null
   `;
 }
 
+async function setProductProvider(productId: string, providerId: string | null) {
+  await prisma.$executeRaw`
+    UPDATE productos
+    SET id_proveedor = ${providerId}::uuid
+    WHERE id_productos = ${productId}::uuid
+  `;
+}
+
 async function getProductWithPackaging(productId: string) {
   const product = await prisma.producto.findUnique({
     where: { id: productId },
@@ -363,7 +401,15 @@ async function getProductWithPackaging(productId: string) {
 
 export const GET = withAuth(async () => {
   try {
-    const [productos, marcas, categorias, unidades, unidadesMedida, empaques] =
+    const [
+      productos,
+      marcas,
+      categorias,
+      unidades,
+      unidadesMedida,
+      empaques,
+      proveedores,
+    ] =
       await Promise.all([
         prisma.producto.findMany({
           orderBy: { nombre: "asc" },
@@ -386,6 +432,7 @@ export const GET = withAuth(async () => {
           select: { id: true, nombre: true },
         }),
         getPackagingOptions(),
+        getProviderOptions(),
       ]);
     const productsWithPackaging = await attachPackagingToProducts(productos);
 
@@ -398,6 +445,7 @@ export const GET = withAuth(async () => {
         unidades,
         unidadesMedida,
         empaques,
+        proveedores,
       },
     });
   } catch (error) {
@@ -532,6 +580,9 @@ export const POST = withAuth(async (request) => {
     if (product.empaque) {
       await setProductPackaging(createdProductBase.id, product.empaque);
     }
+    if (product.id_proveedor) {
+      await setProductProvider(createdProductBase.id, product.id_proveedor);
+    }
     const createdProduct =
       (await getProductWithPackaging(createdProductBase.id)) ?? createdProductBase;
 
@@ -591,6 +642,7 @@ export const PUT = withAuth(async (request) => {
       select: productSelect,
     });
     await setProductPackaging(updatedProductBase.id, product.empaque ?? null);
+    await setProductProvider(updatedProductBase.id, product.id_proveedor ?? null);
     const updatedProduct =
       (await getProductWithPackaging(updatedProductBase.id)) ?? updatedProductBase;
 

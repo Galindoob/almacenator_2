@@ -62,7 +62,8 @@ export const ModelName = {
   instancia_producto: 'instancia_producto',
   empaque: 'empaque',
   apertura_caja: 'apertura_caja',
-  historia_caja: 'historia_caja'
+  historia_caja: 'historia_caja',
+  proveedores: 'proveedores'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -139,7 +140,8 @@ export const ProductoScalarFieldEnum = {
   costo: 'costo',
   contenido: 'contenido',
   unidad_medida: 'unidad_medida',
-  empaque: 'empaque'
+  empaque: 'empaque',
+  id_proveedor: 'id_proveedor'
 } as const
 
 export type ProductoScalarFieldEnum = (typeof ProductoScalarFieldEnum)[keyof typeof ProductoScalarFieldEnum]
@@ -202,7 +204,10 @@ export const Apertura_cajaScalarFieldEnum = {
   saldo_apertura: 'saldo_apertura',
   saldo_cierre: 'saldo_cierre',
   diferencia: 'diferencia',
-  saldo_esperado: 'saldo_esperado'
+  saldo_esperado: 'saldo_esperado',
+  venta_transferencia: 'venta_transferencia',
+  total_transferencia: 'total_transferencia',
+  total: 'total'
 } as const
 
 export type Apertura_cajaScalarFieldEnum = (typeof Apertura_cajaScalarFieldEnum)[keyof typeof Apertura_cajaScalarFieldEnum]
@@ -217,6 +222,18 @@ export const Historia_cajaScalarFieldEnum = {
 } as const
 
 export type Historia_cajaScalarFieldEnum = (typeof Historia_cajaScalarFieldEnum)[keyof typeof Historia_cajaScalarFieldEnum]
+
+
+export const ProveedoresScalarFieldEnum = {
+  id_proveedor: 'id_proveedor',
+  nombre: 'nombre',
+  nombre_vendedor: 'nombre_vendedor',
+  correo_contacto: 'correo_contacto',
+  telefono: 'telefono',
+  url_imagen: 'url_imagen'
+} as const
+
+export type ProveedoresScalarFieldEnum = (typeof ProveedoresScalarFieldEnum)[keyof typeof ProveedoresScalarFieldEnum]
 
 
 export const SortOrder = {

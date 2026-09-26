@@ -408,7 +408,8 @@ export const ModelName = {
   instancia_producto: 'instancia_producto',
   empaque: 'empaque',
   apertura_caja: 'apertura_caja',
-  historia_caja: 'historia_caja'
+  historia_caja: 'historia_caja',
+  proveedores: 'proveedores'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -424,7 +425,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "role" | "marca" | "categoria" | "unidad" | "producto" | "movimiento_de_stock" | "unidad_medida" | "instancia_producto" | "empaque" | "apertura_caja" | "historia_caja"
+    modelProps: "user" | "role" | "marca" | "categoria" | "unidad" | "producto" | "movimiento_de_stock" | "unidad_medida" | "instancia_producto" | "empaque" | "apertura_caja" | "historia_caja" | "proveedores"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1316,6 +1317,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    proveedores: {
+      payload: Prisma.$proveedoresPayload<ExtArgs>
+      fields: Prisma.proveedoresFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.proveedoresFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$proveedoresPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.proveedoresFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$proveedoresPayload>
+        }
+        findFirst: {
+          args: Prisma.proveedoresFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$proveedoresPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.proveedoresFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$proveedoresPayload>
+        }
+        findMany: {
+          args: Prisma.proveedoresFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$proveedoresPayload>[]
+        }
+        create: {
+          args: Prisma.proveedoresCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$proveedoresPayload>
+        }
+        createMany: {
+          args: Prisma.proveedoresCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.proveedoresCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$proveedoresPayload>[]
+        }
+        delete: {
+          args: Prisma.proveedoresDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$proveedoresPayload>
+        }
+        update: {
+          args: Prisma.proveedoresUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$proveedoresPayload>
+        }
+        deleteMany: {
+          args: Prisma.proveedoresDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.proveedoresUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.proveedoresUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$proveedoresPayload>[]
+        }
+        upsert: {
+          args: Prisma.proveedoresUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$proveedoresPayload>
+        }
+        aggregate: {
+          args: Prisma.ProveedoresAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateProveedores>
+        }
+        groupBy: {
+          args: Prisma.proveedoresGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ProveedoresGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.proveedoresCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ProveedoresCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -1413,7 +1488,8 @@ export const ProductoScalarFieldEnum = {
   costo: 'costo',
   contenido: 'contenido',
   unidad_medida: 'unidad_medida',
-  empaque: 'empaque'
+  empaque: 'empaque',
+  id_proveedor: 'id_proveedor'
 } as const
 
 export type ProductoScalarFieldEnum = (typeof ProductoScalarFieldEnum)[keyof typeof ProductoScalarFieldEnum]
@@ -1476,7 +1552,10 @@ export const Apertura_cajaScalarFieldEnum = {
   saldo_apertura: 'saldo_apertura',
   saldo_cierre: 'saldo_cierre',
   diferencia: 'diferencia',
-  saldo_esperado: 'saldo_esperado'
+  saldo_esperado: 'saldo_esperado',
+  venta_transferencia: 'venta_transferencia',
+  total_transferencia: 'total_transferencia',
+  total: 'total'
 } as const
 
 export type Apertura_cajaScalarFieldEnum = (typeof Apertura_cajaScalarFieldEnum)[keyof typeof Apertura_cajaScalarFieldEnum]
@@ -1491,6 +1570,18 @@ export const Historia_cajaScalarFieldEnum = {
 } as const
 
 export type Historia_cajaScalarFieldEnum = (typeof Historia_cajaScalarFieldEnum)[keyof typeof Historia_cajaScalarFieldEnum]
+
+
+export const ProveedoresScalarFieldEnum = {
+  id_proveedor: 'id_proveedor',
+  nombre: 'nombre',
+  nombre_vendedor: 'nombre_vendedor',
+  correo_contacto: 'correo_contacto',
+  telefono: 'telefono',
+  url_imagen: 'url_imagen'
+} as const
+
+export type ProveedoresScalarFieldEnum = (typeof ProveedoresScalarFieldEnum)[keyof typeof ProveedoresScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -1741,6 +1832,7 @@ export type GlobalOmitConfig = {
   empaque?: Prisma.empaqueOmit
   apertura_caja?: Prisma.apertura_cajaOmit
   historia_caja?: Prisma.historia_cajaOmit
+  proveedores?: Prisma.proveedoresOmit
 }
 
 /* Types for Logging */

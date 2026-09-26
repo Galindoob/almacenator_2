@@ -13,6 +13,7 @@ type Producto = {
   categoriaId: string;
   unidadId: string;
   empaque: string | null;
+  id_proveedor: string | null;
   contenido: number | null;
   unidad_medida: string | null;
   stock: number;
@@ -30,6 +31,9 @@ type Producto = {
   };
   empaque_productos_empaqueToempaque: {
     nombre_empaque: string;
+  } | null;
+  proveedores: {
+    nombre: string;
   } | null;
   unidad_medida_productos_unidad_medidaTounidad_medida: {
     nombre: string;
@@ -50,6 +54,7 @@ type Option = {
   unidad?: string;
   id_empaque?: string;
   nombre_empaque?: string;
+  id_proveedor?: string;
 };
 
 type ProductOptions = {
@@ -58,6 +63,7 @@ type ProductOptions = {
   unidades: Option[];
   unidadesMedida: Option[];
   empaques: Option[];
+  proveedores: Option[];
 };
 
 type CreateProductForm = {
@@ -71,6 +77,7 @@ type CreateProductForm = {
   unidadId: string;
   empaqueId: string;
   empaqueNombre: string;
+  proveedorId: string;
   contenido: string;
   unidadMedidaId: string;
   precioVenta: string;
@@ -85,6 +92,7 @@ type EditProductForm = {
   categoriaId: string;
   unidadId: string;
   empaqueId: string;
+  proveedorId: string;
   contenido: string;
   unidadMedidaId: string;
 };
@@ -284,6 +292,7 @@ function buildEditForm(producto: Producto): EditProductForm {
     categoriaId: producto.categoriaId,
     unidadId: producto.unidadId,
     empaqueId: producto.empaque ?? "",
+    proveedorId: producto.id_proveedor ?? "",
     contenido: producto.contenido ? String(producto.contenido) : "",
     unidadMedidaId: producto.unidad_medida ?? "",
   };
@@ -300,6 +309,7 @@ const initialCreateForm: CreateProductForm = {
   unidadId: "",
   empaqueId: "",
   empaqueNombre: "",
+  proveedorId: "",
   contenido: "",
   unidadMedidaId: "",
   precioVenta: "",
@@ -337,6 +347,7 @@ export default function ProductoPage() {
     unidades: [],
     unidadesMedida: [],
     empaques: [],
+    proveedores: [],
   });
   const [search, setSearch] = useState("");
   const [isLoading, setIsLoading] = useState(true);
@@ -810,6 +821,7 @@ export default function ProductoPage() {
         formData.append("empaque", createForm.empaqueId);
       }
       formData.append("unidadId", createForm.unidadId);
+      formData.append("id_proveedor", createForm.proveedorId);
       if (needsMeasure) {
         formData.append("contenido", createForm.contenido);
         formData.append("unidad_medida", createForm.unidadMedidaId);
@@ -962,6 +974,7 @@ export default function ProductoPage() {
       formData.append("categoriaId", editForm.categoriaId);
       formData.append("empaque", editForm.empaqueId);
       formData.append("unidadId", editForm.unidadId);
+      formData.append("id_proveedor", editForm.proveedorId);
       if (needsMeasure) {
         formData.append("contenido", editForm.contenido);
         formData.append("unidad_medida", editForm.unidadMedidaId);
@@ -2029,6 +2042,23 @@ function ProductCreatePanel({
           </label>
         ) : null}
 
+        <label>
+          Proveedor
+          <SearchableSelect
+            value={form.proveedorId}
+            placeholder="Sin proveedor"
+            searchPlaceholder="Buscar proveedor"
+            options={[
+              { value: "", label: "Sin proveedor" },
+              ...options.proveedores.map((proveedor) => ({
+                value: proveedor.id_proveedor ?? proveedor.id,
+                label: proveedor.nombre ?? "",
+              })),
+            ]}
+            onChange={(nextValue) => onChange("proveedorId", nextValue)}
+          />
+        </label>
+
         <label className={isMissing("unidadId") ? "is-invalid" : ""}>
           Como se vende? <span className="required-mark">*</span>
           <SearchableSelect
@@ -2292,6 +2322,23 @@ function ProductEditModal({
                 label: empaque.nombre_empaque ?? "",
               }))}
               onChange={(nextValue) => onChange("empaqueId", nextValue)}
+            />
+          </label>
+
+          <label>
+            Proveedor
+            <SearchableSelect
+              value={form.proveedorId}
+              placeholder="Sin proveedor"
+              searchPlaceholder="Buscar proveedor"
+              options={[
+                { value: "", label: "Sin proveedor" },
+                ...options.proveedores.map((proveedor) => ({
+                  value: proveedor.id_proveedor ?? proveedor.id,
+                  label: proveedor.nombre ?? "",
+                })),
+              ]}
+              onChange={(nextValue) => onChange("proveedorId", nextValue)}
             />
           </label>
 
