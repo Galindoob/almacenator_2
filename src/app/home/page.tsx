@@ -167,6 +167,11 @@ export default function HomePage() {
   }
 
   function handleAction(action: HomeAction["action"]) {
+    if (action === "sale") {
+      router.push("/ventas");
+      return;
+    }
+
     if (action === "close") {
       router.push("/cierreCaja");
     }

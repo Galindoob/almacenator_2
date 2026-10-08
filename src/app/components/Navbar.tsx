@@ -87,6 +87,11 @@ export function Navbar({
     router.push("/producto");
   }
 
+  function goToSales() {
+    setIsMenuOpen(false);
+    router.push("/ventas");
+  }
+
   function goToProviders() {
     setIsMenuOpen(false);
     router.push("/proveedores");
@@ -193,6 +198,9 @@ export function Navbar({
             <nav className="side-menu-nav" aria-label="Opciones principales">
               <button type="button" onClick={goToHome}>
                 Caja registradora
+              </button>
+              <button type="button" onClick={goToSales}>
+                Ventas
               </button>
               <button
                 type="button"

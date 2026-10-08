@@ -14,7 +14,7 @@ export class AppInputValidationError extends Error {
 
 export const appTextInputSchema = z
   .string()
-  .max(25, unsafeInputMessage)
+  .max(60, unsafeInputMessage)
   .refine((value) => !/['"]/.test(value), unsafeInputMessage);
 
 export const appDescriptionInputSchema = z
