@@ -5,10 +5,14 @@ import {
   deleteCloudinaryImage,
   uploadCloudinaryImage,
 } from "@/lib/cloudinary-images";
+import {
+  AppInputValidationError,
+  getSafeFormString,
+  unsafeInputMessage,
+} from "@/lib/input-validation";
 
 function getFormString(formData: FormData, key: string) {
-  const value = formData.get(key);
-  return typeof value === "string" ? value : undefined;
+  return getSafeFormString(formData, key);
 }
 
 export const PUT = withAuth(async (request) => {
@@ -83,13 +87,15 @@ export const PUT = withAuth(async (request) => {
     }
 
     const message =
-      error instanceof Error && error.message.includes("imagen")
-        ? error.message
-        : "No se pudo actualizar la imagen del proveedor.";
+      error instanceof AppInputValidationError
+        ? unsafeInputMessage
+        : error instanceof Error && error.message.includes("imagen")
+          ? error.message
+          : "No se pudo actualizar la imagen del proveedor.";
 
     return NextResponse.json(
       { status: "error", message },
-      { status: 500 },
+      { status: error instanceof AppInputValidationError ? 400 : 500 },
     );
   }
 });

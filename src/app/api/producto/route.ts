@@ -2,6 +2,12 @@ import { NextResponse } from "next/server";
 import { v2 as cloudinary, type UploadApiResponse } from "cloudinary";
 import { prisma } from "@/lib/db";
 import { withAuth } from "@/lib/auth";
+import {
+  AppInputValidationError,
+  assertSafePayloadText,
+  getSafeFormString,
+  unsafeInputMessage,
+} from "@/lib/input-validation";
 import type {
   ProductoUncheckedCreateInput,
   ProductoUncheckedUpdateInput,
@@ -128,8 +134,7 @@ function normalizeName(value: string) {
 }
 
 function getFormString(formData: FormData, key: string) {
-  const value = formData.get(key);
-  return typeof value === "string" ? value : undefined;
+  return getSafeFormString(formData, key);
 }
 
 function getFormNumber(formData: FormData, key: string) {
@@ -466,6 +471,7 @@ export const POST = withAuth(async (request) => {
       ? parseProductFormData(await request.formData())
       : { product: (await request.json()) as ProductPayload, imageFile: null };
     const product = parsed.product;
+    assertSafePayloadText(product);
     const marcaNombre = product.marcaNombre?.trim();
     const categoriaNombre = product.categoriaNombre?.trim();
     const empaqueNombre = product.empaqueNombre?.trim();
@@ -590,6 +596,13 @@ export const POST = withAuth(async (request) => {
   } catch (error) {
     console.error("Error creando producto:", error);
 
+    if (error instanceof AppInputValidationError) {
+      return NextResponse.json(
+        { status: "error", message: error.message || unsafeInputMessage },
+        { status: 400 },
+      );
+    }
+
     if (isPrismaError(error, "P2002")) {
       return NextResponse.json(
         { status: "error", message: "Ya existe un producto con datos únicos repetidos." },
@@ -612,6 +625,7 @@ export const PUT = withAuth(async (request) => {
       ? parseProductFormData(await request.formData())
       : { product: (await request.json()) as ProductPayload, imageFile: null, removeImage: false };
     const product = parsed.product;
+    assertSafePayloadText(product);
 
     if (!product.id) {
       return NextResponse.json(
@@ -658,6 +672,13 @@ export const PUT = withAuth(async (request) => {
   } catch (error) {
     console.error("Error actualizando producto:", error);
 
+    if (error instanceof AppInputValidationError) {
+      return NextResponse.json(
+        { status: "error", message: error.message || unsafeInputMessage },
+        { status: 400 },
+      );
+    }
+
     if (isPrismaError(error, "P2025")) {
       return NextResponse.json(
         { status: "error", message: "El producto no existe." },
@@ -684,6 +705,7 @@ export const PATCH = PUT;
 export const DELETE = withAuth(async (request) => {
   try {
     const { id } = (await request.json()) as { id?: string };
+    assertSafePayloadText(id);
 
     if (!id) {
       return NextResponse.json(
@@ -697,6 +719,13 @@ export const DELETE = withAuth(async (request) => {
     return NextResponse.json({ status: "ok" });
   } catch (error) {
     console.error("Error eliminando producto:", error);
+
+    if (error instanceof AppInputValidationError) {
+      return NextResponse.json(
+        { status: "error", message: error.message || unsafeInputMessage },
+        { status: 400 },
+      );
+    }
 
     if (isPrismaError(error, "P2025")) {
       return NextResponse.json(

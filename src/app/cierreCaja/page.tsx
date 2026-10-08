@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
+import { isSafeAppInput } from "@/lib/input-validation";
 
 type CashRegister = {
   id_apertura: string;
@@ -94,7 +95,7 @@ export default function CierreCajaPage() {
   const differenceTitle = difference >= 0 ? "Sobran" : "Faltan";
 
   function updateCashOnHand(value: string) {
-    if (/^\d*$/.test(value)) {
+    if (isSafeAppInput(value) && /^\d*$/.test(value)) {
       setCashOnHand(value);
       setMessage("");
     }

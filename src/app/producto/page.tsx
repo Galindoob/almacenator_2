@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
 import { Navbar } from "../components/Navbar";
+import { isSafeAppInput, isSafeDescriptionInput } from "@/lib/input-validation";
 
 type Producto = {
   id: string;
@@ -561,6 +562,15 @@ export default function ProductoPage() {
   }
 
   function updateCreateForm(field: keyof CreateProductForm, value: string) {
+    const isSafeValue =
+      field === "descripcion"
+        ? isSafeDescriptionInput(value)
+        : isSafeAppInput(value);
+
+    if (!isSafeValue) {
+      return;
+    }
+
     if (
       ["contenido", "precioVenta", "costo"].includes(field) &&
       !isUnsignedIntegerText(value)
@@ -593,6 +603,15 @@ export default function ProductoPage() {
   }
 
   function updateEditForm(field: keyof EditProductForm, value: string) {
+    const isSafeValue =
+      field === "descripcion"
+        ? isSafeDescriptionInput(value)
+        : isSafeAppInput(value);
+
+    if (!isSafeValue) {
+      return;
+    }
+
     if (field === "contenido" && !isUnsignedIntegerText(value)) {
       return;
     }
@@ -626,8 +645,21 @@ export default function ProductoPage() {
   }
 
   function updateStockQuantity(value: string) {
-    if (value === "" || /^[1-9]\d*$/.test(value)) {
+    if (isSafeAppInput(value) && (value === "" || /^[1-9]\d*$/.test(value))) {
       setStockQuantity(value);
+      setStockActionMessage("");
+    }
+  }
+
+  function updateStockExpirationDate(value: string) {
+    if (isSafeAppInput(value)) {
+      setStockExpirationDate(value);
+    }
+  }
+
+  function updateWasteComment(value: string) {
+    if (isSafeAppInput(value)) {
+      setWasteComment(value);
       setStockActionMessage("");
     }
   }
@@ -1324,7 +1356,11 @@ export default function ProductoPage() {
               type="search"
               placeholder="Buscar producto"
               value={search}
-              onChange={(event) => setSearch(event.target.value)}
+              onChange={(event) => {
+                if (isSafeAppInput(event.target.value)) {
+                  setSearch(event.target.value);
+                }
+              }}
             />
             {activeProductTab === "productos" ? (
               <button
@@ -1480,8 +1516,8 @@ export default function ProductoPage() {
           selectedComment={selectedComment}
           showExpirationConfirm={showStockExpirationConfirm}
           onQuantityChange={updateStockQuantity}
-          onExpirationDateChange={setStockExpirationDate}
-          onCommentChange={setWasteComment}
+          onExpirationDateChange={updateStockExpirationDate}
+          onCommentChange={updateWasteComment}
           onClose={closeStockModal}
           onConfirmAdd={requestAddedStockConfirmation}
           onBackFromExpirationConfirm={() => setShowStockExpirationConfirm(false)}
@@ -1818,7 +1854,11 @@ function SearchableSelect({
             type="search"
             value={query}
             placeholder={searchPlaceholder}
-            onChange={(event) => setQuery(event.target.value)}
+            onChange={(event) => {
+              if (isSafeAppInput(event.target.value)) {
+                setQuery(event.target.value);
+              }
+            }}
             onMouseDown={(event) => event.stopPropagation()}
           />
           <div className="searchable-select-options">
@@ -2452,7 +2492,7 @@ function ProductDetail({
   const marginClass = (value: number) =>
     value < 0 ? "is-negative" : "is-positive";
   const handleNumericInput = (field: keyof PriceState, value: string) => {
-    if (!/^\d*$/.test(value)) {
+    if (!isSafeAppInput(value) || !/^\d*$/.test(value)) {
       return;
     }
 

@@ -3,6 +3,7 @@
 import { Fragment, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Navbar } from "../components/Navbar";
+import { isSafeAppInput } from "@/lib/input-validation";
 
 type ProviderProduct = {
   id: string;
@@ -232,6 +233,10 @@ export default function ProvidersPage() {
   }
 
   function updateForm(field: keyof ProviderForm, value: string) {
+    if (!isSafeAppInput(value)) {
+      return;
+    }
+
     setForm((current) => (current ? { ...current, [field]: value } : current));
     setMessage("");
   }
@@ -257,6 +262,10 @@ export default function ProvidersPage() {
   }
 
   function updateCreateForm(field: keyof ProviderForm, value: string) {
+    if (!isSafeAppInput(value)) {
+      return;
+    }
+
     setCreateForm((current) => ({ ...current, [field]: value }));
     setCreateMessage("");
   }
@@ -664,7 +673,11 @@ export default function ProvidersPage() {
             type="search"
             placeholder="Buscar proveedor"
             value={search}
-            onChange={(event) => setSearch(event.target.value)}
+            onChange={(event) => {
+              if (isSafeAppInput(event.target.value)) {
+                setSearch(event.target.value);
+              }
+            }}
           />
 
           {isLoading ? <p className="product-empty">Cargando proveedores...</p> : null}

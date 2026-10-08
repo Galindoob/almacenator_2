@@ -2,10 +2,31 @@ import bcrypt from "bcryptjs";
 import { Prisma } from "@/generated/prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
+import {
+  AppInputValidationError,
+  assertSafePayloadText,
+  unsafeInputMessage,
+} from "@/lib/input-validation";
 
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export async function POST(request: NextRequest) {
+  try {
+    assertSafePayloadText({
+      correo: request.headers.get("correo") ?? "",
+      contrasena: request.headers.get("contrasena") ?? "",
+      nombre: request.headers.get("nombre") ?? "",
+      apellido: request.headers.get("apellido") ?? "",
+    });
+  } catch (error) {
+    if (error instanceof AppInputValidationError) {
+      return NextResponse.json(
+        { status: "error", message: unsafeInputMessage },
+        { status: 400 },
+      );
+    }
+  }
+
   const correo = request.headers.get("correo")?.trim() ?? "";
   const contrasena = request.headers.get("contrasena") ?? "";
   const nombre = request.headers.get("nombre")?.trim() ?? "";

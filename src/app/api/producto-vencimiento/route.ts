@@ -1,6 +1,11 @@
 import { NextResponse } from "next/server";
 import { AuthenticatedRequest, withAuth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
+import {
+  AppInputValidationError,
+  assertSafePayloadText,
+  unsafeInputMessage,
+} from "@/lib/input-validation";
 
 const expiringProductSelect = {
   id: true,
@@ -163,6 +168,7 @@ export const GET = withAuth(async () => {
 export const DELETE = withAuth(async (request: AuthenticatedRequest) => {
   try {
     const payload = (await request.json()) as DeleteLotPayload;
+    assertSafePayloadText(payload);
     const expirationDate = parseExpirationDate(payload.fecha_vencimiento);
 
     if (!payload.productoId || !expirationDate) {
@@ -232,6 +238,13 @@ export const DELETE = withAuth(async (request: AuthenticatedRequest) => {
     });
   } catch (error) {
     console.error("Error eliminando lote vencido:", error);
+
+    if (error instanceof AppInputValidationError) {
+      return NextResponse.json(
+        { status: "error", message: unsafeInputMessage },
+        { status: 400 },
+      );
+    }
 
     if (error instanceof Error && error.message === "PRODUCT_NOT_FOUND") {
       return NextResponse.json(

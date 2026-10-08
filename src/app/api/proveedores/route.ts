@@ -5,6 +5,12 @@ import {
   deleteCloudinaryImage,
   uploadCloudinaryImage,
 } from "@/lib/cloudinary-images";
+import {
+  AppInputValidationError,
+  assertSafePayloadText,
+  getSafeFormString,
+  unsafeInputMessage,
+} from "@/lib/input-validation";
 
 type ProviderRow = {
   id_proveedor: string;
@@ -42,8 +48,7 @@ function optionalText(value: string | null | undefined) {
 }
 
 function getFormString(formData: FormData, key: string) {
-  const value = formData.get(key);
-  return typeof value === "string" ? value : undefined;
+  return getSafeFormString(formData, key);
 }
 
 export const GET = withAuth(async () => {
@@ -193,13 +198,15 @@ export const POST = withAuth(async (request) => {
     }
 
     const message =
-      error instanceof Error && error.message.includes("imagen")
-        ? error.message
-        : "No se pudo crear el proveedor.";
+      error instanceof AppInputValidationError
+        ? unsafeInputMessage
+        : error instanceof Error && error.message.includes("imagen")
+          ? error.message
+          : "No se pudo crear el proveedor.";
 
     return NextResponse.json(
       { status: "error", message },
-      { status: 500 },
+      { status: error instanceof AppInputValidationError ? 400 : 500 },
     );
   }
 });
@@ -207,6 +214,7 @@ export const POST = withAuth(async (request) => {
 export const PUT = withAuth(async (request) => {
   try {
     const payload = (await request.json()) as ProviderPayload;
+    assertSafePayloadText(payload);
     const providerId = payload.id_proveedor?.trim();
     const name = payload.nombre?.trim();
     const email = optionalText(payload.correo_contacto);
@@ -253,6 +261,13 @@ export const PUT = withAuth(async (request) => {
   } catch (error) {
     console.error("Error actualizando proveedor:", error);
 
+    if (error instanceof AppInputValidationError) {
+      return NextResponse.json(
+        { status: "error", message: unsafeInputMessage },
+        { status: 400 },
+      );
+    }
+
     return NextResponse.json(
       { status: "error", message: "No se pudo actualizar el proveedor." },
       { status: 500 },
@@ -266,6 +281,7 @@ export const PATCH = withAuth(async (request) => {
       id_proveedor?: string;
       productos_asignados?: string[];
     };
+    assertSafePayloadText(payload);
     const providerId = payload.id_proveedor?.trim();
     const assignedProductIds = [
       ...new Set(
@@ -330,6 +346,13 @@ export const PATCH = withAuth(async (request) => {
     return NextResponse.json({ status: "ok" });
   } catch (error) {
     console.error("Error administrando productos del proveedor:", error);
+
+    if (error instanceof AppInputValidationError) {
+      return NextResponse.json(
+        { status: "error", message: unsafeInputMessage },
+        { status: 400 },
+      );
+    }
 
     return NextResponse.json(
       { status: "error", message: "No se pudieron actualizar los productos." },

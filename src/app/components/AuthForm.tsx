@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FormEvent, useEffect, useMemo, useState } from "react";
+import { isSafeAppInput } from "@/lib/input-validation";
 
 type AuthMode = "login" | "register";
 
@@ -72,6 +73,12 @@ export function AuthForm({ mode }: AuthFormProps) {
 
   const showError = (field: keyof typeof errors) =>
     (submitted || touched[field]) && errors[field];
+
+  function updateSafeInput(value: string, setter: (nextValue: string) => void) {
+    if (isSafeAppInput(value)) {
+      setter(value);
+    }
+  }
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -173,7 +180,9 @@ export function AuthForm({ mode }: AuthFormProps) {
                   onBlur={() =>
                     setTouched((state) => ({ ...state, firstName: true }))
                   }
-                  onChange={(event) => setFirstName(event.target.value)}
+                  onChange={(event) =>
+                    updateSafeInput(event.target.value, setFirstName)
+                  }
                   aria-invalid={Boolean(showError("firstName"))}
                 />
                 {showError("firstName") ? <span>{errors.firstName}</span> : null}
@@ -188,7 +197,9 @@ export function AuthForm({ mode }: AuthFormProps) {
                   onBlur={() =>
                     setTouched((state) => ({ ...state, lastName: true }))
                   }
-                  onChange={(event) => setLastName(event.target.value)}
+                  onChange={(event) =>
+                    updateSafeInput(event.target.value, setLastName)
+                  }
                   aria-invalid={Boolean(showError("lastName"))}
                 />
                 {showError("lastName") ? <span>{errors.lastName}</span> : null}
@@ -203,7 +214,7 @@ export function AuthForm({ mode }: AuthFormProps) {
               value={email}
               placeholder="correo@dominio.com"
               onBlur={() => setTouched((state) => ({ ...state, email: true }))}
-              onChange={(event) => setEmail(event.target.value)}
+              onChange={(event) => updateSafeInput(event.target.value, setEmail)}
               aria-invalid={Boolean(showError("email"))}
             />
             {showError("email") ? <span>{errors.email}</span> : null}
@@ -220,7 +231,9 @@ export function AuthForm({ mode }: AuthFormProps) {
               onBlur={() =>
                 setTouched((state) => ({ ...state, password: true }))
               }
-              onChange={(event) => setPassword(event.target.value)}
+              onChange={(event) =>
+                updateSafeInput(event.target.value, setPassword)
+              }
               aria-invalid={Boolean(showError("password"))}
             />
             {showError("password") ? <span>{errors.password}</span> : null}
@@ -238,7 +251,9 @@ export function AuthForm({ mode }: AuthFormProps) {
                 onBlur={() =>
                   setTouched((state) => ({ ...state, confirmPassword: true }))
                 }
-                onChange={(event) => setConfirmPassword(event.target.value)}
+                onChange={(event) =>
+                  updateSafeInput(event.target.value, setConfirmPassword)
+                }
                 aria-invalid={Boolean(showError("confirmPassword"))}
               />
               {showError("confirmPassword") ? (

@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Navbar } from "../components/Navbar";
+import { isSafeAppInput } from "@/lib/input-validation";
 
 type TokenPayload = {
   nombre?: string;
@@ -159,7 +160,7 @@ export default function HomePage() {
   }
 
   function updateOpeningAmount(value: string) {
-    if (/^\d*$/.test(value)) {
+    if (isSafeAppInput(value) && /^\d*$/.test(value)) {
       setOpeningAmount(value);
       setCashMessage("");
     }

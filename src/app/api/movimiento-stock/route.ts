@@ -1,6 +1,11 @@
 import { NextResponse } from "next/server";
 import { AuthenticatedRequest, withAuth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
+import {
+  AppInputValidationError,
+  assertSafePayloadText,
+  unsafeInputMessage,
+} from "@/lib/input-validation";
 
 type MovementPayload = {
   producto?: string;
@@ -36,6 +41,17 @@ function isFutureDate(date: Date) {
 
 export const GET = withAuth(async (request: AuthenticatedRequest) => {
   const productId = request.nextUrl.searchParams.get("producto");
+
+  try {
+    assertSafePayloadText(productId);
+  } catch (error) {
+    if (error instanceof AppInputValidationError) {
+      return NextResponse.json(
+        { status: "error", message: unsafeInputMessage },
+        { status: 400 },
+      );
+    }
+  }
 
   if (!productId) {
     return NextResponse.json(
@@ -80,6 +96,7 @@ export const GET = withAuth(async (request: AuthenticatedRequest) => {
 export const POST = withAuth(async (request: AuthenticatedRequest) => {
   try {
     const payload = (await request.json()) as MovementPayload;
+    assertSafePayloadText(payload);
     const cantidad = toRoundedNumber(payload.cantidad);
     const stockRestante = toRoundedNumber(payload.stock_restante);
     const costoSinIva = toRoundedNumber(payload.costo_sin_iva);
@@ -207,6 +224,13 @@ export const POST = withAuth(async (request: AuthenticatedRequest) => {
     });
   } catch (error) {
     console.error("Error registrando movimiento de stock:", error);
+
+    if (error instanceof AppInputValidationError) {
+      return NextResponse.json(
+        { status: "error", message: unsafeInputMessage },
+        { status: 400 },
+      );
+    }
 
     if (
       error instanceof Error &&
