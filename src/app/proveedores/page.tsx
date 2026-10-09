@@ -218,7 +218,7 @@ export default function ProvidersPage() {
   }, [providerImagePreview]);
 
   function handleLogout() {
-    localStorage.clear();
+    localStorage.removeItem("jwt");
     router.replace("/login");
   }
 

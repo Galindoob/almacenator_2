@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Navbar } from "../components/Navbar";
+import { useAppearance } from "../components/AppearanceProvider";
 import { isSafeAppInput } from "@/lib/input-validation";
 
 type TokenPayload = {
@@ -93,6 +94,7 @@ function HomeActionIcon({ name }: { name: HomeAction["icon"] }) {
 
 export default function HomePage() {
   const router = useRouter();
+  const { storeName } = useAppearance();
   const [payload, setPayload] = useState<TokenPayload | null>(null);
   const [isCashRegisterOpen, setIsCashRegisterOpen] = useState<boolean | null>(null);
   const [isOpenCashModalVisible, setIsOpenCashModalVisible] = useState(false);
@@ -111,7 +113,7 @@ export default function HomePage() {
     const decodedPayload = decodeJwtPayload(token);
 
     if (!decodedPayload) {
-      localStorage.clear();
+      localStorage.removeItem("jwt");
       router.replace("/login");
       return;
     }
@@ -155,7 +157,7 @@ export default function HomePage() {
   }, [payload]);
 
   function handleLogout() {
-    localStorage.clear();
+    localStorage.removeItem("jwt");
     router.replace("/login");
   }
 
@@ -234,7 +236,7 @@ export default function HomePage() {
         <div className="home-store-badge">
           <StoreHeroIcon />
         </div>
-        <h1>nombre_tienda</h1>
+        <h1>{storeName || "nombre_tienda"}</h1>
         <p>
           Bienvenido, {payload.nombre} {payload.apellido}
         </p>

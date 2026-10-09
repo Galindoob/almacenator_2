@@ -409,7 +409,8 @@ export const ModelName = {
   empaque: 'empaque',
   apertura_caja: 'apertura_caja',
   historia_caja: 'historia_caja',
-  proveedores: 'proveedores'
+  proveedores: 'proveedores',
+  ConfiguracionUsuario: 'ConfiguracionUsuario'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -425,7 +426,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "role" | "marca" | "categoria" | "unidad" | "producto" | "movimiento_de_stock" | "unidad_medida" | "instancia_producto" | "empaque" | "apertura_caja" | "historia_caja" | "proveedores"
+    modelProps: "user" | "role" | "marca" | "categoria" | "unidad" | "producto" | "movimiento_de_stock" | "unidad_medida" | "instancia_producto" | "empaque" | "apertura_caja" | "historia_caja" | "proveedores" | "configuracionUsuario"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1391,6 +1392,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    ConfiguracionUsuario: {
+      payload: Prisma.$ConfiguracionUsuarioPayload<ExtArgs>
+      fields: Prisma.ConfiguracionUsuarioFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ConfiguracionUsuarioFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ConfiguracionUsuarioPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ConfiguracionUsuarioFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ConfiguracionUsuarioPayload>
+        }
+        findFirst: {
+          args: Prisma.ConfiguracionUsuarioFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ConfiguracionUsuarioPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ConfiguracionUsuarioFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ConfiguracionUsuarioPayload>
+        }
+        findMany: {
+          args: Prisma.ConfiguracionUsuarioFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ConfiguracionUsuarioPayload>[]
+        }
+        create: {
+          args: Prisma.ConfiguracionUsuarioCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ConfiguracionUsuarioPayload>
+        }
+        createMany: {
+          args: Prisma.ConfiguracionUsuarioCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.ConfiguracionUsuarioCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ConfiguracionUsuarioPayload>[]
+        }
+        delete: {
+          args: Prisma.ConfiguracionUsuarioDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ConfiguracionUsuarioPayload>
+        }
+        update: {
+          args: Prisma.ConfiguracionUsuarioUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ConfiguracionUsuarioPayload>
+        }
+        deleteMany: {
+          args: Prisma.ConfiguracionUsuarioDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ConfiguracionUsuarioUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.ConfiguracionUsuarioUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ConfiguracionUsuarioPayload>[]
+        }
+        upsert: {
+          args: Prisma.ConfiguracionUsuarioUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ConfiguracionUsuarioPayload>
+        }
+        aggregate: {
+          args: Prisma.ConfiguracionUsuarioAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateConfiguracionUsuario>
+        }
+        groupBy: {
+          args: Prisma.ConfiguracionUsuarioGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ConfiguracionUsuarioGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ConfiguracionUsuarioCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ConfiguracionUsuarioCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -1582,6 +1657,17 @@ export const ProveedoresScalarFieldEnum = {
 } as const
 
 export type ProveedoresScalarFieldEnum = (typeof ProveedoresScalarFieldEnum)[keyof typeof ProveedoresScalarFieldEnum]
+
+
+export const ConfiguracionUsuarioScalarFieldEnum = {
+  usuarioId: 'usuarioId',
+  tema: 'tema',
+  escala: 'escala',
+  nombreTienda: 'nombreTienda',
+  actualizado: 'actualizado'
+} as const
+
+export type ConfiguracionUsuarioScalarFieldEnum = (typeof ConfiguracionUsuarioScalarFieldEnum)[keyof typeof ConfiguracionUsuarioScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -1833,6 +1919,7 @@ export type GlobalOmitConfig = {
   apertura_caja?: Prisma.apertura_cajaOmit
   historia_caja?: Prisma.historia_cajaOmit
   proveedores?: Prisma.proveedoresOmit
+  configuracionUsuario?: Prisma.ConfiguracionUsuarioOmit
 }
 
 /* Types for Logging */

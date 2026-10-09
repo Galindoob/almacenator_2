@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { AuthenticatedRequest, withAuth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
+import { getChileCurrentDate } from "@/lib/chile-time";
 import {
   AppInputValidationError,
   assertSafePayloadText,
@@ -29,14 +30,12 @@ function parseExpirationDate(value: unknown) {
     return null;
   }
 
-  const date = new Date(`${value}T00:00:00`);
+  const date = new Date(`${value}T00:00:00.000Z`);
   return Number.isNaN(date.getTime()) ? null : date;
 }
 
-function isFutureDate(date: Date) {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  return date.getTime() > today.getTime();
+function isFutureDate(date: Date, chileToday: string) {
+  return date.toISOString().slice(0, 10) > chileToday;
 }
 
 export const GET = withAuth(async (request: AuthenticatedRequest) => {
@@ -121,7 +120,22 @@ export const POST = withAuth(async (request: AuthenticatedRequest) => {
       );
     }
 
-    if (tipo === 2 && (!expirationDate || !isFutureDate(expirationDate))) {
+    let chileToday: string | null = null;
+    if (tipo === 2) {
+      try {
+        chileToday = await getChileCurrentDate();
+      } catch {
+        return NextResponse.json(
+          { status: "error", message: "No se pudo consultar la fecha de Chile. Intenta nuevamente." },
+          { status: 503 },
+        );
+      }
+    }
+
+    if (
+      tipo === 2 &&
+      (!expirationDate || !chileToday || !isFutureDate(expirationDate, chileToday))
+    ) {
       return NextResponse.json(
         {
           status: "error",

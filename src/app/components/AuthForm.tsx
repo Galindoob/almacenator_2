@@ -22,6 +22,7 @@ export function AuthForm({ mode }: AuthFormProps) {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [submitted, setSubmitted] = useState(false);
+  const [isCheckingSession, setIsCheckingSession] = useState(true);
   const [status, setStatus] = useState<{
     type: "success" | "error";
     message: string;
@@ -35,9 +36,45 @@ export function AuthForm({ mode }: AuthFormProps) {
   });
 
   useEffect(() => {
-    if (localStorage.length > 0) {
-      router.replace("/home");
+    let isActive = true;
+    const token = localStorage.getItem("jwt");
+
+    if (!token) {
+      queueMicrotask(() => {
+        if (isActive) setIsCheckingSession(false);
+      });
+      return () => {
+        isActive = false;
+      };
     }
+
+    const controller = new AbortController();
+    const timeout = window.setTimeout(() => controller.abort(), 5000);
+
+    fetch("/api/session", {
+      headers: { Authorization: `Bearer ${token}` },
+      cache: "no-store",
+      signal: controller.signal,
+    })
+      .then((response) => {
+        if (!isActive) return;
+        if (response.ok) {
+          router.replace("/home");
+          return;
+        }
+        if (response.status === 401) localStorage.removeItem("jwt");
+        setIsCheckingSession(false);
+      })
+      .catch(() => {
+        if (isActive) setIsCheckingSession(false);
+      })
+      .finally(() => window.clearTimeout(timeout));
+
+    return () => {
+      isActive = false;
+      controller.abort();
+      window.clearTimeout(timeout);
+    };
   }, [router]);
 
   const errors = useMemo(() => {
@@ -112,8 +149,9 @@ export function AuthForm({ mode }: AuthFormProps) {
           return;
         }
 
-        localStorage.clear();
+        localStorage.removeItem("jwt");
         localStorage.setItem("jwt", data.token);
+        window.dispatchEvent(new Event("mini-gest-auth-change"));
         router.push("/home");
       } catch {
         setStatus({
@@ -156,10 +194,20 @@ export function AuthForm({ mode }: AuthFormProps) {
     }
   }
 
+  if (isCheckingSession) {
+    return (
+      <section className="auth-shell">
+        <div className="auth-panel" role="status" aria-live="polite">
+          Verificando sesión...
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section className="auth-shell">
       <div className="auth-panel">
-        <p className="auth-kicker">Almacenator 2.0</p>
+        <p className="auth-kicker">Mini Gest</p>
         <h1>{isRegister ? "Registro" : "Iniciar sesión"}</h1>
 
         {isRegister ? (

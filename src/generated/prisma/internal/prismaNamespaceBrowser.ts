@@ -63,7 +63,8 @@ export const ModelName = {
   empaque: 'empaque',
   apertura_caja: 'apertura_caja',
   historia_caja: 'historia_caja',
-  proveedores: 'proveedores'
+  proveedores: 'proveedores',
+  ConfiguracionUsuario: 'ConfiguracionUsuario'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -234,6 +235,17 @@ export const ProveedoresScalarFieldEnum = {
 } as const
 
 export type ProveedoresScalarFieldEnum = (typeof ProveedoresScalarFieldEnum)[keyof typeof ProveedoresScalarFieldEnum]
+
+
+export const ConfiguracionUsuarioScalarFieldEnum = {
+  usuarioId: 'usuarioId',
+  tema: 'tema',
+  escala: 'escala',
+  nombreTienda: 'nombreTienda',
+  actualizado: 'actualizado'
+} as const
+
+export type ConfiguracionUsuarioScalarFieldEnum = (typeof ConfiguracionUsuarioScalarFieldEnum)[keyof typeof ConfiguracionUsuarioScalarFieldEnum]
 
 
 export const SortOrder = {

@@ -2,9 +2,11 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect, useId, useState } from "react";
+import { useAppearance } from "./AppearanceProvider";
 
 type NavbarProps = {
-  onLogout: () => void;
+  onLogout?: () => void;
+  compact?: boolean;
   showProductTabs?: boolean;
   activeProductTab?: "productos" | "promociones" | "vencimiento";
   onProductTabChange?: (tab: "productos" | "promociones" | "vencimiento") => void;
@@ -36,6 +38,7 @@ function LogoutIcon() {
 
 export function Navbar({
   onLogout,
+  compact = false,
   showProductTabs = false,
   activeProductTab = "productos",
   onProductTabChange,
@@ -45,6 +48,7 @@ export function Navbar({
   const router = useRouter();
   const menuId = useId();
   const productsSubmenuId = useId();
+  const { storeName, resetThemeForLogout } = useAppearance();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isProductsOpen, setIsProductsOpen] = useState(false);
 
@@ -87,24 +91,45 @@ export function Navbar({
     router.push("/producto");
   }
 
-  function goToSales() {
-    setIsMenuOpen(false);
-    router.push("/ventas");
-  }
-
   function goToProviders() {
     setIsMenuOpen(false);
     router.push("/proveedores");
   }
 
+  function goToPriceLookup() {
+    setIsMenuOpen(false);
+    router.push("/consultar-precio");
+  }
+
+  function goToSettings() {
+    setIsMenuOpen(false);
+    router.push("/configuracion");
+  }
+
+  function goToTransactions() {
+    setIsMenuOpen(false);
+    router.push("/transacciones");
+  }
+
+  function goToReports() {
+    setIsMenuOpen(false);
+    router.push("/reportes");
+  }
+
+  function goToAcademy() {
+    setIsMenuOpen(false);
+    router.push("/academia-minigest");
+  }
+
   function handleLogout() {
     setIsMenuOpen(false);
-    onLogout();
+    resetThemeForLogout();
+    onLogout?.();
   }
 
   return (
     <>
-      <header className="app-navbar">
+      <header className={`app-navbar${compact ? " is-compact" : ""}`}>
         <button
           type="button"
           className="hamburger-button"
@@ -123,7 +148,7 @@ export function Navbar({
             <StoreIcon />
           </span>
           <span>
-            <strong>nombre_tienda</strong>
+            <strong>{storeName || "nombre_tienda"}</strong>
             <small>Tu negocio, mas simple</small>
           </span>
         </button>
@@ -159,7 +184,7 @@ export function Navbar({
           <div className="navbar-spacer" />
         )}
 
-        {showLogout ? (
+        {showLogout && onLogout ? (
           <button type="button" className="navbar-logout" onClick={handleLogout}>
             <LogoutIcon />
             Cerrar sesion
@@ -184,7 +209,7 @@ export function Navbar({
             aria-modal="true"
           >
             <div className="side-menu-header">
-              <strong>Almacenator 2.0</strong>
+              <strong>Mini Gest</strong>
               <button
                 type="button"
                 className="side-menu-close"
@@ -198,9 +223,6 @@ export function Navbar({
             <nav className="side-menu-nav" aria-label="Opciones principales">
               <button type="button" onClick={goToHome}>
                 Caja registradora
-              </button>
-              <button type="button" onClick={goToSales}>
-                Ventas
               </button>
               <button
                 type="button"
@@ -224,6 +246,15 @@ export function Navbar({
               ) : null}
               <button type="button" onClick={goToProviders}>
                 Proveedores
+              </button>
+              <button type="button" onClick={goToPriceLookup}>
+                Consultar precio
+              </button>
+              <button type="button" onClick={goToTransactions}>Transacciones</button>
+              <button type="button" onClick={goToReports}>Reportes</button>
+              <button type="button" onClick={goToAcademy}>Academia MiniGest</button>
+              <button type="button" onClick={goToSettings}>
+                Configuración
               </button>
             </nav>
           </aside>

@@ -16,6 +16,7 @@ model User {
   correo              String?               @unique @db.VarChar(255)
   apertura_caja       apertura_caja[]
   movimiento_de_stock movimiento_de_stock[]
+  configuracion       ConfiguracionUsuario?
   role                Role                  @relation(fields: [roleid], references: [id], map: "fk_users_role")
 
   @@map("users")
@@ -157,4 +158,15 @@ model proveedores {
   telefono        String?    @db.VarChar(50)
   url_imagen      String?    @db.VarChar(500)
   productos       Producto[]
+}
+
+model ConfiguracionUsuario {
+  usuarioId  String   @id @map("id_usuario") @db.Uuid
+  tema       String   @default("green") @db.VarChar(20)
+  escala     Float    @default(1) @map("escala_fuente")
+  nombreTienda String @default("nombre_tienda") @map("nombre_tienda") @db.VarChar(25)
+  actualizado DateTime @default(now()) @map("actualizado") @db.Timestamptz(6)
+  usuario    User     @relation(fields: [usuarioId], references: [id], onDelete: Cascade, map: "fk_configuracion_usuario")
+
+  @@map("configuracion_usuario")
 }

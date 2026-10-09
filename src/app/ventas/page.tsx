@@ -213,11 +213,6 @@ export default function SalesPage() {
     [cart],
   );
 
-  function handleLogout() {
-    localStorage.clear();
-    router.replace("/login");
-  }
-
   function focusWeightInput(productId: string) {
     const input = weightInputs.current.get(productId);
 
@@ -315,7 +310,7 @@ export default function SalesPage() {
 
   return (
     <main className="sales-view-shell">
-      <Navbar onLogout={handleLogout} />
+      <Navbar compact showLogout={false} />
 
       <section className="sales-view-layout">
         <section className="sales-view-cart" aria-label="Carrito de venta">
@@ -371,18 +366,10 @@ export default function SalesPage() {
         </section>
 
         <section className="sales-view-catalog" aria-label="Catalogo de productos">
-          <div className="sales-view-heading">
-            <div>
-              <span>Catalogo</span>
-              <h2>Productos disponibles</h2>
-            </div>
-            <strong>{availableProducts.length}</strong>
-          </div>
-
           <input
             className="sales-view-search"
             type="search"
-            placeholder="Buscar por nombre o marca"
+            placeholder="Buscar producto por nombre o marca"
             value={search}
             onChange={(event) => {
               if (isSafeAppInput(event.target.value)) {
@@ -391,6 +378,11 @@ export default function SalesPage() {
             }}
             aria-label="Buscar producto"
           />
+
+          <div className="sales-view-catalog-heading">
+            <h2>Productos disponibles</h2>
+            <span>{availableProducts.length}</span>
+          </div>
 
           <div className="sales-view-catalog-scroll">
             {isLoading ? (

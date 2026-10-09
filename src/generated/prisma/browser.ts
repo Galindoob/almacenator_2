@@ -82,3 +82,8 @@ export type historia_caja = Prisma.historia_cajaModel
  * 
  */
 export type proveedores = Prisma.proveedoresModel
+/**
+ * Model ConfiguracionUsuario
+ * 
+ */
+export type ConfiguracionUsuario = Prisma.ConfiguracionUsuarioModel

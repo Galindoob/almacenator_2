@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
+import { AppearanceProvider } from "./components/AppearanceProvider";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Almacenator 2.0",
-  description: "Sistema de acceso para Almacenator 2.0",
+  title: "Mini Gest",
+  description: "Sistema de acceso para Mini Gest",
 };
 
 export default function RootLayout({
@@ -13,7 +14,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="es" className="h-full antialiased">
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">
+        <AppearanceProvider>{children}</AppearanceProvider>
+      </body>
     </html>
   );
 }

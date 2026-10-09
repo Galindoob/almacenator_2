@@ -205,28 +205,23 @@ function getMovementQuantity(movement: StockMovement) {
   return movement.cantidad;
 }
 
-function getTodayAtMidnight() {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  return today;
-}
-
-function getTomorrowDateInputValue() {
-  const tomorrow = getTodayAtMidnight();
-  tomorrow.setDate(tomorrow.getDate() + 1);
+function getTomorrowDateInputValue(chileToday: string | null) {
+  if (!chileToday) return "";
+  const tomorrow = new Date(`${chileToday}T00:00:00.000Z`);
+  tomorrow.setUTCDate(tomorrow.getUTCDate() + 1);
   return tomorrow.toISOString().slice(0, 10);
 }
 
-function getExpirationDiffDays(expirationDate: string) {
-  if (!expirationDate) {
+function getExpirationDiffDays(expirationDate: string, chileToday: string | null) {
+  if (!expirationDate || !chileToday) {
     return null;
   }
 
-  const today = getTodayAtMidnight();
   const normalizedExpirationDate = expirationDate.includes("T")
     ? expirationDate.slice(0, 10)
     : expirationDate;
-  const expiration = new Date(`${normalizedExpirationDate}T00:00:00`);
+  const expiration = new Date(`${normalizedExpirationDate}T00:00:00.000Z`);
+  const today = new Date(`${chileToday}T00:00:00.000Z`);
 
   if (Number.isNaN(expiration.getTime())) {
     return null;
@@ -237,13 +232,13 @@ function getExpirationDiffDays(expirationDate: string) {
   );
 }
 
-function isFutureExpirationDate(expirationDate: string) {
-  const diffDays = getExpirationDiffDays(expirationDate);
+function isFutureExpirationDate(expirationDate: string, chileToday: string | null) {
+  const diffDays = getExpirationDiffDays(expirationDate, chileToday);
   return diffDays !== null && diffDays > 0;
 }
 
-function getExpirationSummary(expirationDate: string) {
-  const diffDays = getExpirationDiffDays(expirationDate);
+function getExpirationSummary(expirationDate: string, chileToday: string | null) {
+  const diffDays = getExpirationDiffDays(expirationDate, chileToday);
 
   if (diffDays === null) {
     return "";
@@ -274,13 +269,13 @@ function getExpirationSummary(expirationDate: string) {
   return parts.join(", ");
 }
 
-function isCloseToExpiration(expirationDate: string) {
-  const diffDays = getExpirationDiffDays(expirationDate);
+function isCloseToExpiration(expirationDate: string, chileToday: string | null) {
+  const diffDays = getExpirationDiffDays(expirationDate, chileToday);
   return diffDays !== null && diffDays > 0 && diffDays <= 5;
 }
 
-function isExpiredOrToday(expirationDate: string) {
-  const diffDays = getExpirationDiffDays(expirationDate);
+function isExpiredOrToday(expirationDate: string, chileToday: string | null) {
+  const diffDays = getExpirationDiffDays(expirationDate, chileToday);
   return diffDays !== null && diffDays <= 0;
 }
 
@@ -341,6 +336,8 @@ export default function ProductoPage() {
   const [pendingLotDeletion, setPendingLotDeletion] =
     useState<PendingLotDeletion | null>(null);
   const [isDeletingLot, setIsDeletingLot] = useState(false);
+  const [chileToday, setChileToday] = useState<string | null>(null);
+  const [chileTimeError, setChileTimeError] = useState("");
   const [deleteLotMessage, setDeleteLotMessage] = useState("");
   const [options, setOptions] = useState<ProductOptions>({
     marcas: [],
@@ -389,6 +386,30 @@ export default function ProductoPage() {
   const [editSubmitted, setEditSubmitted] = useState(false);
   const [editMessage, setEditMessage] = useState("");
   const [isSavingEdit, setIsSavingEdit] = useState(false);
+
+  const loadChileDate = useCallback(async () => {
+    try {
+      const response = await fetch("/api/hora-chile", { cache: "no-store" });
+      const data = (await response.json()) as { status?: string; fecha?: string };
+      if (!response.ok || data.status !== "ok" || !data.fecha) {
+        throw new Error("No se pudo consultar la fecha de Chile.");
+      }
+      setChileToday(data.fecha);
+      setChileTimeError("");
+    } catch {
+      setChileToday(null);
+      setChileTimeError("No se pudo consultar la fecha de Chile. Revisa tu conexión e intenta nuevamente.");
+    }
+  }, []);
+
+  useEffect(() => {
+    const initialLoad = window.setTimeout(() => void loadChileDate(), 0);
+    const interval = window.setInterval(loadChileDate, 60_000);
+    return () => {
+      window.clearTimeout(initialLoad);
+      window.clearInterval(interval);
+    };
+  }, [loadChileDate]);
 
   const loadExpiringProducts = useCallback(async () => {
     const token = localStorage.getItem("jwt");
@@ -484,7 +505,7 @@ export default function ProductoPage() {
   }, [loadExpiringProducts, router]);
 
   function handleLogout() {
-    localStorage.clear();
+    localStorage.removeItem("jwt");
     router.replace("/login");
   }
 
@@ -534,9 +555,9 @@ export default function ProductoPage() {
   const hasCloseExpiringProduct = useMemo(
     () =>
       expiringProducts.some((producto) =>
-        producto.lotes.some((lote) => isCloseToExpiration(lote.fecha_vencimiento)),
+        producto.lotes.some((lote) => isCloseToExpiration(lote.fecha_vencimiento, chileToday)),
       ),
-    [expiringProducts],
+    [expiringProducts, chileToday],
   );
 
   function selectProduct(producto: Producto) {
@@ -955,7 +976,7 @@ export default function ProductoPage() {
   function requestAddedStockConfirmation() {
     if (
       !isPositiveIntegerText(stockQuantity) ||
-      !isFutureExpirationDate(stockExpirationDate)
+      !isFutureExpirationDate(stockExpirationDate, chileToday)
     ) {
       return;
     }
@@ -1060,7 +1081,7 @@ export default function ProductoPage() {
     if (
       !selectedProduct ||
       !isPositiveIntegerText(stockQuantity) ||
-      !isFutureExpirationDate(stockExpirationDate)
+      !isFutureExpirationDate(stockExpirationDate, chileToday)
     ) {
       return;
     }
@@ -1380,6 +1401,8 @@ export default function ProductoPage() {
               products={filteredExpiringProducts}
               isLoading={isLoadingExpiringProducts}
               error={expiringProductsError}
+              chileToday={chileToday}
+              timeError={chileTimeError}
               openProductId={openExpiringProductId}
               onToggleProduct={(productId) =>
                 setOpenExpiringProductId((current) =>
@@ -1505,6 +1528,8 @@ export default function ProductoPage() {
       {selectedProduct ? (
         <StockModalView
           product={selectedProduct}
+          chileToday={chileToday}
+          timeError={chileTimeError}
           modal={stockModal}
           quantity={stockQuantity}
           expirationDate={stockExpirationDate}
@@ -1570,6 +1595,8 @@ type ExpiringProductsTableProps = {
   products: ExpiringProduct[];
   isLoading: boolean;
   error: string;
+  chileToday: string | null;
+  timeError: string;
   openProductId: string | null;
   onToggleProduct: (productId: string) => void;
   onRequestDeleteLot: (lot: PendingLotDeletion) => void;
@@ -1579,6 +1606,8 @@ function ExpiringProductsTable({
   products,
   isLoading,
   error,
+  chileToday,
+  timeError,
   openProductId,
   onToggleProduct,
   onRequestDeleteLot,
@@ -1593,6 +1622,7 @@ function ExpiringProductsTable({
 
   return (
     <div className="product-table-wrap">
+      {timeError ? <p className="product-error">{timeError}</p> : null}
       <table className="product-table expiring-products-table">
         <thead>
           <tr>
@@ -1605,7 +1635,7 @@ function ExpiringProductsTable({
             const imageUrl = producto.urlImagen || "/generic-product.svg";
             const isOpen = openProductId === producto.id;
             const hasCloseLot = producto.lotes.some((lote) =>
-              isCloseToExpiration(lote.fecha_vencimiento),
+              isCloseToExpiration(lote.fecha_vencimiento, chileToday),
             );
 
             return (
@@ -1661,9 +1691,15 @@ function ExpiringProductsTable({
                           producto.lotes.map((lote, index) => {
                             const isCloseLot = isCloseToExpiration(
                               lote.fecha_vencimiento,
+                              chileToday,
                             );
                             const canDeleteLot = isExpiredOrToday(
                               lote.fecha_vencimiento,
+                              chileToday,
+                            );
+                            const daysRemaining = getExpirationDiffDays(
+                              lote.fecha_vencimiento,
+                              chileToday,
                             );
 
                             return (
@@ -1686,9 +1722,20 @@ function ExpiringProductsTable({
                                 <span>Cantidad {lote.cantidad}</span>
                                 <span>
                                   Vencen en{" "}
-                                  {new Date(
-                                    lote.fecha_vencimiento,
-                                  ).toLocaleDateString("es-CL")}
+                                  {new Date(lote.fecha_vencimiento).toLocaleDateString(
+                                    "es-CL",
+                                    { timeZone: "UTC" },
+                                  )}
+                                  {daysRemaining !== null ? (
+                                    <span>
+                                      {" · "}
+                                      {daysRemaining > 0
+                                        ? `Le quedan ${daysRemaining} días`
+                                        : daysRemaining === 0
+                                          ? "Vence hoy"
+                                          : `Vencido hace ${Math.abs(daysRemaining)} días`}
+                                    </span>
+                                  ) : null}
                                 </span>
                                 {canDeleteLot ? (
                                   <button
@@ -2711,6 +2758,8 @@ function ProductDetail({
 
 type StockModalViewProps = {
   product: Producto;
+  chileToday: string | null;
+  timeError: string;
   modal: StockModal;
   quantity: string;
   expirationDate: string;
@@ -2734,6 +2783,8 @@ type StockModalViewProps = {
 
 function StockModalView({
   product,
+  chileToday,
+  timeError,
   modal,
   quantity,
   expirationDate,
@@ -2762,12 +2813,12 @@ function StockModalView({
   const addedStock = product.stock + parsedQuantity;
   const remainingStock = product.stock - parsedQuantity;
   const canConfirmAdd =
-    parsedQuantity > 0 && isFutureExpirationDate(expirationDate) && !isSaving;
+    parsedQuantity > 0 && isFutureExpirationDate(expirationDate, chileToday) && !isSaving;
   const canConfirmWaste = parsedQuantity > 0 && remainingStock >= 0 && !isSaving;
-  const expirationSummary = getExpirationSummary(expirationDate);
-  const minExpirationDate = getTomorrowDateInputValue();
+  const expirationSummary = getExpirationSummary(expirationDate, chileToday);
+  const minExpirationDate = getTomorrowDateInputValue(chileToday);
   const hasInvalidExpirationDate =
-    Boolean(expirationDate) && !isFutureExpirationDate(expirationDate);
+    Boolean(expirationDate) && !isFutureExpirationDate(expirationDate, chileToday);
 
   return (
     <div className="stock-modal-layer" role="presentation">
@@ -2820,8 +2871,10 @@ function StockModalView({
                   min={minExpirationDate}
                   value={expirationDate}
                   onChange={(event) => onExpirationDateChange(event.target.value)}
+                  disabled={!chileToday}
                 />
               </span>
+              {timeError ? <span className="date-error">{timeError}</span> : null}
               {hasInvalidExpirationDate ? (
                 <span className="date-error">
                   Debe ser una fecha posterior a hoy.
