@@ -46,6 +46,7 @@ const productSelect = {
   unidad_medida: true,
   precioVenta: true,
   stock: true,
+  controlaStock: true,
   urlImagen: true,
   costo: true,
   unidad: {
@@ -72,6 +73,7 @@ const productSelect = {
 
 function buildProductCreateData(
   product: ProductPayload,
+  controlaStock: boolean,
 ): ProductoUncheckedCreateInput {
   return {
     nombre: product.nombre ?? "",
@@ -89,7 +91,8 @@ function buildProductCreateData(
       typeof product.precioVenta === "number"
         ? Math.round(product.precioVenta)
         : 0,
-    stock: typeof product.stock === "number" ? Math.round(product.stock) : undefined,
+    stock: controlaStock && typeof product.stock === "number" ? Math.round(product.stock) : 0,
+    controlaStock,
     urlImagen: product.urlImagen,
     costo: typeof product.costo === "number" ? Math.round(product.costo) : undefined,
   };
@@ -97,6 +100,7 @@ function buildProductCreateData(
 
 function buildProductUpdateData(
   product: ProductPayload,
+  controlaStock: boolean,
 ): ProductoUncheckedUpdateInput {
   return {
     nombre: product.nombre,
@@ -114,7 +118,8 @@ function buildProductUpdateData(
       typeof product.precioVenta === "number"
         ? Math.round(product.precioVenta)
         : undefined,
-    stock: typeof product.stock === "number" ? Math.round(product.stock) : undefined,
+    stock: controlaStock && typeof product.stock === "number" ? Math.round(product.stock) : undefined,
+    controlaStock,
     urlImagen: product.urlImagen,
     costo: typeof product.costo === "number" ? Math.round(product.costo) : undefined,
   };
@@ -498,6 +503,18 @@ export const POST = withAuth(async (request) => {
       );
     }
 
+    const selectedUnit = await prisma.unidad.findUnique({
+      where: { id: product.unidadId },
+      select: { unidad: true },
+    });
+    if (!selectedUnit) {
+      return NextResponse.json(
+        { status: "error", message: "El tipo de venta seleccionado no existe." },
+        { status: 400 },
+      );
+    }
+    const controlaStock = selectedUnit.unidad.trim().toLowerCase() !== "por peso variable";
+
     if (marcaNombre) {
       const marcas = await prisma.marca.findMany({
         select: { id: true, nombre: true },
@@ -580,7 +597,7 @@ export const POST = withAuth(async (request) => {
     }
 
     const createdProductBase = await prisma.producto.create({
-      data: buildProductCreateData(product),
+      data: buildProductCreateData(product, controlaStock),
       select: productSelect,
     });
     if (product.empaque) {
@@ -634,12 +651,39 @@ export const PUT = withAuth(async (request) => {
       );
     }
 
-    const currentProduct = imageRequest
-      ? await prisma.producto.findUnique({
-          where: { id: product.id },
-          select: { urlImagen: true },
-        })
-      : null;
+    const currentProduct = await prisma.producto.findUnique({
+      where: { id: product.id },
+      select: { urlImagen: true, unidadId: true, stock: true, controlaStock: true },
+    });
+    if (!currentProduct) {
+      return NextResponse.json(
+        { status: "error", message: "El producto no existe." },
+        { status: 404 },
+      );
+    }
+
+    const selectedUnit = await prisma.unidad.findUnique({
+      where: { id: product.unidadId ?? currentProduct.unidadId },
+      select: { unidad: true },
+    });
+    if (!selectedUnit) {
+      return NextResponse.json(
+        { status: "error", message: "El tipo de venta seleccionado no existe." },
+        { status: 400 },
+      );
+    }
+    const controlaStock = selectedUnit.unidad.trim().toLowerCase() !== "por peso variable";
+    if (currentProduct.controlaStock && !controlaStock) {
+      const instanceCount = await prisma.instancia_producto.count({
+        where: { id_producto: product.id },
+      });
+      if (currentProduct.stock > 0 || instanceCount > 0) {
+        return NextResponse.json(
+          { status: "error", message: "Retira el stock y los lotes existentes antes de cambiar a venta por peso variable." },
+          { status: 400 },
+        );
+      }
+    }
 
     const imageUrl = await uploadProductImage(parsed.imageFile);
     const shouldClearImage = parsed.removeImage || Boolean(imageUrl);
@@ -652,7 +696,7 @@ export const PUT = withAuth(async (request) => {
 
     const updatedProductBase = await prisma.producto.update({
       where: { id: product.id },
-      data: buildProductUpdateData(product),
+      data: buildProductUpdateData(product, controlaStock),
       select: productSelect,
     });
     await setProductPackaging(updatedProductBase.id, product.empaque ?? null);

@@ -159,6 +159,14 @@ export const POST = withAuth(async (request: AuthenticatedRequest) => {
     }
 
     const result = await prisma.$transaction(async (tx) => {
+      const product = await tx.producto.findUnique({
+        where: { id: payload.producto },
+        select: { controlaStock: true },
+      });
+      if (!product?.controlaStock) {
+        throw new Error("Este producto no controla stock.");
+      }
+
       if (tipo === 1) {
         const instancesToDelete = await tx.instancia_producto.findMany({
           where: { id_producto: payload.producto },
@@ -248,7 +256,7 @@ export const POST = withAuth(async (request: AuthenticatedRequest) => {
 
     if (
       error instanceof Error &&
-      error.message === "No hay suficientes instancias para descontar la merma."
+      ["No hay suficientes instancias para descontar la merma.", "Este producto no controla stock."].includes(error.message)
     ) {
       return NextResponse.json(
         { status: "error", message: error.message },

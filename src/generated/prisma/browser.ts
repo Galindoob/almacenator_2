@@ -83,6 +83,26 @@ export type historia_caja = Prisma.historia_cajaModel
  */
 export type proveedores = Prisma.proveedoresModel
 /**
+ * Model medio_pago
+ * 
+ */
+export type medio_pago = Prisma.medio_pagoModel
+/**
+ * Model venta
+ * 
+ */
+export type venta = Prisma.ventaModel
+/**
+ * Model detalle
+ * 
+ */
+export type detalle = Prisma.detalleModel
+/**
+ * Model pagos
+ * 
+ */
+export type pagos = Prisma.pagosModel
+/**
  * Model ConfiguracionUsuario
  * 
  */

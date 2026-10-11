@@ -1,23 +1,47 @@
 import bcrypt from "bcryptjs";
 import { Prisma } from "@/generated/prisma/client";
 import { NextRequest, NextResponse } from "next/server";
+import { z } from "zod";
 import { prisma } from "@/lib/db";
+import { authEmailSchema, registrationPasswordSchema } from "@/lib/auth-validation";
 import {
   AppInputValidationError,
   assertSafePayloadText,
   unsafeInputMessage,
 } from "@/lib/input-validation";
 
-const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const registrationFieldsSchema = z.object({
+  correo: z.string(),
+  contrasena: z.string(),
+  nombre: z.string(),
+  apellido: z.string(),
+});
 
 export async function POST(request: NextRequest) {
+  const rawFields = request.headers.get("content-type")?.includes("application/json")
+    ? await request.json().catch(() => null)
+    : {
+        correo: request.headers.get("correo"),
+        contrasena: request.headers.get("contrasena"),
+        nombre: request.headers.get("nombre"),
+        apellido: request.headers.get("apellido"),
+      };
+  const fields = registrationFieldsSchema.safeParse(rawFields);
+
+  if (!fields.success) {
+    return NextResponse.json(
+      { status: "error", message: "Completa todos los datos de registro." },
+      { status: 400 },
+    );
+  }
+
+  const correo = fields.data.correo.trim();
+  const contrasena = fields.data.contrasena;
+  const nombre = fields.data.nombre.trim();
+  const apellido = fields.data.apellido.trim();
+
   try {
-    assertSafePayloadText({
-      correo: request.headers.get("correo") ?? "",
-      contrasena: request.headers.get("contrasena") ?? "",
-      nombre: request.headers.get("nombre") ?? "",
-      apellido: request.headers.get("apellido") ?? "",
-    });
+    assertSafePayloadText({ nombre, apellido });
   } catch (error) {
     if (error instanceof AppInputValidationError) {
       return NextResponse.json(
@@ -27,28 +51,25 @@ export async function POST(request: NextRequest) {
     }
   }
 
-  const correo = request.headers.get("correo")?.trim() ?? "";
-  const contrasena = request.headers.get("contrasena") ?? "";
-  const nombre = request.headers.get("nombre")?.trim() ?? "";
-  const apellido = request.headers.get("apellido")?.trim() ?? "";
-
   if (!nombre || !apellido || !correo || !contrasena) {
     return NextResponse.json(
-      { message: "Nombre, apellido, correo y contraseña son obligatorios." },
+      { status: "error", message: "Nombre, apellido, correo y contraseña son obligatorios." },
       { status: 400 },
     );
   }
 
-  if (!emailPattern.test(correo)) {
+  const validatedEmail = authEmailSchema.safeParse(correo);
+  if (!validatedEmail.success) {
     return NextResponse.json(
-      { message: "El correo no tiene un formato válido." },
+      { status: "error", message: validatedEmail.error.issues[0]?.message ?? "Correo inválido." },
       { status: 400 },
     );
   }
 
-  if (contrasena.length < 5 || contrasena.length > 12) {
+  const validatedPassword = registrationPasswordSchema.safeParse(contrasena);
+  if (!validatedPassword.success) {
     return NextResponse.json(
-      { message: "La clave debe tener mínimo 5 y máximo 12 caracteres." },
+      { status: "error", message: validatedPassword.error.issues[0]?.message ?? "Contraseña inválida." },
       { status: 400 },
     );
   }
@@ -60,7 +81,7 @@ export async function POST(request: NextRequest) {
       data: {
         nombre,
         apellido,
-        correo,
+        correo: validatedEmail.data,
         contrasena: hashedPassword,
       },
     });

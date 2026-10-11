@@ -39,6 +39,16 @@ export type ConfiguracionUsuarioMinAggregateOutputType = {
   tema: string | null
   escala: number | null
   nombreTienda: string | null
+  altoContraste: boolean | null
+  modoOscuro: boolean | null
+  empresaRut: string | null
+  empresaNombre: string | null
+  empresaGiro: string | null
+  empresaActividad: string | null
+  empresaEmail: string | null
+  empresaTelefono: string | null
+  empresaDireccion: string | null
+  empresaComuna: string | null
   actualizado: Date | null
 }
 
@@ -47,6 +57,16 @@ export type ConfiguracionUsuarioMaxAggregateOutputType = {
   tema: string | null
   escala: number | null
   nombreTienda: string | null
+  altoContraste: boolean | null
+  modoOscuro: boolean | null
+  empresaRut: string | null
+  empresaNombre: string | null
+  empresaGiro: string | null
+  empresaActividad: string | null
+  empresaEmail: string | null
+  empresaTelefono: string | null
+  empresaDireccion: string | null
+  empresaComuna: string | null
   actualizado: Date | null
 }
 
@@ -55,6 +75,16 @@ export type ConfiguracionUsuarioCountAggregateOutputType = {
   tema: number
   escala: number
   nombreTienda: number
+  altoContraste: number
+  modoOscuro: number
+  empresaRut: number
+  empresaNombre: number
+  empresaGiro: number
+  empresaActividad: number
+  empresaEmail: number
+  empresaTelefono: number
+  empresaDireccion: number
+  empresaComuna: number
   actualizado: number
   _all: number
 }
@@ -73,6 +103,16 @@ export type ConfiguracionUsuarioMinAggregateInputType = {
   tema?: true
   escala?: true
   nombreTienda?: true
+  altoContraste?: true
+  modoOscuro?: true
+  empresaRut?: true
+  empresaNombre?: true
+  empresaGiro?: true
+  empresaActividad?: true
+  empresaEmail?: true
+  empresaTelefono?: true
+  empresaDireccion?: true
+  empresaComuna?: true
   actualizado?: true
 }
 
@@ -81,6 +121,16 @@ export type ConfiguracionUsuarioMaxAggregateInputType = {
   tema?: true
   escala?: true
   nombreTienda?: true
+  altoContraste?: true
+  modoOscuro?: true
+  empresaRut?: true
+  empresaNombre?: true
+  empresaGiro?: true
+  empresaActividad?: true
+  empresaEmail?: true
+  empresaTelefono?: true
+  empresaDireccion?: true
+  empresaComuna?: true
   actualizado?: true
 }
 
@@ -89,6 +139,16 @@ export type ConfiguracionUsuarioCountAggregateInputType = {
   tema?: true
   escala?: true
   nombreTienda?: true
+  altoContraste?: true
+  modoOscuro?: true
+  empresaRut?: true
+  empresaNombre?: true
+  empresaGiro?: true
+  empresaActividad?: true
+  empresaEmail?: true
+  empresaTelefono?: true
+  empresaDireccion?: true
+  empresaComuna?: true
   actualizado?: true
   _all?: true
 }
@@ -184,6 +244,16 @@ export type ConfiguracionUsuarioGroupByOutputType = {
   tema: string
   escala: number
   nombreTienda: string
+  altoContraste: boolean
+  modoOscuro: boolean
+  empresaRut: string | null
+  empresaNombre: string | null
+  empresaGiro: string | null
+  empresaActividad: string | null
+  empresaEmail: string | null
+  empresaTelefono: string | null
+  empresaDireccion: string | null
+  empresaComuna: string | null
   actualizado: Date
   _count: ConfiguracionUsuarioCountAggregateOutputType | null
   _avg: ConfiguracionUsuarioAvgAggregateOutputType | null
@@ -215,6 +285,16 @@ export type ConfiguracionUsuarioWhereInput = {
   tema?: Prisma.StringFilter<"ConfiguracionUsuario"> | string
   escala?: Prisma.FloatFilter<"ConfiguracionUsuario"> | number
   nombreTienda?: Prisma.StringFilter<"ConfiguracionUsuario"> | string
+  altoContraste?: Prisma.BoolFilter<"ConfiguracionUsuario"> | boolean
+  modoOscuro?: Prisma.BoolFilter<"ConfiguracionUsuario"> | boolean
+  empresaRut?: Prisma.StringNullableFilter<"ConfiguracionUsuario"> | string | null
+  empresaNombre?: Prisma.StringNullableFilter<"ConfiguracionUsuario"> | string | null
+  empresaGiro?: Prisma.StringNullableFilter<"ConfiguracionUsuario"> | string | null
+  empresaActividad?: Prisma.StringNullableFilter<"ConfiguracionUsuario"> | string | null
+  empresaEmail?: Prisma.StringNullableFilter<"ConfiguracionUsuario"> | string | null
+  empresaTelefono?: Prisma.StringNullableFilter<"ConfiguracionUsuario"> | string | null
+  empresaDireccion?: Prisma.StringNullableFilter<"ConfiguracionUsuario"> | string | null
+  empresaComuna?: Prisma.StringNullableFilter<"ConfiguracionUsuario"> | string | null
   actualizado?: Prisma.DateTimeFilter<"ConfiguracionUsuario"> | Date | string
   usuario?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
 }
@@ -224,6 +304,16 @@ export type ConfiguracionUsuarioOrderByWithRelationInput = {
   tema?: Prisma.SortOrder
   escala?: Prisma.SortOrder
   nombreTienda?: Prisma.SortOrder
+  altoContraste?: Prisma.SortOrder
+  modoOscuro?: Prisma.SortOrder
+  empresaRut?: Prisma.SortOrderInput | Prisma.SortOrder
+  empresaNombre?: Prisma.SortOrderInput | Prisma.SortOrder
+  empresaGiro?: Prisma.SortOrderInput | Prisma.SortOrder
+  empresaActividad?: Prisma.SortOrderInput | Prisma.SortOrder
+  empresaEmail?: Prisma.SortOrderInput | Prisma.SortOrder
+  empresaTelefono?: Prisma.SortOrderInput | Prisma.SortOrder
+  empresaDireccion?: Prisma.SortOrderInput | Prisma.SortOrder
+  empresaComuna?: Prisma.SortOrderInput | Prisma.SortOrder
   actualizado?: Prisma.SortOrder
   usuario?: Prisma.UserOrderByWithRelationInput
 }
@@ -236,6 +326,16 @@ export type ConfiguracionUsuarioWhereUniqueInput = Prisma.AtLeast<{
   tema?: Prisma.StringFilter<"ConfiguracionUsuario"> | string
   escala?: Prisma.FloatFilter<"ConfiguracionUsuario"> | number
   nombreTienda?: Prisma.StringFilter<"ConfiguracionUsuario"> | string
+  altoContraste?: Prisma.BoolFilter<"ConfiguracionUsuario"> | boolean
+  modoOscuro?: Prisma.BoolFilter<"ConfiguracionUsuario"> | boolean
+  empresaRut?: Prisma.StringNullableFilter<"ConfiguracionUsuario"> | string | null
+  empresaNombre?: Prisma.StringNullableFilter<"ConfiguracionUsuario"> | string | null
+  empresaGiro?: Prisma.StringNullableFilter<"ConfiguracionUsuario"> | string | null
+  empresaActividad?: Prisma.StringNullableFilter<"ConfiguracionUsuario"> | string | null
+  empresaEmail?: Prisma.StringNullableFilter<"ConfiguracionUsuario"> | string | null
+  empresaTelefono?: Prisma.StringNullableFilter<"ConfiguracionUsuario"> | string | null
+  empresaDireccion?: Prisma.StringNullableFilter<"ConfiguracionUsuario"> | string | null
+  empresaComuna?: Prisma.StringNullableFilter<"ConfiguracionUsuario"> | string | null
   actualizado?: Prisma.DateTimeFilter<"ConfiguracionUsuario"> | Date | string
   usuario?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
 }, "usuarioId">
@@ -245,6 +345,16 @@ export type ConfiguracionUsuarioOrderByWithAggregationInput = {
   tema?: Prisma.SortOrder
   escala?: Prisma.SortOrder
   nombreTienda?: Prisma.SortOrder
+  altoContraste?: Prisma.SortOrder
+  modoOscuro?: Prisma.SortOrder
+  empresaRut?: Prisma.SortOrderInput | Prisma.SortOrder
+  empresaNombre?: Prisma.SortOrderInput | Prisma.SortOrder
+  empresaGiro?: Prisma.SortOrderInput | Prisma.SortOrder
+  empresaActividad?: Prisma.SortOrderInput | Prisma.SortOrder
+  empresaEmail?: Prisma.SortOrderInput | Prisma.SortOrder
+  empresaTelefono?: Prisma.SortOrderInput | Prisma.SortOrder
+  empresaDireccion?: Prisma.SortOrderInput | Prisma.SortOrder
+  empresaComuna?: Prisma.SortOrderInput | Prisma.SortOrder
   actualizado?: Prisma.SortOrder
   _count?: Prisma.ConfiguracionUsuarioCountOrderByAggregateInput
   _avg?: Prisma.ConfiguracionUsuarioAvgOrderByAggregateInput
@@ -261,6 +371,16 @@ export type ConfiguracionUsuarioScalarWhereWithAggregatesInput = {
   tema?: Prisma.StringWithAggregatesFilter<"ConfiguracionUsuario"> | string
   escala?: Prisma.FloatWithAggregatesFilter<"ConfiguracionUsuario"> | number
   nombreTienda?: Prisma.StringWithAggregatesFilter<"ConfiguracionUsuario"> | string
+  altoContraste?: Prisma.BoolWithAggregatesFilter<"ConfiguracionUsuario"> | boolean
+  modoOscuro?: Prisma.BoolWithAggregatesFilter<"ConfiguracionUsuario"> | boolean
+  empresaRut?: Prisma.StringNullableWithAggregatesFilter<"ConfiguracionUsuario"> | string | null
+  empresaNombre?: Prisma.StringNullableWithAggregatesFilter<"ConfiguracionUsuario"> | string | null
+  empresaGiro?: Prisma.StringNullableWithAggregatesFilter<"ConfiguracionUsuario"> | string | null
+  empresaActividad?: Prisma.StringNullableWithAggregatesFilter<"ConfiguracionUsuario"> | string | null
+  empresaEmail?: Prisma.StringNullableWithAggregatesFilter<"ConfiguracionUsuario"> | string | null
+  empresaTelefono?: Prisma.StringNullableWithAggregatesFilter<"ConfiguracionUsuario"> | string | null
+  empresaDireccion?: Prisma.StringNullableWithAggregatesFilter<"ConfiguracionUsuario"> | string | null
+  empresaComuna?: Prisma.StringNullableWithAggregatesFilter<"ConfiguracionUsuario"> | string | null
   actualizado?: Prisma.DateTimeWithAggregatesFilter<"ConfiguracionUsuario"> | Date | string
 }
 
@@ -268,6 +388,16 @@ export type ConfiguracionUsuarioCreateInput = {
   tema?: string
   escala?: number
   nombreTienda?: string
+  altoContraste?: boolean
+  modoOscuro?: boolean
+  empresaRut?: string | null
+  empresaNombre?: string | null
+  empresaGiro?: string | null
+  empresaActividad?: string | null
+  empresaEmail?: string | null
+  empresaTelefono?: string | null
+  empresaDireccion?: string | null
+  empresaComuna?: string | null
   actualizado?: Date | string
   usuario: Prisma.UserCreateNestedOneWithoutConfiguracionInput
 }
@@ -277,6 +407,16 @@ export type ConfiguracionUsuarioUncheckedCreateInput = {
   tema?: string
   escala?: number
   nombreTienda?: string
+  altoContraste?: boolean
+  modoOscuro?: boolean
+  empresaRut?: string | null
+  empresaNombre?: string | null
+  empresaGiro?: string | null
+  empresaActividad?: string | null
+  empresaEmail?: string | null
+  empresaTelefono?: string | null
+  empresaDireccion?: string | null
+  empresaComuna?: string | null
   actualizado?: Date | string
 }
 
@@ -284,6 +424,16 @@ export type ConfiguracionUsuarioUpdateInput = {
   tema?: Prisma.StringFieldUpdateOperationsInput | string
   escala?: Prisma.FloatFieldUpdateOperationsInput | number
   nombreTienda?: Prisma.StringFieldUpdateOperationsInput | string
+  altoContraste?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  modoOscuro?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  empresaRut?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  empresaNombre?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  empresaGiro?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  empresaActividad?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  empresaEmail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  empresaTelefono?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  empresaDireccion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  empresaComuna?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   actualizado?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   usuario?: Prisma.UserUpdateOneRequiredWithoutConfiguracionNestedInput
 }
@@ -293,6 +443,16 @@ export type ConfiguracionUsuarioUncheckedUpdateInput = {
   tema?: Prisma.StringFieldUpdateOperationsInput | string
   escala?: Prisma.FloatFieldUpdateOperationsInput | number
   nombreTienda?: Prisma.StringFieldUpdateOperationsInput | string
+  altoContraste?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  modoOscuro?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  empresaRut?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  empresaNombre?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  empresaGiro?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  empresaActividad?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  empresaEmail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  empresaTelefono?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  empresaDireccion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  empresaComuna?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   actualizado?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -301,6 +461,16 @@ export type ConfiguracionUsuarioCreateManyInput = {
   tema?: string
   escala?: number
   nombreTienda?: string
+  altoContraste?: boolean
+  modoOscuro?: boolean
+  empresaRut?: string | null
+  empresaNombre?: string | null
+  empresaGiro?: string | null
+  empresaActividad?: string | null
+  empresaEmail?: string | null
+  empresaTelefono?: string | null
+  empresaDireccion?: string | null
+  empresaComuna?: string | null
   actualizado?: Date | string
 }
 
@@ -308,6 +478,16 @@ export type ConfiguracionUsuarioUpdateManyMutationInput = {
   tema?: Prisma.StringFieldUpdateOperationsInput | string
   escala?: Prisma.FloatFieldUpdateOperationsInput | number
   nombreTienda?: Prisma.StringFieldUpdateOperationsInput | string
+  altoContraste?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  modoOscuro?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  empresaRut?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  empresaNombre?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  empresaGiro?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  empresaActividad?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  empresaEmail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  empresaTelefono?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  empresaDireccion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  empresaComuna?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   actualizado?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -316,6 +496,16 @@ export type ConfiguracionUsuarioUncheckedUpdateManyInput = {
   tema?: Prisma.StringFieldUpdateOperationsInput | string
   escala?: Prisma.FloatFieldUpdateOperationsInput | number
   nombreTienda?: Prisma.StringFieldUpdateOperationsInput | string
+  altoContraste?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  modoOscuro?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  empresaRut?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  empresaNombre?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  empresaGiro?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  empresaActividad?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  empresaEmail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  empresaTelefono?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  empresaDireccion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  empresaComuna?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   actualizado?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -329,6 +519,16 @@ export type ConfiguracionUsuarioCountOrderByAggregateInput = {
   tema?: Prisma.SortOrder
   escala?: Prisma.SortOrder
   nombreTienda?: Prisma.SortOrder
+  altoContraste?: Prisma.SortOrder
+  modoOscuro?: Prisma.SortOrder
+  empresaRut?: Prisma.SortOrder
+  empresaNombre?: Prisma.SortOrder
+  empresaGiro?: Prisma.SortOrder
+  empresaActividad?: Prisma.SortOrder
+  empresaEmail?: Prisma.SortOrder
+  empresaTelefono?: Prisma.SortOrder
+  empresaDireccion?: Prisma.SortOrder
+  empresaComuna?: Prisma.SortOrder
   actualizado?: Prisma.SortOrder
 }
 
@@ -341,6 +541,16 @@ export type ConfiguracionUsuarioMaxOrderByAggregateInput = {
   tema?: Prisma.SortOrder
   escala?: Prisma.SortOrder
   nombreTienda?: Prisma.SortOrder
+  altoContraste?: Prisma.SortOrder
+  modoOscuro?: Prisma.SortOrder
+  empresaRut?: Prisma.SortOrder
+  empresaNombre?: Prisma.SortOrder
+  empresaGiro?: Prisma.SortOrder
+  empresaActividad?: Prisma.SortOrder
+  empresaEmail?: Prisma.SortOrder
+  empresaTelefono?: Prisma.SortOrder
+  empresaDireccion?: Prisma.SortOrder
+  empresaComuna?: Prisma.SortOrder
   actualizado?: Prisma.SortOrder
 }
 
@@ -349,6 +559,16 @@ export type ConfiguracionUsuarioMinOrderByAggregateInput = {
   tema?: Prisma.SortOrder
   escala?: Prisma.SortOrder
   nombreTienda?: Prisma.SortOrder
+  altoContraste?: Prisma.SortOrder
+  modoOscuro?: Prisma.SortOrder
+  empresaRut?: Prisma.SortOrder
+  empresaNombre?: Prisma.SortOrder
+  empresaGiro?: Prisma.SortOrder
+  empresaActividad?: Prisma.SortOrder
+  empresaEmail?: Prisma.SortOrder
+  empresaTelefono?: Prisma.SortOrder
+  empresaDireccion?: Prisma.SortOrder
+  empresaComuna?: Prisma.SortOrder
   actualizado?: Prisma.SortOrder
 }
 
@@ -400,6 +620,16 @@ export type ConfiguracionUsuarioCreateWithoutUsuarioInput = {
   tema?: string
   escala?: number
   nombreTienda?: string
+  altoContraste?: boolean
+  modoOscuro?: boolean
+  empresaRut?: string | null
+  empresaNombre?: string | null
+  empresaGiro?: string | null
+  empresaActividad?: string | null
+  empresaEmail?: string | null
+  empresaTelefono?: string | null
+  empresaDireccion?: string | null
+  empresaComuna?: string | null
   actualizado?: Date | string
 }
 
@@ -407,6 +637,16 @@ export type ConfiguracionUsuarioUncheckedCreateWithoutUsuarioInput = {
   tema?: string
   escala?: number
   nombreTienda?: string
+  altoContraste?: boolean
+  modoOscuro?: boolean
+  empresaRut?: string | null
+  empresaNombre?: string | null
+  empresaGiro?: string | null
+  empresaActividad?: string | null
+  empresaEmail?: string | null
+  empresaTelefono?: string | null
+  empresaDireccion?: string | null
+  empresaComuna?: string | null
   actualizado?: Date | string
 }
 
@@ -430,6 +670,16 @@ export type ConfiguracionUsuarioUpdateWithoutUsuarioInput = {
   tema?: Prisma.StringFieldUpdateOperationsInput | string
   escala?: Prisma.FloatFieldUpdateOperationsInput | number
   nombreTienda?: Prisma.StringFieldUpdateOperationsInput | string
+  altoContraste?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  modoOscuro?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  empresaRut?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  empresaNombre?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  empresaGiro?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  empresaActividad?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  empresaEmail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  empresaTelefono?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  empresaDireccion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  empresaComuna?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   actualizado?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -437,6 +687,16 @@ export type ConfiguracionUsuarioUncheckedUpdateWithoutUsuarioInput = {
   tema?: Prisma.StringFieldUpdateOperationsInput | string
   escala?: Prisma.FloatFieldUpdateOperationsInput | number
   nombreTienda?: Prisma.StringFieldUpdateOperationsInput | string
+  altoContraste?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  modoOscuro?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  empresaRut?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  empresaNombre?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  empresaGiro?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  empresaActividad?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  empresaEmail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  empresaTelefono?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  empresaDireccion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  empresaComuna?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   actualizado?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -447,6 +707,16 @@ export type ConfiguracionUsuarioSelect<ExtArgs extends runtime.Types.Extensions.
   tema?: boolean
   escala?: boolean
   nombreTienda?: boolean
+  altoContraste?: boolean
+  modoOscuro?: boolean
+  empresaRut?: boolean
+  empresaNombre?: boolean
+  empresaGiro?: boolean
+  empresaActividad?: boolean
+  empresaEmail?: boolean
+  empresaTelefono?: boolean
+  empresaDireccion?: boolean
+  empresaComuna?: boolean
   actualizado?: boolean
   usuario?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["configuracionUsuario"]>
@@ -456,6 +726,16 @@ export type ConfiguracionUsuarioSelectCreateManyAndReturn<ExtArgs extends runtim
   tema?: boolean
   escala?: boolean
   nombreTienda?: boolean
+  altoContraste?: boolean
+  modoOscuro?: boolean
+  empresaRut?: boolean
+  empresaNombre?: boolean
+  empresaGiro?: boolean
+  empresaActividad?: boolean
+  empresaEmail?: boolean
+  empresaTelefono?: boolean
+  empresaDireccion?: boolean
+  empresaComuna?: boolean
   actualizado?: boolean
   usuario?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["configuracionUsuario"]>
@@ -465,6 +745,16 @@ export type ConfiguracionUsuarioSelectUpdateManyAndReturn<ExtArgs extends runtim
   tema?: boolean
   escala?: boolean
   nombreTienda?: boolean
+  altoContraste?: boolean
+  modoOscuro?: boolean
+  empresaRut?: boolean
+  empresaNombre?: boolean
+  empresaGiro?: boolean
+  empresaActividad?: boolean
+  empresaEmail?: boolean
+  empresaTelefono?: boolean
+  empresaDireccion?: boolean
+  empresaComuna?: boolean
   actualizado?: boolean
   usuario?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["configuracionUsuario"]>
@@ -474,10 +764,20 @@ export type ConfiguracionUsuarioSelectScalar = {
   tema?: boolean
   escala?: boolean
   nombreTienda?: boolean
+  altoContraste?: boolean
+  modoOscuro?: boolean
+  empresaRut?: boolean
+  empresaNombre?: boolean
+  empresaGiro?: boolean
+  empresaActividad?: boolean
+  empresaEmail?: boolean
+  empresaTelefono?: boolean
+  empresaDireccion?: boolean
+  empresaComuna?: boolean
   actualizado?: boolean
 }
 
-export type ConfiguracionUsuarioOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"usuarioId" | "tema" | "escala" | "nombreTienda" | "actualizado", ExtArgs["result"]["configuracionUsuario"]>
+export type ConfiguracionUsuarioOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"usuarioId" | "tema" | "escala" | "nombreTienda" | "altoContraste" | "modoOscuro" | "empresaRut" | "empresaNombre" | "empresaGiro" | "empresaActividad" | "empresaEmail" | "empresaTelefono" | "empresaDireccion" | "empresaComuna" | "actualizado", ExtArgs["result"]["configuracionUsuario"]>
 export type ConfiguracionUsuarioInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   usuario?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
@@ -498,6 +798,16 @@ export type $ConfiguracionUsuarioPayload<ExtArgs extends runtime.Types.Extension
     tema: string
     escala: number
     nombreTienda: string
+    altoContraste: boolean
+    modoOscuro: boolean
+    empresaRut: string | null
+    empresaNombre: string | null
+    empresaGiro: string | null
+    empresaActividad: string | null
+    empresaEmail: string | null
+    empresaTelefono: string | null
+    empresaDireccion: string | null
+    empresaComuna: string | null
     actualizado: Date
   }, ExtArgs["result"]["configuracionUsuario"]>
   composites: {}
@@ -927,6 +1237,16 @@ export interface ConfiguracionUsuarioFieldRefs {
   readonly tema: Prisma.FieldRef<"ConfiguracionUsuario", 'String'>
   readonly escala: Prisma.FieldRef<"ConfiguracionUsuario", 'Float'>
   readonly nombreTienda: Prisma.FieldRef<"ConfiguracionUsuario", 'String'>
+  readonly altoContraste: Prisma.FieldRef<"ConfiguracionUsuario", 'Boolean'>
+  readonly modoOscuro: Prisma.FieldRef<"ConfiguracionUsuario", 'Boolean'>
+  readonly empresaRut: Prisma.FieldRef<"ConfiguracionUsuario", 'String'>
+  readonly empresaNombre: Prisma.FieldRef<"ConfiguracionUsuario", 'String'>
+  readonly empresaGiro: Prisma.FieldRef<"ConfiguracionUsuario", 'String'>
+  readonly empresaActividad: Prisma.FieldRef<"ConfiguracionUsuario", 'String'>
+  readonly empresaEmail: Prisma.FieldRef<"ConfiguracionUsuario", 'String'>
+  readonly empresaTelefono: Prisma.FieldRef<"ConfiguracionUsuario", 'String'>
+  readonly empresaDireccion: Prisma.FieldRef<"ConfiguracionUsuario", 'String'>
+  readonly empresaComuna: Prisma.FieldRef<"ConfiguracionUsuario", 'String'>
   readonly actualizado: Prisma.FieldRef<"ConfiguracionUsuario", 'DateTime'>
 }
     

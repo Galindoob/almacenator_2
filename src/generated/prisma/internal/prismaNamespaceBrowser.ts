@@ -64,6 +64,10 @@ export const ModelName = {
   apertura_caja: 'apertura_caja',
   historia_caja: 'historia_caja',
   proveedores: 'proveedores',
+  medio_pago: 'medio_pago',
+  venta: 'venta',
+  detalle: 'detalle',
+  pagos: 'pagos',
   ConfiguracionUsuario: 'ConfiguracionUsuario'
 } as const
 
@@ -137,6 +141,7 @@ export const ProductoScalarFieldEnum = {
   unidadId: 'unidadId',
   precioVenta: 'precioVenta',
   stock: 'stock',
+  controlaStock: 'controlaStock',
   urlImagen: 'urlImagen',
   costo: 'costo',
   contenido: 'contenido',
@@ -237,11 +242,66 @@ export const ProveedoresScalarFieldEnum = {
 export type ProveedoresScalarFieldEnum = (typeof ProveedoresScalarFieldEnum)[keyof typeof ProveedoresScalarFieldEnum]
 
 
+export const Medio_pagoScalarFieldEnum = {
+  id_medio: 'id_medio',
+  medio_de_pago: 'medio_de_pago'
+} as const
+
+export type Medio_pagoScalarFieldEnum = (typeof Medio_pagoScalarFieldEnum)[keyof typeof Medio_pagoScalarFieldEnum]
+
+
+export const VentaScalarFieldEnum = {
+  id_venta: 'id_venta',
+  num_venta: 'num_venta',
+  id_vendedor: 'id_vendedor',
+  valor_total: 'valor_total',
+  fecha_de_creacion: 'fecha_de_creacion',
+  fecha_pago: 'fecha_pago',
+  estado: 'estado',
+  vuelto: 'vuelto'
+} as const
+
+export type VentaScalarFieldEnum = (typeof VentaScalarFieldEnum)[keyof typeof VentaScalarFieldEnum]
+
+
+export const DetalleScalarFieldEnum = {
+  id_detalle: 'id_detalle',
+  id_venta: 'id_venta',
+  id_producto: 'id_producto',
+  costo_adquisicion_actual: 'costo_adquisicion_actual',
+  cantidad: 'cantidad',
+  precio_actual: 'precio_actual',
+  subtotal_venta: 'subtotal_venta'
+} as const
+
+export type DetalleScalarFieldEnum = (typeof DetalleScalarFieldEnum)[keyof typeof DetalleScalarFieldEnum]
+
+
+export const PagosScalarFieldEnum = {
+  id_pago: 'id_pago',
+  id_venta: 'id_venta',
+  id_medio_pago: 'id_medio_pago',
+  pago: 'pago'
+} as const
+
+export type PagosScalarFieldEnum = (typeof PagosScalarFieldEnum)[keyof typeof PagosScalarFieldEnum]
+
+
 export const ConfiguracionUsuarioScalarFieldEnum = {
   usuarioId: 'usuarioId',
   tema: 'tema',
   escala: 'escala',
   nombreTienda: 'nombreTienda',
+  altoContraste: 'altoContraste',
+  modoOscuro: 'modoOscuro',
+  empresaRut: 'empresaRut',
+  empresaNombre: 'empresaNombre',
+  empresaGiro: 'empresaGiro',
+  empresaActividad: 'empresaActividad',
+  empresaEmail: 'empresaEmail',
+  empresaTelefono: 'empresaTelefono',
+  empresaDireccion: 'empresaDireccion',
+  empresaComuna: 'empresaComuna',
   actualizado: 'actualizado'
 } as const
 

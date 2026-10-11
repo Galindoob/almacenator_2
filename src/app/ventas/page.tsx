@@ -2,7 +2,9 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { ArrowLeft, ArrowLeftRight, Banknote, CreditCard, Wallet } from "lucide-react";
 import { Navbar } from "../components/Navbar";
+import { useAppearance } from "../components/AppearanceProvider";
 import { isSafeAppInput } from "@/lib/input-validation";
 
 type Producto = {
@@ -11,6 +13,7 @@ type Producto = {
   descripcion: string | null;
   contenido: number | null;
   stock: number;
+  controlaStock: boolean;
   precioVenta: number;
   urlImagen: string | null;
   unidad: {
@@ -48,7 +51,20 @@ type WeightCartItem = {
 
 type CartItem = UnitCartItem | WeightCartItem;
 
-const VARIABLE_WEIGHT_LABEL = "por peso variable";
+type PaymentMethod = {
+  id_medio: string;
+  medio_de_pago: string;
+};
+
+const PAYMENT_METHOD_ORDER: Record<string, number> = {
+  efectivo: 0,
+  debito: 1,
+  credito: 2,
+  transferencia: 3,
+  trasnferencia: 3,
+  edenred: 4,
+};
+
 const FALLBACK_IMAGE = "/generic-product.svg";
 const QUANTITY_PATTERN = /^\d*([.,]\d*)?$/;
 const PRICE_PATTERN = /^\d*$/;
@@ -57,8 +73,35 @@ function formatPrice(value: number) {
   return `$${value.toLocaleString("es-CL")}`;
 }
 
+function PaymentMethodIcon({ name }: { name: string }) {
+  const normalized = name.trim().toLocaleLowerCase("es-CL");
+  if (normalized === "efectivo") return <Banknote aria-hidden="true" />;
+  if (normalized === "debito" || normalized === "débito" || normalized === "credito" || normalized === "crédito") {
+    return <CreditCard aria-hidden="true" />;
+  }
+  if (normalized === "transferencia" || normalized === "trasnferencia") {
+    return <ArrowLeftRight aria-hidden="true" />;
+  }
+  return <Wallet aria-hidden="true" />;
+}
+
+function formatPaymentMethodName(name: string) {
+  const normalized = name.trim().toLocaleLowerCase("es-CL");
+  if (normalized === "debito") return "Débito";
+  if (normalized === "credito") return "Crédito";
+  if (normalized === "trasnferencia") return "Transferencia";
+  return name.charAt(0).toLocaleUpperCase("es-CL") + name.slice(1);
+}
+
+function paymentMethodRank(name: string) {
+  const normalized = name.trim().toLocaleLowerCase("es-CL")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
+  return PAYMENT_METHOD_ORDER[normalized] ?? Number.MAX_SAFE_INTEGER;
+}
+
 function isVariableWeight(product: Producto) {
-  return product.unidad.unidad.trim().toLowerCase() === VARIABLE_WEIGHT_LABEL;
+  return !product.controlaStock;
 }
 
 function getMeasureName(product: Producto) {
@@ -146,11 +189,17 @@ function ProductDetails({ product }: { product: Producto }) {
 
 export default function SalesPage() {
   const router = useRouter();
+  const { storeName } = useAppearance();
   const [productos, setProductos] = useState<Producto[]>([]);
   const [cart, setCart] = useState<CartItem[]>([]);
   const [search, setSearch] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
+  const [rightPanel, setRightPanel] = useState<"catalog" | "payment">("catalog");
+  const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
+  const [paymentMethodsLoading, setPaymentMethodsLoading] = useState(false);
+  const [paymentMethodsError, setPaymentMethodsError] = useState("");
+  const [selectedPaymentMethodId, setSelectedPaymentMethodId] = useState<string | null>(null);
   const weightInputs = useRef(new Map<string, HTMLInputElement>());
 
   useEffect(() => {
@@ -196,12 +245,45 @@ export default function SalesPage() {
     loadProductos();
   }, [router]);
 
+  useEffect(() => {
+    if (rightPanel !== "payment") return;
+
+    const token = localStorage.getItem("jwt");
+    if (!token) return;
+
+    const controller = new AbortController();
+    fetch("/api/medio-pago", {
+      headers: { Authorization: `Bearer ${token}` },
+      cache: "no-store",
+      signal: controller.signal,
+    })
+      .then(async (response) => {
+        if (!response.ok) throw new Error("No se pudieron cargar los métodos de pago.");
+        return response.json() as Promise<{ paymentMethods: PaymentMethod[] }>;
+      })
+      .then((data) => {
+        setPaymentMethods([...data.paymentMethods].sort((a, b) =>
+          paymentMethodRank(a.medio_de_pago) - paymentMethodRank(b.medio_de_pago) ||
+          a.medio_de_pago.localeCompare(b.medio_de_pago, "es-CL"),
+        ));
+        setPaymentMethodsError("");
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) setPaymentMethodsError("No se pudieron cargar los métodos de pago.");
+      })
+      .finally(() => {
+        if (!controller.signal.aborted) setPaymentMethodsLoading(false);
+      });
+
+    return () => controller.abort();
+  }, [rightPanel]);
+
   const availableProducts = useMemo(() => {
     const normalizedSearch = search.trim().toLowerCase();
 
     return productos.filter(
       (product) =>
-        product.stock >= 1 &&
+        (!product.controlaStock || product.stock >= 1) &&
         (!normalizedSearch ||
           product.nombre.toLowerCase().includes(normalizedSearch) ||
           product.marca.nombre.toLowerCase().includes(normalizedSearch)),
@@ -212,6 +294,16 @@ export default function SalesPage() {
     () => cart.reduce((sum, item) => sum + getLineTotal(item), 0),
     [cart],
   );
+  const amountPaid = 0;
+  const amountDue = Math.max(0, cartTotal - amountPaid);
+  const showPaymentDetails = rightPanel === "payment" && cartTotal > 0;
+
+  function openPaymentDetails() {
+    if (cartTotal <= 0 || rightPanel === "payment") return;
+    setPaymentMethodsLoading(true);
+    setPaymentMethodsError("");
+    setRightPanel("payment");
+  }
 
   function focusWeightInput(productId: string) {
     const input = weightInputs.current.get(productId);
@@ -224,6 +316,7 @@ export default function SalesPage() {
   }
 
   function addToCart(product: Producto) {
+    if (cartTotal <= 0) setRightPanel("catalog");
     const existing = cart.find((item) => item.product.id === product.id);
 
     if (!existing) {
@@ -244,6 +337,10 @@ export default function SalesPage() {
   }
 
   function updateUnitQuantity(productId: string, delta: number) {
+    const item = cart.find((entry) => entry.product.id === productId);
+    if (item?.kind === "unit" && cartTotal - item.product.precioVenta <= 0 && delta < 0) {
+      setRightPanel("catalog");
+    }
     setCart((items) =>
       items.flatMap((item) => {
         if (item.product.id !== productId || item.kind !== "unit") {
@@ -257,6 +354,8 @@ export default function SalesPage() {
   }
 
   function removeFromCart(productId: string) {
+    const item = cart.find((entry) => entry.product.id === productId);
+    if (item && cartTotal - getLineTotal(item) <= 0) setRightPanel("catalog");
     weightInputs.current.delete(productId);
     setCart((items) => items.filter((item) => item.product.id !== productId));
   }
@@ -265,6 +364,11 @@ export default function SalesPage() {
   function updateWeightPrice(productId: string, text: string) {
     if (!isSafeAppInput(text) || !PRICE_PATTERN.test(text)) {
       return;
+    }
+
+    const item = cart.find((entry) => entry.product.id === productId);
+    if (item?.kind === "weight" && cartTotal - getLineTotal(item) + parseDecimal(text) <= 0) {
+      setRightPanel("catalog");
     }
 
     setCart((items) =>
@@ -284,6 +388,11 @@ export default function SalesPage() {
   function updateWeightQuantity(productId: string, text: string) {
     if (!isSafeAppInput(text) || !QUANTITY_PATTERN.test(text)) {
       return;
+    }
+
+    const item = cart.find((entry) => entry.product.id === productId);
+    if (item?.kind === "weight" && cartTotal - getLineTotal(item) + Math.round(item.product.precioVenta * parseDecimal(text)) <= 0) {
+      setRightPanel("catalog");
     }
 
     setCart((items) =>
@@ -322,11 +431,16 @@ export default function SalesPage() {
             <strong>{cart.length}</strong>
           </div>
 
-          <div className="sales-view-cart-scroll">
+          <div className={`sales-view-cart-scroll${cart.length === 0 ? " is-empty" : ""}`}>
             {cart.length === 0 ? (
-              <p className="sales-view-empty">
-                El carrito esta vacio. Selecciona productos del catalogo para agregarlos.
-              </p>
+              <div className="sales-view-empty">
+                <strong className="sales-view-empty-store">{storeName}</strong>
+                <svg className="sales-view-empty-icon" viewBox="0 0 64 64" fill="none" aria-hidden="true">
+                  <path d="M23 9h-7a5 5 0 0 0-5 5v41a5 5 0 0 0 5 5h32a5 5 0 0 0 5-5V14a5 5 0 0 0-5-5h-7" />
+                  <path d="M24 6h16v9H24zM21 27h22M21 37h22M21 47h14" />
+                </svg>
+                <p>Busca o escanea un producto<br />para iniciar esta venta</p>
+              </div>
             ) : (
               <table className="sales-view-cart-table">
                 <thead>
@@ -359,13 +473,73 @@ export default function SalesPage() {
             )}
           </div>
 
-          <div className="sales-view-total" aria-live="polite">
+          <button
+            type="button"
+            className="sales-view-total"
+            disabled={cartTotal <= 0}
+            onClick={openPaymentDetails}
+            aria-label={`Ver detalle del carrito. Total ${formatPrice(cartTotal)}`}
+          >
             <span>Total</span>
             <strong>{formatPrice(cartTotal)}</strong>
-          </div>
+          </button>
         </section>
 
-        <section className="sales-view-catalog" aria-label="Catalogo de productos">
+        <section className={`sales-view-catalog${showPaymentDetails ? " sales-view-payment" : ""}`} aria-label={showPaymentDetails ? "Detalle del carrito" : "Catálogo de productos"}>
+          {showPaymentDetails ? (
+            <>
+              <header className="sales-payment-heading">
+                <button type="button" onClick={() => setRightPanel("catalog")} aria-label="Volver a productos" title="Volver a productos">
+                  <ArrowLeft aria-hidden="true" />
+                </button>
+                <h2>Detalle del carrito</h2>
+              </header>
+
+              <div className="sales-payment-scroll">
+                <dl className="sales-payment-summary">
+                  <div>
+                    <dt>Productos por cobrar ({cart.length})</dt>
+                    <dd>{formatPrice(cartTotal)}</dd>
+                  </div>
+                  <div>
+                    <dt>Ya pagado</dt>
+                    <dd>{formatPrice(amountPaid)}</dd>
+                  </div>
+                  <div className="is-due">
+                    <dt>Por cobrar</dt>
+                    <dd>{formatPrice(amountDue)}</dd>
+                  </div>
+                </dl>
+
+                <div className="sales-payment-methods-heading">
+                  <h3>Método de pago</h3>
+                </div>
+                {paymentMethodsLoading ? (
+                  <p className="sales-payment-status" role="status">Cargando métodos de pago...</p>
+                ) : paymentMethodsError ? (
+                  <p className="sales-payment-status is-error" role="alert">{paymentMethodsError}</p>
+                ) : paymentMethods.length === 0 ? (
+                  <p className="sales-payment-status">No hay métodos de pago disponibles.</p>
+                ) : (
+                  <div className="sales-payment-method-grid">
+                    {paymentMethods.map((method) => (
+                      <button
+                        key={method.id_medio}
+                        type="button"
+                        className="sales-payment-method"
+                        aria-pressed={selectedPaymentMethodId === method.id_medio}
+                        onClick={() => setSelectedPaymentMethodId(method.id_medio)}
+                      >
+                        <PaymentMethodIcon name={method.medio_de_pago} />
+                        <span>{formatPaymentMethodName(method.medio_de_pago)}</span>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </>
+          ) : (
+          <>
           <input
             className="sales-view-search"
             type="search"
@@ -390,7 +564,7 @@ export default function SalesPage() {
             ) : error ? (
               <p className="sales-view-status is-error">{error}</p>
             ) : availableProducts.length === 0 ? (
-              <p className="sales-view-status">No hay productos con stock disponible.</p>
+              <p className="sales-view-status">No hay productos disponibles.</p>
             ) : (
               <div className="sales-view-grid">
                 {availableProducts.map((product) => {
@@ -423,7 +597,9 @@ export default function SalesPage() {
                         <ProductDetails product={product} />
                         <span className="sales-view-card-footer">
                           <span className="sales-view-price">{getPriceLabel(product)}</span>
-                          <span className="sales-view-stock">Stock: {product.stock}</span>
+                          {product.controlaStock ? (
+                            <span className="sales-view-stock">Stock: {product.stock}</span>
+                          ) : null}
                         </span>
                       </span>
                     </button>
@@ -432,6 +608,8 @@ export default function SalesPage() {
               </div>
             )}
           </div>
+          </>
+          )}
         </section>
       </section>
     </main>
@@ -532,9 +710,6 @@ function CartRow({
                 <em>{measure}</em>
               </span>
             </label>
-            {parseDecimal(item.quantityText) > product.stock ? (
-              <small className="is-warning">Supera el stock disponible ({product.stock})</small>
-            ) : null}
           </div>
         )}
       </td>

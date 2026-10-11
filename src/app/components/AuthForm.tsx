@@ -4,14 +4,20 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import { isSafeAppInput } from "@/lib/input-validation";
+import {
+  authEmailSchema,
+  MAX_PASSWORD_BYTES,
+  MIN_PASSWORD_LENGTH,
+  passwordByteCount,
+  passwordCharacterCount,
+  registrationPasswordSchema,
+} from "@/lib/auth-validation";
 
 type AuthMode = "login" | "register";
 
 type AuthFormProps = {
   mode: AuthMode;
 };
-
-const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export function AuthForm({ mode }: AuthFormProps) {
   const router = useRouter();
@@ -40,6 +46,7 @@ export function AuthForm({ mode }: AuthFormProps) {
     const token = localStorage.getItem("jwt");
 
     if (!token) {
+      window.dispatchEvent(new Event("mini-gest-auth-change"));
       queueMicrotask(() => {
         if (isActive) setIsCheckingSession(false);
       });
@@ -62,7 +69,10 @@ export function AuthForm({ mode }: AuthFormProps) {
           router.replace("/home");
           return;
         }
-        if (response.status === 401) localStorage.removeItem("jwt");
+        if (response.status === 401) {
+          localStorage.removeItem("jwt");
+          window.dispatchEvent(new Event("mini-gest-auth-change"));
+        }
         setIsCheckingSession(false);
       })
       .catch(() => {
@@ -78,6 +88,9 @@ export function AuthForm({ mode }: AuthFormProps) {
   }, [router]);
 
   const errors = useMemo(() => {
+    const validatedEmail = authEmailSchema.safeParse(email);
+    const validatedPassword = registrationPasswordSchema.safeParse(password);
+
     return {
       firstName:
         isRegister && firstName.trim().length === 0
@@ -88,16 +101,18 @@ export function AuthForm({ mode }: AuthFormProps) {
           ? "El apellido es obligatorio."
           : "",
       email:
-        email.length === 0
+        email.trim().length === 0
           ? "El correo es obligatorio."
-          : !emailPattern.test(email)
-            ? "El correo debe respetar el formato ejemplo@dominio.com."
+          : !validatedEmail.success
+            ? validatedEmail.error.issues[0]?.message ?? "El correo no tiene un formato válido."
             : "",
       password:
         password.length === 0
           ? "La contraseña es obligatoria."
-          : password.length < 5 || password.length > 12
-            ? "La clave debe tener mínimo 5 y máximo 12 caracteres."
+          : isRegister && !validatedPassword.success
+            ? validatedPassword.error.issues[0]?.message ?? "Contraseña inválida."
+            : passwordByteCount(password) > MAX_PASSWORD_BYTES
+              ? `La contraseña no puede superar ${MAX_PASSWORD_BYTES} bytes.`
             : "",
       confirmPassword:
         isRegister && confirmPassword.length === 0
@@ -107,6 +122,16 @@ export function AuthForm({ mode }: AuthFormProps) {
             : "",
     };
   }, [confirmPassword, email, firstName, isRegister, lastName, password]);
+
+  const passwordChecks = [
+    {
+      label: `${MIN_PASSWORD_LENGTH} caracteres como mínimo (obligatorio)`,
+      met: passwordCharacterCount(password) >= MIN_PASSWORD_LENGTH,
+    },
+    { label: "Una mayúscula (opcional)", met: /\p{Lu}/u.test(password) },
+    { label: "Un número (opcional)", met: /\p{N}/u.test(password) },
+    { label: "Un símbolo (opcional)", met: /[^\p{L}\p{N}\s]/u.test(password) },
+  ];
 
   const showError = (field: keyof typeof errors) =>
     (submitted || touched[field]) && errors[field];
@@ -131,9 +156,9 @@ export function AuthForm({ mode }: AuthFormProps) {
         const response = await fetch("/api/login", {
           method: "POST",
           headers: {
-            correo: email,
-            contrasena: password,
+            "Content-Type": "application/json",
           },
+          body: JSON.stringify({ correo: email.trim(), contrasena: password }),
         });
         const data = (await response.json()) as {
           status?: "ok" | "error";
@@ -166,11 +191,14 @@ export function AuthForm({ mode }: AuthFormProps) {
       const response = await fetch("/api/register", {
         method: "POST",
         headers: {
-          correo: email,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          correo: email.trim(),
           contrasena: password,
           nombre: firstName.trim(),
           apellido: lastName.trim(),
-        },
+        }),
       });
       const data = (await response.json()) as {
         status?: "ok" | "error";
@@ -260,32 +288,45 @@ export function AuthForm({ mode }: AuthFormProps) {
             <input
               type="email"
               value={email}
+              maxLength={255}
+              autoComplete="email"
               placeholder="correo@dominio.com"
               onBlur={() => setTouched((state) => ({ ...state, email: true }))}
-              onChange={(event) => updateSafeInput(event.target.value, setEmail)}
+              onChange={(event) => {
+                if (!/['"]/.test(event.target.value)) setEmail(event.target.value);
+              }}
               aria-invalid={Boolean(showError("email"))}
             />
             {showError("email") ? <span>{errors.email}</span> : null}
           </label>
 
-          <label>
-            Contraseña
-            <input
-              type="password"
-              value={password}
-              placeholder="5 a 12 caracteres"
-              minLength={5}
-              maxLength={12}
-              onBlur={() =>
-                setTouched((state) => ({ ...state, password: true }))
-              }
-              onChange={(event) =>
-                updateSafeInput(event.target.value, setPassword)
-              }
-              aria-invalid={Boolean(showError("password"))}
-            />
-            {showError("password") ? <span>{errors.password}</span> : null}
-          </label>
+          <div className="auth-password-block">
+            <label>
+              Contraseña
+              <input
+                type="password"
+                value={password}
+                placeholder={isRegister ? "Al menos 15 caracteres" : "Tu contraseña"}
+                maxLength={128}
+                autoComplete={isRegister ? "new-password" : "current-password"}
+                onBlur={() =>
+                  setTouched((state) => ({ ...state, password: true }))
+                }
+                onChange={(event) => setPassword(event.target.value)}
+                aria-invalid={Boolean(showError("password"))}
+              />
+              {showError("password") ? <span>{errors.password}</span> : null}
+            </label>
+            {isRegister ? (
+              <ul className="auth-password-rules" aria-label="Condiciones de la contraseña">
+                {passwordChecks.map((check) => (
+                  <li className={check.met ? "is-met" : ""} key={check.label}>
+                    {check.met ? "✓" : "○"} {check.label}
+                  </li>
+                ))}
+              </ul>
+            ) : null}
+          </div>
 
           {isRegister ? (
             <label>
@@ -294,14 +335,12 @@ export function AuthForm({ mode }: AuthFormProps) {
                 type="password"
                 value={confirmPassword}
                 placeholder="Repite tu contraseña"
-                minLength={5}
-                maxLength={12}
+                maxLength={128}
+                autoComplete="new-password"
                 onBlur={() =>
                   setTouched((state) => ({ ...state, confirmPassword: true }))
                 }
-                onChange={(event) =>
-                  updateSafeInput(event.target.value, setConfirmPassword)
-                }
+                onChange={(event) => setConfirmPassword(event.target.value)}
                 aria-invalid={Boolean(showError("confirmPassword"))}
               />
               {showError("confirmPassword") ? (

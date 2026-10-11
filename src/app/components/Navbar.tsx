@@ -48,9 +48,11 @@ export function Navbar({
   const router = useRouter();
   const menuId = useId();
   const productsSubmenuId = useId();
+  const reportsSubmenuId = useId();
   const { storeName, resetThemeForLogout } = useAppearance();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isProductsOpen, setIsProductsOpen] = useState(false);
+  const [isReportsOpen, setIsReportsOpen] = useState(false);
 
   useEffect(() => {
     function handleEscape(event: KeyboardEvent) {
@@ -111,9 +113,14 @@ export function Navbar({
     router.push("/transacciones");
   }
 
-  function goToReports() {
+  function goToInstantReport() {
     setIsMenuOpen(false);
     router.push("/reportes");
+  }
+
+  function goToProductReport() {
+    setIsMenuOpen(false);
+    router.push("/reportes/productos");
   }
 
   function goToAcademy() {
@@ -251,7 +258,24 @@ export function Navbar({
                 Consultar precio
               </button>
               <button type="button" onClick={goToTransactions}>Transacciones</button>
-              <button type="button" onClick={goToReports}>Reportes</button>
+              <button
+                type="button"
+                aria-controls={reportsSubmenuId}
+                aria-expanded={isReportsOpen}
+                onClick={() => setIsReportsOpen((value) => !value)}
+              >
+                Reportes
+              </button>
+              {isReportsOpen ? (
+                <div id={reportsSubmenuId} className="side-submenu">
+                  <button type="button" onClick={goToInstantReport}>
+                    Reporte instantáneo
+                  </button>
+                  <button type="button" onClick={goToProductReport}>
+                    Reporte por productos
+                  </button>
+                </div>
+              ) : null}
               <button type="button" onClick={goToAcademy}>Academia MiniGest</button>
               <button type="button" onClick={goToSettings}>
                 Configuración

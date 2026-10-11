@@ -1,32 +1,33 @@
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { NextRequest, NextResponse } from "next/server";
+import { z } from "zod";
 import { prisma } from "@/lib/db";
-import {
-  AppInputValidationError,
-  assertSafePayloadText,
-  unsafeInputMessage,
-} from "@/lib/input-validation";
+import { authEmailSchema, MAX_PASSWORD_BYTES, passwordByteCount } from "@/lib/auth-validation";
 
-const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const loginFieldsSchema = z.object({
+  correo: z.string(),
+  contrasena: z.string(),
+});
 
 export async function POST(request: NextRequest) {
-  try {
-    assertSafePayloadText({
-      correo: request.headers.get("correo") ?? "",
-      contrasena: request.headers.get("contrasena") ?? "",
-    });
-  } catch (error) {
-    if (error instanceof AppInputValidationError) {
-      return NextResponse.json(
-        { status: "error", message: unsafeInputMessage },
-        { status: 400 },
-      );
-    }
+  const rawFields = request.headers.get("content-type")?.includes("application/json")
+    ? await request.json().catch(() => null)
+    : {
+        correo: request.headers.get("correo"),
+        contrasena: request.headers.get("contrasena"),
+      };
+  const fields = loginFieldsSchema.safeParse(rawFields);
+
+  if (!fields.success) {
+    return NextResponse.json(
+      { status: "error", message: "Correo y contraseña son obligatorios." },
+      { status: 400 },
+    );
   }
 
-  const correo = request.headers.get("correo")?.trim() ?? "";
-  const contrasena = request.headers.get("contrasena") ?? "";
+  const correo = fields.data.correo.trim();
+  const contrasena = fields.data.contrasena;
 
   if (!correo || !contrasena) {
     return NextResponse.json(
@@ -38,12 +39,20 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  if (!emailPattern.test(correo)) {
+  const validatedEmail = authEmailSchema.safeParse(correo);
+  if (!validatedEmail.success) {
     return NextResponse.json(
       {
         status: "error",
-        message: "El correo no tiene un formato válido.",
+        message: validatedEmail.error.issues[0]?.message ?? "Correo inválido.",
       },
+      { status: 400 },
+    );
+  }
+
+  if (passwordByteCount(contrasena) > MAX_PASSWORD_BYTES) {
+    return NextResponse.json(
+      { status: "error", message: `La contraseña no puede superar ${MAX_PASSWORD_BYTES} bytes.` },
       { status: 400 },
     );
   }
@@ -62,7 +71,7 @@ export async function POST(request: NextRequest) {
 
   try {
     const user = await prisma.user.findUnique({
-      where: { correo },
+      where: { correo: validatedEmail.data },
       include: { role: true },
     });
 
@@ -91,21 +100,17 @@ export async function POST(request: NextRequest) {
       { expiresIn: "8h" },
     );
 
-    console.log("JWT login:", token);
-
     return NextResponse.json({
       status: "ok",
       message: "Login correcto.",
       token,
     });
   } catch (error) {
-    const message =
-      error instanceof Error ? error.message : "Error interno al iniciar sesión.";
-
+    console.error("Error al iniciar sesión:", error);
     return NextResponse.json(
       {
         status: "error",
-        message: `Error interno de Neon: ${message}`,
+        message: "Error interno al iniciar sesión.",
       },
       { status: 500 },
     );

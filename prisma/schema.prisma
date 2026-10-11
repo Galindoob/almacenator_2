@@ -16,6 +16,7 @@ model User {
   correo              String?               @unique @db.VarChar(255)
   apertura_caja       apertura_caja[]
   movimiento_de_stock movimiento_de_stock[]
+  ventas              venta[]
   configuracion       ConfiguracionUsuario?
   role                Role                  @relation(fields: [roleid], references: [id], map: "fk_users_role")
 
@@ -64,6 +65,7 @@ model Producto {
   unidadId                                             String                @map("id_unidad") @db.Uuid
   precioVenta                                          Int                   @map("precio_venta")
   stock                                                Int                   @default(0)
+  controlaStock                                         Boolean               @default(true) @map("controla_stock")
   urlImagen                                            String?               @map("url_imagen") @db.VarChar(500)
   costo                                                Int                   @default(0)
   contenido                                            Int?
@@ -72,6 +74,7 @@ model Producto {
   id_proveedor                                         String?               @db.Uuid
   instancia_producto                                   instancia_producto[]
   movimiento_de_stock                                  movimiento_de_stock[]
+  detalles                                             detalle[]
   categoria                                            Categoria             @relation(fields: [categoriaId], references: [id], map: "fk_productos_categoria")
   empaque_productos_empaqueToempaque                   empaque?              @relation("productos_empaqueToempaque", fields: [empaque], references: [id_empaque], onDelete: Restrict, map: "fk_productos_empaque")
   marca                                                Marca                 @relation(fields: [marcaId], references: [id], map: "fk_productos_marca")
@@ -160,11 +163,66 @@ model proveedores {
   productos       Producto[]
 }
 
+model medio_pago {
+  id_medio      String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  medio_de_pago String @unique @db.VarChar(50)
+  pagos         pagos[]
+}
+
+model venta {
+  id_venta          String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  num_venta         Int       @unique @default(autoincrement())
+  id_vendedor       String    @db.Uuid
+  valor_total       Int
+  fecha_de_creacion DateTime  @default(now()) @db.Timestamptz(6)
+  fecha_pago        DateTime? @db.Timestamptz(6)
+  estado            String    @db.VarChar(30)
+  vuelto            Int       @default(0)
+  vendedor          User      @relation(fields: [id_vendedor], references: [id], onDelete: Restrict, map: "fk_venta_vendedor")
+  detalles          detalle[]
+  pagos             pagos[]
+}
+
+model detalle {
+  id_detalle                String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  id_venta                  String   @db.Uuid
+  id_producto               String   @db.Uuid
+  costo_adquisicion_actual  Int
+  cantidad                  Decimal  @db.Decimal(12, 3)
+  precio_actual             Int
+  subtotal_venta            Int
+  venta                     venta    @relation(fields: [id_venta], references: [id_venta], onDelete: Restrict, map: "fk_detalle_venta")
+  producto                  Producto @relation(fields: [id_producto], references: [id], onDelete: Restrict, map: "fk_detalle_producto")
+
+  @@index([id_venta])
+}
+
+model pagos {
+  id_pago       String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  id_venta      String     @db.Uuid
+  id_medio_pago String     @db.Uuid
+  pago          Int
+  venta         venta      @relation(fields: [id_venta], references: [id_venta], onDelete: Restrict, map: "fk_pagos_venta")
+  medio_pago    medio_pago @relation(fields: [id_medio_pago], references: [id_medio], onDelete: Restrict, map: "fk_pagos_medio_pago")
+
+  @@index([id_venta])
+}
+
 model ConfiguracionUsuario {
   usuarioId  String   @id @map("id_usuario") @db.Uuid
   tema       String   @default("green") @db.VarChar(20)
   escala     Float    @default(1) @map("escala_fuente")
   nombreTienda String @default("nombre_tienda") @map("nombre_tienda") @db.VarChar(25)
+  altoContraste Boolean @default(false) @map("alto_contraste")
+  modoOscuro Boolean @default(false) @map("modo_oscuro")
+  empresaRut String? @map("empresa_rut") @db.VarChar(12)
+  empresaNombre String? @map("empresa_nombre") @db.VarChar(120)
+  empresaGiro String? @map("empresa_giro") @db.VarChar(120)
+  empresaActividad String? @map("empresa_actividad") @db.VarChar(120)
+  empresaEmail String? @map("empresa_email") @db.VarChar(255)
+  empresaTelefono String? @map("empresa_telefono") @db.VarChar(50)
+  empresaDireccion String? @map("empresa_direccion") @db.VarChar(200)
+  empresaComuna String? @map("empresa_comuna") @db.VarChar(100)
   actualizado DateTime @default(now()) @map("actualizado") @db.Timestamptz(6)
   usuario    User     @relation(fields: [usuarioId], references: [id], onDelete: Cascade, map: "fk_configuracion_usuario")
 

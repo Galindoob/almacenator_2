@@ -26,6 +26,7 @@ type ProviderProductRow = {
   id_proveedor: string | null;
   nombre: string;
   stock: number;
+  controla_stock: boolean;
   costo: number;
   contenido: number | null;
   nombre_empaque: string | null;
@@ -71,6 +72,7 @@ export const GET = withAuth(async () => {
           p.id_proveedor::text AS id_proveedor,
           p.nombre,
           p.stock,
+          p.controla_stock,
           p.costo,
           p.contenido,
           e.nombre_empaque,
@@ -103,6 +105,7 @@ export const GET = withAuth(async () => {
             id: product.id_producto,
             nombre: product.nombre,
             stock: product.stock,
+            controlaStock: product.controla_stock,
             costoConIva: Math.round(product.costo * 1.19),
             contenido: product.contenido,
             nombreEmpaque: product.nombre_empaque,
@@ -115,6 +118,7 @@ export const GET = withAuth(async () => {
         id_proveedor: product.id_proveedor,
         nombre: product.nombre,
         stock: product.stock,
+        controlaStock: product.controla_stock,
         costoConIva: Math.round(product.costo * 1.19),
         contenido: product.contenido,
         nombreEmpaque: product.nombre_empaque,

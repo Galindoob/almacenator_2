@@ -20,6 +20,7 @@ const expiringProductSelect = {
   unidad_medida: true,
   precioVenta: true,
   stock: true,
+  controlaStock: true,
   urlImagen: true,
   costo: true,
   unidad: {
@@ -112,7 +113,7 @@ export const GET = withAuth(async () => {
   try {
     const [productos, groupedLots] = await Promise.all([
       prisma.producto.findMany({
-        where: { stock: { gt: 0 } },
+        where: { stock: { gt: 0 }, controlaStock: true },
         orderBy: { nombre: "asc" },
         select: expiringProductSelect,
       }),
@@ -121,6 +122,7 @@ export const GET = withAuth(async () => {
         where: {
           productos: {
             stock: { gt: 0 },
+            controlaStock: true,
           },
         },
         _count: {
@@ -200,7 +202,7 @@ export const DELETE = withAuth(async (request: AuthenticatedRequest) => {
       const [producto, lotCount] = await Promise.all([
         tx.producto.findUnique({
           where: { id: payload.productoId },
-          select: { id: true, stock: true },
+          select: { id: true, stock: true, controlaStock: true },
         }),
         tx.instancia_producto.count({
           where: {
@@ -212,6 +214,10 @@ export const DELETE = withAuth(async (request: AuthenticatedRequest) => {
 
       if (!producto) {
         throw new Error("PRODUCT_NOT_FOUND");
+      }
+
+      if (!producto.controlaStock) {
+        throw new Error("STOCK_NOT_TRACKED");
       }
 
       if (lotCount < 1) {
@@ -258,6 +264,13 @@ export const DELETE = withAuth(async (request: AuthenticatedRequest) => {
       return NextResponse.json(
         { status: "error", message: "Producto no encontrado." },
         { status: 404 },
+      );
+    }
+
+    if (error instanceof Error && error.message === "STOCK_NOT_TRACKED") {
+      return NextResponse.json(
+        { status: "error", message: "Este producto no controla stock." },
+        { status: 400 },
       );
     }
 

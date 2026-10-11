@@ -3,6 +3,7 @@
 import {
   createContext,
   type ReactNode,
+  useCallback,
   useContext,
   useEffect,
   useMemo,
@@ -17,6 +18,8 @@ export type AppearancePreferences = {
   colorTheme: ColorTheme;
   fontScale: number;
   storeName: string;
+  highContrast: boolean;
+  darkMode: boolean;
 };
 
 type AppearanceContextValue = AppearancePreferences & {
@@ -24,6 +27,7 @@ type AppearanceContextValue = AppearancePreferences & {
   clearAppearancePreview: () => void;
   savePreferences: (preferences: AppearancePreferences) => Promise<void>;
   setStoreName: (name: string) => Promise<void>;
+  syncSavedStoreName: (name: string, token: string) => void;
   resetThemeForLogout: () => void;
 };
 
@@ -32,30 +36,39 @@ const DEFAULT_PREFERENCES: AppearancePreferences = {
   colorTheme: "green",
   fontScale: 1,
   storeName: "nombre_tienda",
+  highContrast: false,
+  darkMode: false,
 };
 
 const AppearanceContext = createContext<AppearanceContextValue | null>(null);
 
 function subscribeToAppearance(onChange: () => void) {
   function handleStorage(event: StorageEvent) {
-    if (event.key === STORAGE_KEY || event.key === null) onChange();
+    if (event.key === STORAGE_KEY || event.key === "jwt" || event.key === null) onChange();
   }
 
   window.addEventListener("storage", handleStorage);
   window.addEventListener("almacenator-appearance-change", onChange);
+  window.addEventListener("mini-gest-auth-change", onChange);
 
   return () => {
     window.removeEventListener("storage", handleStorage);
     window.removeEventListener("almacenator-appearance-change", onChange);
+    window.removeEventListener("mini-gest-auth-change", onChange);
   };
 }
 
 function getAppearanceSnapshot() {
-  return localStorage.getItem(STORAGE_KEY);
+  return localStorage.getItem("jwt") ? localStorage.getItem(STORAGE_KEY) : null;
 }
 
 function writePreferences(preferences: AppearancePreferences) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(preferences));
+  window.dispatchEvent(new Event("almacenator-appearance-change"));
+}
+
+function clearCachedPreferences() {
+  localStorage.removeItem(STORAGE_KEY);
   window.dispatchEvent(new Event("almacenator-appearance-change"));
 }
 
@@ -80,8 +93,10 @@ function parsePreferences(value: string | null): AppearancePreferences {
       isSafeAppInput(parsed.storeName)
         ? parsed.storeName
         : DEFAULT_PREFERENCES.storeName;
+    const highContrast = parsed.highContrast === true;
+    const darkMode = parsed.darkMode === true;
 
-    return { colorTheme, fontScale, storeName };
+    return { colorTheme, fontScale, storeName, highContrast, darkMode };
   } catch {
     return DEFAULT_PREFERENCES;
   }
@@ -89,6 +104,7 @@ function parsePreferences(value: string | null): AppearancePreferences {
 
 export function AppearanceProvider({ children }: { children: ReactNode }) {
   const [preview, setPreview] = useState<Pick<AppearancePreferences, "colorTheme" | "fontScale"> | null>(null);
+  const clearAppearancePreview = useCallback(() => setPreview(null), []);
   const storedPreferences = useSyncExternalStore(
     subscribeToAppearance,
     getAppearanceSnapshot,
@@ -102,7 +118,10 @@ export function AppearanceProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     async function loadPreferences() {
       const token = localStorage.getItem("jwt");
-      if (!token) return;
+      if (!token) {
+        if (localStorage.getItem(STORAGE_KEY)) clearCachedPreferences();
+        return;
+      }
 
       try {
         const response = await fetch("/api/configuracion", {
@@ -111,45 +130,35 @@ export function AppearanceProvider({ children }: { children: ReactNode }) {
         });
         if (!response.ok) return;
 
-        const result = (await response.json()) as {
-          saved: boolean;
-          preferences: AppearancePreferences;
-        };
-
-        if (!result.saved) {
-          const localPreferences = localStorage.getItem(STORAGE_KEY);
-          if (localPreferences) {
-            const migrated = parsePreferences(localPreferences);
-            const saveResponse = await fetch("/api/configuracion", {
-              method: "PUT",
-              headers: {
-                Authorization: `Bearer ${token}`,
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify(migrated),
-            });
-            if (saveResponse.ok) {
-              const saved = (await saveResponse.json()) as { preferences: AppearancePreferences };
-              writePreferences(saved.preferences);
-              return;
-            }
-          }
-        }
-
-        writePreferences(result.preferences);
+        const result = (await response.json()) as { preferences: AppearancePreferences };
+        if (localStorage.getItem("jwt") === token) writePreferences(result.preferences);
       } catch {
-        // Keep the last local preferences available while the API is unreachable.
+        // Keep the current user's cached preferences while the API is unreachable.
       }
     }
 
     void loadPreferences();
-    window.addEventListener("mini-gest-auth-change", loadPreferences);
-    return () => window.removeEventListener("mini-gest-auth-change", loadPreferences);
+    function handleAuthChange() {
+      setPreview(null);
+      clearCachedPreferences();
+      void loadPreferences();
+    }
+    function handleStorageAuthChange(event: StorageEvent) {
+      if (event.key === "jwt") handleAuthChange();
+    }
+    window.addEventListener("mini-gest-auth-change", handleAuthChange);
+    window.addEventListener("storage", handleStorageAuthChange);
+    return () => {
+      window.removeEventListener("mini-gest-auth-change", handleAuthChange);
+      window.removeEventListener("storage", handleStorageAuthChange);
+    };
   }, []);
 
   useEffect(() => {
     const root = document.documentElement;
     root.dataset.colorTheme = preview?.colorTheme ?? preferences.colorTheme;
+    root.dataset.highContrast = String(preferences.highContrast);
+    root.dataset.appearanceMode = preferences.darkMode ? "dark" : "light";
     root.style.setProperty("--app-font-scale", String(preview?.fontScale ?? preferences.fontScale));
   }, [preferences, preview]);
 
@@ -173,20 +182,27 @@ export function AppearanceProvider({ children }: { children: ReactNode }) {
       throw new Error(result.message ?? "No se pudieron guardar las preferencias.");
     }
 
-    setPreview(null);
-    writePreferences(result.preferences);
+    if (localStorage.getItem("jwt") === token) {
+      setPreview(null);
+      writePreferences(result.preferences);
+    }
   }
 
   const value: AppearanceContextValue = {
     ...preferences,
     previewAppearance: (colorTheme, fontScale) =>
       setPreview({ colorTheme, fontScale: Math.min(1.2, Math.max(0.85, fontScale)) }),
-    clearAppearancePreview: () => setPreview(null),
+    clearAppearancePreview,
     savePreferences,
     setStoreName: (storeName) => savePreferences({ ...preferences, storeName }),
+    syncSavedStoreName: (storeName, token) => {
+      if (localStorage.getItem("jwt") === token) {
+        writePreferences({ ...parsePreferences(localStorage.getItem(STORAGE_KEY)), storeName });
+      }
+    },
     resetThemeForLogout: () => {
       setPreview(null);
-      writePreferences({ ...preferences, colorTheme: DEFAULT_PREFERENCES.colorTheme });
+      clearCachedPreferences();
     },
   };
 

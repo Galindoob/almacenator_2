@@ -50,6 +50,7 @@ export type ProductoMinAggregateOutputType = {
   unidadId: string | null
   precioVenta: number | null
   stock: number | null
+  controlaStock: boolean | null
   urlImagen: string | null
   costo: number | null
   contenido: number | null
@@ -68,6 +69,7 @@ export type ProductoMaxAggregateOutputType = {
   unidadId: string | null
   precioVenta: number | null
   stock: number | null
+  controlaStock: boolean | null
   urlImagen: string | null
   costo: number | null
   contenido: number | null
@@ -86,6 +88,7 @@ export type ProductoCountAggregateOutputType = {
   unidadId: number
   precioVenta: number
   stock: number
+  controlaStock: number
   urlImagen: number
   costo: number
   contenido: number
@@ -120,6 +123,7 @@ export type ProductoMinAggregateInputType = {
   unidadId?: true
   precioVenta?: true
   stock?: true
+  controlaStock?: true
   urlImagen?: true
   costo?: true
   contenido?: true
@@ -138,6 +142,7 @@ export type ProductoMaxAggregateInputType = {
   unidadId?: true
   precioVenta?: true
   stock?: true
+  controlaStock?: true
   urlImagen?: true
   costo?: true
   contenido?: true
@@ -156,6 +161,7 @@ export type ProductoCountAggregateInputType = {
   unidadId?: true
   precioVenta?: true
   stock?: true
+  controlaStock?: true
   urlImagen?: true
   costo?: true
   contenido?: true
@@ -261,6 +267,7 @@ export type ProductoGroupByOutputType = {
   unidadId: string
   precioVenta: number
   stock: number
+  controlaStock: boolean
   urlImagen: string | null
   costo: number
   contenido: number | null
@@ -302,6 +309,7 @@ export type ProductoWhereInput = {
   unidadId?: Prisma.UuidFilter<"Producto"> | string
   precioVenta?: Prisma.IntFilter<"Producto"> | number
   stock?: Prisma.IntFilter<"Producto"> | number
+  controlaStock?: Prisma.BoolFilter<"Producto"> | boolean
   urlImagen?: Prisma.StringNullableFilter<"Producto"> | string | null
   costo?: Prisma.IntFilter<"Producto"> | number
   contenido?: Prisma.IntNullableFilter<"Producto"> | number | null
@@ -310,6 +318,7 @@ export type ProductoWhereInput = {
   id_proveedor?: Prisma.UuidNullableFilter<"Producto"> | string | null
   instancia_producto?: Prisma.Instancia_productoListRelationFilter
   movimiento_de_stock?: Prisma.Movimiento_de_stockListRelationFilter
+  detalles?: Prisma.DetalleListRelationFilter
   categoria?: Prisma.XOR<Prisma.CategoriaScalarRelationFilter, Prisma.CategoriaWhereInput>
   empaque_productos_empaqueToempaque?: Prisma.XOR<Prisma.EmpaqueNullableScalarRelationFilter, Prisma.empaqueWhereInput> | null
   marca?: Prisma.XOR<Prisma.MarcaScalarRelationFilter, Prisma.MarcaWhereInput>
@@ -328,6 +337,7 @@ export type ProductoOrderByWithRelationInput = {
   unidadId?: Prisma.SortOrder
   precioVenta?: Prisma.SortOrder
   stock?: Prisma.SortOrder
+  controlaStock?: Prisma.SortOrder
   urlImagen?: Prisma.SortOrderInput | Prisma.SortOrder
   costo?: Prisma.SortOrder
   contenido?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -336,6 +346,7 @@ export type ProductoOrderByWithRelationInput = {
   id_proveedor?: Prisma.SortOrderInput | Prisma.SortOrder
   instancia_producto?: Prisma.instancia_productoOrderByRelationAggregateInput
   movimiento_de_stock?: Prisma.movimiento_de_stockOrderByRelationAggregateInput
+  detalles?: Prisma.detalleOrderByRelationAggregateInput
   categoria?: Prisma.CategoriaOrderByWithRelationInput
   empaque_productos_empaqueToempaque?: Prisma.empaqueOrderByWithRelationInput
   marca?: Prisma.MarcaOrderByWithRelationInput
@@ -357,6 +368,7 @@ export type ProductoWhereUniqueInput = Prisma.AtLeast<{
   unidadId?: Prisma.UuidFilter<"Producto"> | string
   precioVenta?: Prisma.IntFilter<"Producto"> | number
   stock?: Prisma.IntFilter<"Producto"> | number
+  controlaStock?: Prisma.BoolFilter<"Producto"> | boolean
   urlImagen?: Prisma.StringNullableFilter<"Producto"> | string | null
   costo?: Prisma.IntFilter<"Producto"> | number
   contenido?: Prisma.IntNullableFilter<"Producto"> | number | null
@@ -365,6 +377,7 @@ export type ProductoWhereUniqueInput = Prisma.AtLeast<{
   id_proveedor?: Prisma.UuidNullableFilter<"Producto"> | string | null
   instancia_producto?: Prisma.Instancia_productoListRelationFilter
   movimiento_de_stock?: Prisma.Movimiento_de_stockListRelationFilter
+  detalles?: Prisma.DetalleListRelationFilter
   categoria?: Prisma.XOR<Prisma.CategoriaScalarRelationFilter, Prisma.CategoriaWhereInput>
   empaque_productos_empaqueToempaque?: Prisma.XOR<Prisma.EmpaqueNullableScalarRelationFilter, Prisma.empaqueWhereInput> | null
   marca?: Prisma.XOR<Prisma.MarcaScalarRelationFilter, Prisma.MarcaWhereInput>
@@ -383,6 +396,7 @@ export type ProductoOrderByWithAggregationInput = {
   unidadId?: Prisma.SortOrder
   precioVenta?: Prisma.SortOrder
   stock?: Prisma.SortOrder
+  controlaStock?: Prisma.SortOrder
   urlImagen?: Prisma.SortOrderInput | Prisma.SortOrder
   costo?: Prisma.SortOrder
   contenido?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -409,6 +423,7 @@ export type ProductoScalarWhereWithAggregatesInput = {
   unidadId?: Prisma.UuidWithAggregatesFilter<"Producto"> | string
   precioVenta?: Prisma.IntWithAggregatesFilter<"Producto"> | number
   stock?: Prisma.IntWithAggregatesFilter<"Producto"> | number
+  controlaStock?: Prisma.BoolWithAggregatesFilter<"Producto"> | boolean
   urlImagen?: Prisma.StringNullableWithAggregatesFilter<"Producto"> | string | null
   costo?: Prisma.IntWithAggregatesFilter<"Producto"> | number
   contenido?: Prisma.IntNullableWithAggregatesFilter<"Producto"> | number | null
@@ -424,11 +439,13 @@ export type ProductoCreateInput = {
   codigoBarra?: string | null
   precioVenta: number
   stock?: number
+  controlaStock?: boolean
   urlImagen?: string | null
   costo?: number
   contenido?: number | null
   instancia_producto?: Prisma.instancia_productoCreateNestedManyWithoutProductosInput
   movimiento_de_stock?: Prisma.movimiento_de_stockCreateNestedManyWithoutProductosInput
+  detalles?: Prisma.detalleCreateNestedManyWithoutProductoInput
   categoria: Prisma.CategoriaCreateNestedOneWithoutProductosInput
   empaque_productos_empaqueToempaque?: Prisma.empaqueCreateNestedOneWithoutProductos_productos_empaqueToempaqueInput
   marca: Prisma.MarcaCreateNestedOneWithoutProductosInput
@@ -447,6 +464,7 @@ export type ProductoUncheckedCreateInput = {
   unidadId: string
   precioVenta: number
   stock?: number
+  controlaStock?: boolean
   urlImagen?: string | null
   costo?: number
   contenido?: number | null
@@ -455,6 +473,7 @@ export type ProductoUncheckedCreateInput = {
   id_proveedor?: string | null
   instancia_producto?: Prisma.instancia_productoUncheckedCreateNestedManyWithoutProductosInput
   movimiento_de_stock?: Prisma.movimiento_de_stockUncheckedCreateNestedManyWithoutProductosInput
+  detalles?: Prisma.detalleUncheckedCreateNestedManyWithoutProductoInput
 }
 
 export type ProductoUpdateInput = {
@@ -464,11 +483,13 @@ export type ProductoUpdateInput = {
   codigoBarra?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   precioVenta?: Prisma.IntFieldUpdateOperationsInput | number
   stock?: Prisma.IntFieldUpdateOperationsInput | number
+  controlaStock?: Prisma.BoolFieldUpdateOperationsInput | boolean
   urlImagen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   costo?: Prisma.IntFieldUpdateOperationsInput | number
   contenido?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   instancia_producto?: Prisma.instancia_productoUpdateManyWithoutProductosNestedInput
   movimiento_de_stock?: Prisma.movimiento_de_stockUpdateManyWithoutProductosNestedInput
+  detalles?: Prisma.detalleUpdateManyWithoutProductoNestedInput
   categoria?: Prisma.CategoriaUpdateOneRequiredWithoutProductosNestedInput
   empaque_productos_empaqueToempaque?: Prisma.empaqueUpdateOneWithoutProductos_productos_empaqueToempaqueNestedInput
   marca?: Prisma.MarcaUpdateOneRequiredWithoutProductosNestedInput
@@ -487,6 +508,7 @@ export type ProductoUncheckedUpdateInput = {
   unidadId?: Prisma.StringFieldUpdateOperationsInput | string
   precioVenta?: Prisma.IntFieldUpdateOperationsInput | number
   stock?: Prisma.IntFieldUpdateOperationsInput | number
+  controlaStock?: Prisma.BoolFieldUpdateOperationsInput | boolean
   urlImagen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   costo?: Prisma.IntFieldUpdateOperationsInput | number
   contenido?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -495,6 +517,7 @@ export type ProductoUncheckedUpdateInput = {
   id_proveedor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   instancia_producto?: Prisma.instancia_productoUncheckedUpdateManyWithoutProductosNestedInput
   movimiento_de_stock?: Prisma.movimiento_de_stockUncheckedUpdateManyWithoutProductosNestedInput
+  detalles?: Prisma.detalleUncheckedUpdateManyWithoutProductoNestedInput
 }
 
 export type ProductoCreateManyInput = {
@@ -507,6 +530,7 @@ export type ProductoCreateManyInput = {
   unidadId: string
   precioVenta: number
   stock?: number
+  controlaStock?: boolean
   urlImagen?: string | null
   costo?: number
   contenido?: number | null
@@ -522,6 +546,7 @@ export type ProductoUpdateManyMutationInput = {
   codigoBarra?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   precioVenta?: Prisma.IntFieldUpdateOperationsInput | number
   stock?: Prisma.IntFieldUpdateOperationsInput | number
+  controlaStock?: Prisma.BoolFieldUpdateOperationsInput | boolean
   urlImagen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   costo?: Prisma.IntFieldUpdateOperationsInput | number
   contenido?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -537,6 +562,7 @@ export type ProductoUncheckedUpdateManyInput = {
   unidadId?: Prisma.StringFieldUpdateOperationsInput | string
   precioVenta?: Prisma.IntFieldUpdateOperationsInput | number
   stock?: Prisma.IntFieldUpdateOperationsInput | number
+  controlaStock?: Prisma.BoolFieldUpdateOperationsInput | boolean
   urlImagen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   costo?: Prisma.IntFieldUpdateOperationsInput | number
   contenido?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -565,6 +591,7 @@ export type ProductoCountOrderByAggregateInput = {
   unidadId?: Prisma.SortOrder
   precioVenta?: Prisma.SortOrder
   stock?: Prisma.SortOrder
+  controlaStock?: Prisma.SortOrder
   urlImagen?: Prisma.SortOrder
   costo?: Prisma.SortOrder
   contenido?: Prisma.SortOrder
@@ -590,6 +617,7 @@ export type ProductoMaxOrderByAggregateInput = {
   unidadId?: Prisma.SortOrder
   precioVenta?: Prisma.SortOrder
   stock?: Prisma.SortOrder
+  controlaStock?: Prisma.SortOrder
   urlImagen?: Prisma.SortOrder
   costo?: Prisma.SortOrder
   contenido?: Prisma.SortOrder
@@ -608,6 +636,7 @@ export type ProductoMinOrderByAggregateInput = {
   unidadId?: Prisma.SortOrder
   precioVenta?: Prisma.SortOrder
   stock?: Prisma.SortOrder
+  controlaStock?: Prisma.SortOrder
   urlImagen?: Prisma.SortOrder
   costo?: Prisma.SortOrder
   contenido?: Prisma.SortOrder
@@ -760,6 +789,10 @@ export type IntFieldUpdateOperationsInput = {
   decrement?: number
   multiply?: number
   divide?: number
+}
+
+export type BoolFieldUpdateOperationsInput = {
+  set?: boolean
 }
 
 export type NullableIntFieldUpdateOperationsInput = {
@@ -924,6 +957,20 @@ export type ProductoUncheckedUpdateManyWithoutProveedoresNestedInput = {
   deleteMany?: Prisma.ProductoScalarWhereInput | Prisma.ProductoScalarWhereInput[]
 }
 
+export type ProductoCreateNestedOneWithoutDetallesInput = {
+  create?: Prisma.XOR<Prisma.ProductoCreateWithoutDetallesInput, Prisma.ProductoUncheckedCreateWithoutDetallesInput>
+  connectOrCreate?: Prisma.ProductoCreateOrConnectWithoutDetallesInput
+  connect?: Prisma.ProductoWhereUniqueInput
+}
+
+export type ProductoUpdateOneRequiredWithoutDetallesNestedInput = {
+  create?: Prisma.XOR<Prisma.ProductoCreateWithoutDetallesInput, Prisma.ProductoUncheckedCreateWithoutDetallesInput>
+  connectOrCreate?: Prisma.ProductoCreateOrConnectWithoutDetallesInput
+  upsert?: Prisma.ProductoUpsertWithoutDetallesInput
+  connect?: Prisma.ProductoWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ProductoUpdateToOneWithWhereWithoutDetallesInput, Prisma.ProductoUpdateWithoutDetallesInput>, Prisma.ProductoUncheckedUpdateWithoutDetallesInput>
+}
+
 export type ProductoCreateWithoutMarcaInput = {
   id?: string
   nombre: string
@@ -931,11 +978,13 @@ export type ProductoCreateWithoutMarcaInput = {
   codigoBarra?: string | null
   precioVenta: number
   stock?: number
+  controlaStock?: boolean
   urlImagen?: string | null
   costo?: number
   contenido?: number | null
   instancia_producto?: Prisma.instancia_productoCreateNestedManyWithoutProductosInput
   movimiento_de_stock?: Prisma.movimiento_de_stockCreateNestedManyWithoutProductosInput
+  detalles?: Prisma.detalleCreateNestedManyWithoutProductoInput
   categoria: Prisma.CategoriaCreateNestedOneWithoutProductosInput
   empaque_productos_empaqueToempaque?: Prisma.empaqueCreateNestedOneWithoutProductos_productos_empaqueToempaqueInput
   proveedores?: Prisma.proveedoresCreateNestedOneWithoutProductosInput
@@ -952,6 +1001,7 @@ export type ProductoUncheckedCreateWithoutMarcaInput = {
   unidadId: string
   precioVenta: number
   stock?: number
+  controlaStock?: boolean
   urlImagen?: string | null
   costo?: number
   contenido?: number | null
@@ -960,6 +1010,7 @@ export type ProductoUncheckedCreateWithoutMarcaInput = {
   id_proveedor?: string | null
   instancia_producto?: Prisma.instancia_productoUncheckedCreateNestedManyWithoutProductosInput
   movimiento_de_stock?: Prisma.movimiento_de_stockUncheckedCreateNestedManyWithoutProductosInput
+  detalles?: Prisma.detalleUncheckedCreateNestedManyWithoutProductoInput
 }
 
 export type ProductoCreateOrConnectWithoutMarcaInput = {
@@ -1001,6 +1052,7 @@ export type ProductoScalarWhereInput = {
   unidadId?: Prisma.UuidFilter<"Producto"> | string
   precioVenta?: Prisma.IntFilter<"Producto"> | number
   stock?: Prisma.IntFilter<"Producto"> | number
+  controlaStock?: Prisma.BoolFilter<"Producto"> | boolean
   urlImagen?: Prisma.StringNullableFilter<"Producto"> | string | null
   costo?: Prisma.IntFilter<"Producto"> | number
   contenido?: Prisma.IntNullableFilter<"Producto"> | number | null
@@ -1016,11 +1068,13 @@ export type ProductoCreateWithoutCategoriaInput = {
   codigoBarra?: string | null
   precioVenta: number
   stock?: number
+  controlaStock?: boolean
   urlImagen?: string | null
   costo?: number
   contenido?: number | null
   instancia_producto?: Prisma.instancia_productoCreateNestedManyWithoutProductosInput
   movimiento_de_stock?: Prisma.movimiento_de_stockCreateNestedManyWithoutProductosInput
+  detalles?: Prisma.detalleCreateNestedManyWithoutProductoInput
   empaque_productos_empaqueToempaque?: Prisma.empaqueCreateNestedOneWithoutProductos_productos_empaqueToempaqueInput
   marca: Prisma.MarcaCreateNestedOneWithoutProductosInput
   proveedores?: Prisma.proveedoresCreateNestedOneWithoutProductosInput
@@ -1037,6 +1091,7 @@ export type ProductoUncheckedCreateWithoutCategoriaInput = {
   unidadId: string
   precioVenta: number
   stock?: number
+  controlaStock?: boolean
   urlImagen?: string | null
   costo?: number
   contenido?: number | null
@@ -1045,6 +1100,7 @@ export type ProductoUncheckedCreateWithoutCategoriaInput = {
   id_proveedor?: string | null
   instancia_producto?: Prisma.instancia_productoUncheckedCreateNestedManyWithoutProductosInput
   movimiento_de_stock?: Prisma.movimiento_de_stockUncheckedCreateNestedManyWithoutProductosInput
+  detalles?: Prisma.detalleUncheckedCreateNestedManyWithoutProductoInput
 }
 
 export type ProductoCreateOrConnectWithoutCategoriaInput = {
@@ -1080,11 +1136,13 @@ export type ProductoCreateWithoutUnidadInput = {
   codigoBarra?: string | null
   precioVenta: number
   stock?: number
+  controlaStock?: boolean
   urlImagen?: string | null
   costo?: number
   contenido?: number | null
   instancia_producto?: Prisma.instancia_productoCreateNestedManyWithoutProductosInput
   movimiento_de_stock?: Prisma.movimiento_de_stockCreateNestedManyWithoutProductosInput
+  detalles?: Prisma.detalleCreateNestedManyWithoutProductoInput
   categoria: Prisma.CategoriaCreateNestedOneWithoutProductosInput
   empaque_productos_empaqueToempaque?: Prisma.empaqueCreateNestedOneWithoutProductos_productos_empaqueToempaqueInput
   marca: Prisma.MarcaCreateNestedOneWithoutProductosInput
@@ -1101,6 +1159,7 @@ export type ProductoUncheckedCreateWithoutUnidadInput = {
   categoriaId: string
   precioVenta: number
   stock?: number
+  controlaStock?: boolean
   urlImagen?: string | null
   costo?: number
   contenido?: number | null
@@ -1109,6 +1168,7 @@ export type ProductoUncheckedCreateWithoutUnidadInput = {
   id_proveedor?: string | null
   instancia_producto?: Prisma.instancia_productoUncheckedCreateNestedManyWithoutProductosInput
   movimiento_de_stock?: Prisma.movimiento_de_stockUncheckedCreateNestedManyWithoutProductosInput
+  detalles?: Prisma.detalleUncheckedCreateNestedManyWithoutProductoInput
 }
 
 export type ProductoCreateOrConnectWithoutUnidadInput = {
@@ -1144,10 +1204,12 @@ export type ProductoCreateWithoutMovimiento_de_stockInput = {
   codigoBarra?: string | null
   precioVenta: number
   stock?: number
+  controlaStock?: boolean
   urlImagen?: string | null
   costo?: number
   contenido?: number | null
   instancia_producto?: Prisma.instancia_productoCreateNestedManyWithoutProductosInput
+  detalles?: Prisma.detalleCreateNestedManyWithoutProductoInput
   categoria: Prisma.CategoriaCreateNestedOneWithoutProductosInput
   empaque_productos_empaqueToempaque?: Prisma.empaqueCreateNestedOneWithoutProductos_productos_empaqueToempaqueInput
   marca: Prisma.MarcaCreateNestedOneWithoutProductosInput
@@ -1166,6 +1228,7 @@ export type ProductoUncheckedCreateWithoutMovimiento_de_stockInput = {
   unidadId: string
   precioVenta: number
   stock?: number
+  controlaStock?: boolean
   urlImagen?: string | null
   costo?: number
   contenido?: number | null
@@ -1173,6 +1236,7 @@ export type ProductoUncheckedCreateWithoutMovimiento_de_stockInput = {
   empaque?: string | null
   id_proveedor?: string | null
   instancia_producto?: Prisma.instancia_productoUncheckedCreateNestedManyWithoutProductosInput
+  detalles?: Prisma.detalleUncheckedCreateNestedManyWithoutProductoInput
 }
 
 export type ProductoCreateOrConnectWithoutMovimiento_de_stockInput = {
@@ -1198,10 +1262,12 @@ export type ProductoUpdateWithoutMovimiento_de_stockInput = {
   codigoBarra?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   precioVenta?: Prisma.IntFieldUpdateOperationsInput | number
   stock?: Prisma.IntFieldUpdateOperationsInput | number
+  controlaStock?: Prisma.BoolFieldUpdateOperationsInput | boolean
   urlImagen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   costo?: Prisma.IntFieldUpdateOperationsInput | number
   contenido?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   instancia_producto?: Prisma.instancia_productoUpdateManyWithoutProductosNestedInput
+  detalles?: Prisma.detalleUpdateManyWithoutProductoNestedInput
   categoria?: Prisma.CategoriaUpdateOneRequiredWithoutProductosNestedInput
   empaque_productos_empaqueToempaque?: Prisma.empaqueUpdateOneWithoutProductos_productos_empaqueToempaqueNestedInput
   marca?: Prisma.MarcaUpdateOneRequiredWithoutProductosNestedInput
@@ -1220,6 +1286,7 @@ export type ProductoUncheckedUpdateWithoutMovimiento_de_stockInput = {
   unidadId?: Prisma.StringFieldUpdateOperationsInput | string
   precioVenta?: Prisma.IntFieldUpdateOperationsInput | number
   stock?: Prisma.IntFieldUpdateOperationsInput | number
+  controlaStock?: Prisma.BoolFieldUpdateOperationsInput | boolean
   urlImagen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   costo?: Prisma.IntFieldUpdateOperationsInput | number
   contenido?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -1227,6 +1294,7 @@ export type ProductoUncheckedUpdateWithoutMovimiento_de_stockInput = {
   empaque?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   id_proveedor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   instancia_producto?: Prisma.instancia_productoUncheckedUpdateManyWithoutProductosNestedInput
+  detalles?: Prisma.detalleUncheckedUpdateManyWithoutProductoNestedInput
 }
 
 export type ProductoCreateWithoutUnidad_medida_productos_unidad_medidaTounidad_medidaInput = {
@@ -1236,11 +1304,13 @@ export type ProductoCreateWithoutUnidad_medida_productos_unidad_medidaTounidad_m
   codigoBarra?: string | null
   precioVenta: number
   stock?: number
+  controlaStock?: boolean
   urlImagen?: string | null
   costo?: number
   contenido?: number | null
   instancia_producto?: Prisma.instancia_productoCreateNestedManyWithoutProductosInput
   movimiento_de_stock?: Prisma.movimiento_de_stockCreateNestedManyWithoutProductosInput
+  detalles?: Prisma.detalleCreateNestedManyWithoutProductoInput
   categoria: Prisma.CategoriaCreateNestedOneWithoutProductosInput
   empaque_productos_empaqueToempaque?: Prisma.empaqueCreateNestedOneWithoutProductos_productos_empaqueToempaqueInput
   marca: Prisma.MarcaCreateNestedOneWithoutProductosInput
@@ -1258,6 +1328,7 @@ export type ProductoUncheckedCreateWithoutUnidad_medida_productos_unidad_medidaT
   unidadId: string
   precioVenta: number
   stock?: number
+  controlaStock?: boolean
   urlImagen?: string | null
   costo?: number
   contenido?: number | null
@@ -1265,6 +1336,7 @@ export type ProductoUncheckedCreateWithoutUnidad_medida_productos_unidad_medidaT
   id_proveedor?: string | null
   instancia_producto?: Prisma.instancia_productoUncheckedCreateNestedManyWithoutProductosInput
   movimiento_de_stock?: Prisma.movimiento_de_stockUncheckedCreateNestedManyWithoutProductosInput
+  detalles?: Prisma.detalleUncheckedCreateNestedManyWithoutProductoInput
 }
 
 export type ProductoCreateOrConnectWithoutUnidad_medida_productos_unidad_medidaTounidad_medidaInput = {
@@ -1300,10 +1372,12 @@ export type ProductoCreateWithoutInstancia_productoInput = {
   codigoBarra?: string | null
   precioVenta: number
   stock?: number
+  controlaStock?: boolean
   urlImagen?: string | null
   costo?: number
   contenido?: number | null
   movimiento_de_stock?: Prisma.movimiento_de_stockCreateNestedManyWithoutProductosInput
+  detalles?: Prisma.detalleCreateNestedManyWithoutProductoInput
   categoria: Prisma.CategoriaCreateNestedOneWithoutProductosInput
   empaque_productos_empaqueToempaque?: Prisma.empaqueCreateNestedOneWithoutProductos_productos_empaqueToempaqueInput
   marca: Prisma.MarcaCreateNestedOneWithoutProductosInput
@@ -1322,6 +1396,7 @@ export type ProductoUncheckedCreateWithoutInstancia_productoInput = {
   unidadId: string
   precioVenta: number
   stock?: number
+  controlaStock?: boolean
   urlImagen?: string | null
   costo?: number
   contenido?: number | null
@@ -1329,6 +1404,7 @@ export type ProductoUncheckedCreateWithoutInstancia_productoInput = {
   empaque?: string | null
   id_proveedor?: string | null
   movimiento_de_stock?: Prisma.movimiento_de_stockUncheckedCreateNestedManyWithoutProductosInput
+  detalles?: Prisma.detalleUncheckedCreateNestedManyWithoutProductoInput
 }
 
 export type ProductoCreateOrConnectWithoutInstancia_productoInput = {
@@ -1354,10 +1430,12 @@ export type ProductoUpdateWithoutInstancia_productoInput = {
   codigoBarra?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   precioVenta?: Prisma.IntFieldUpdateOperationsInput | number
   stock?: Prisma.IntFieldUpdateOperationsInput | number
+  controlaStock?: Prisma.BoolFieldUpdateOperationsInput | boolean
   urlImagen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   costo?: Prisma.IntFieldUpdateOperationsInput | number
   contenido?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   movimiento_de_stock?: Prisma.movimiento_de_stockUpdateManyWithoutProductosNestedInput
+  detalles?: Prisma.detalleUpdateManyWithoutProductoNestedInput
   categoria?: Prisma.CategoriaUpdateOneRequiredWithoutProductosNestedInput
   empaque_productos_empaqueToempaque?: Prisma.empaqueUpdateOneWithoutProductos_productos_empaqueToempaqueNestedInput
   marca?: Prisma.MarcaUpdateOneRequiredWithoutProductosNestedInput
@@ -1376,6 +1454,7 @@ export type ProductoUncheckedUpdateWithoutInstancia_productoInput = {
   unidadId?: Prisma.StringFieldUpdateOperationsInput | string
   precioVenta?: Prisma.IntFieldUpdateOperationsInput | number
   stock?: Prisma.IntFieldUpdateOperationsInput | number
+  controlaStock?: Prisma.BoolFieldUpdateOperationsInput | boolean
   urlImagen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   costo?: Prisma.IntFieldUpdateOperationsInput | number
   contenido?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -1383,6 +1462,7 @@ export type ProductoUncheckedUpdateWithoutInstancia_productoInput = {
   empaque?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   id_proveedor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   movimiento_de_stock?: Prisma.movimiento_de_stockUncheckedUpdateManyWithoutProductosNestedInput
+  detalles?: Prisma.detalleUncheckedUpdateManyWithoutProductoNestedInput
 }
 
 export type ProductoCreateWithoutEmpaque_productos_empaqueToempaqueInput = {
@@ -1392,11 +1472,13 @@ export type ProductoCreateWithoutEmpaque_productos_empaqueToempaqueInput = {
   codigoBarra?: string | null
   precioVenta: number
   stock?: number
+  controlaStock?: boolean
   urlImagen?: string | null
   costo?: number
   contenido?: number | null
   instancia_producto?: Prisma.instancia_productoCreateNestedManyWithoutProductosInput
   movimiento_de_stock?: Prisma.movimiento_de_stockCreateNestedManyWithoutProductosInput
+  detalles?: Prisma.detalleCreateNestedManyWithoutProductoInput
   categoria: Prisma.CategoriaCreateNestedOneWithoutProductosInput
   marca: Prisma.MarcaCreateNestedOneWithoutProductosInput
   proveedores?: Prisma.proveedoresCreateNestedOneWithoutProductosInput
@@ -1414,6 +1496,7 @@ export type ProductoUncheckedCreateWithoutEmpaque_productos_empaqueToempaqueInpu
   unidadId: string
   precioVenta: number
   stock?: number
+  controlaStock?: boolean
   urlImagen?: string | null
   costo?: number
   contenido?: number | null
@@ -1421,6 +1504,7 @@ export type ProductoUncheckedCreateWithoutEmpaque_productos_empaqueToempaqueInpu
   id_proveedor?: string | null
   instancia_producto?: Prisma.instancia_productoUncheckedCreateNestedManyWithoutProductosInput
   movimiento_de_stock?: Prisma.movimiento_de_stockUncheckedCreateNestedManyWithoutProductosInput
+  detalles?: Prisma.detalleUncheckedCreateNestedManyWithoutProductoInput
 }
 
 export type ProductoCreateOrConnectWithoutEmpaque_productos_empaqueToempaqueInput = {
@@ -1456,11 +1540,13 @@ export type ProductoCreateWithoutProveedoresInput = {
   codigoBarra?: string | null
   precioVenta: number
   stock?: number
+  controlaStock?: boolean
   urlImagen?: string | null
   costo?: number
   contenido?: number | null
   instancia_producto?: Prisma.instancia_productoCreateNestedManyWithoutProductosInput
   movimiento_de_stock?: Prisma.movimiento_de_stockCreateNestedManyWithoutProductosInput
+  detalles?: Prisma.detalleCreateNestedManyWithoutProductoInput
   categoria: Prisma.CategoriaCreateNestedOneWithoutProductosInput
   empaque_productos_empaqueToempaque?: Prisma.empaqueCreateNestedOneWithoutProductos_productos_empaqueToempaqueInput
   marca: Prisma.MarcaCreateNestedOneWithoutProductosInput
@@ -1478,6 +1564,7 @@ export type ProductoUncheckedCreateWithoutProveedoresInput = {
   unidadId: string
   precioVenta: number
   stock?: number
+  controlaStock?: boolean
   urlImagen?: string | null
   costo?: number
   contenido?: number | null
@@ -1485,6 +1572,7 @@ export type ProductoUncheckedCreateWithoutProveedoresInput = {
   empaque?: string | null
   instancia_producto?: Prisma.instancia_productoUncheckedCreateNestedManyWithoutProductosInput
   movimiento_de_stock?: Prisma.movimiento_de_stockUncheckedCreateNestedManyWithoutProductosInput
+  detalles?: Prisma.detalleUncheckedCreateNestedManyWithoutProductoInput
 }
 
 export type ProductoCreateOrConnectWithoutProveedoresInput = {
@@ -1513,6 +1601,106 @@ export type ProductoUpdateManyWithWhereWithoutProveedoresInput = {
   data: Prisma.XOR<Prisma.ProductoUpdateManyMutationInput, Prisma.ProductoUncheckedUpdateManyWithoutProveedoresInput>
 }
 
+export type ProductoCreateWithoutDetallesInput = {
+  id?: string
+  nombre: string
+  descripcion?: string | null
+  codigoBarra?: string | null
+  precioVenta: number
+  stock?: number
+  controlaStock?: boolean
+  urlImagen?: string | null
+  costo?: number
+  contenido?: number | null
+  instancia_producto?: Prisma.instancia_productoCreateNestedManyWithoutProductosInput
+  movimiento_de_stock?: Prisma.movimiento_de_stockCreateNestedManyWithoutProductosInput
+  categoria: Prisma.CategoriaCreateNestedOneWithoutProductosInput
+  empaque_productos_empaqueToempaque?: Prisma.empaqueCreateNestedOneWithoutProductos_productos_empaqueToempaqueInput
+  marca: Prisma.MarcaCreateNestedOneWithoutProductosInput
+  proveedores?: Prisma.proveedoresCreateNestedOneWithoutProductosInput
+  unidad: Prisma.UnidadCreateNestedOneWithoutProductosInput
+  unidad_medida_productos_unidad_medidaTounidad_medida?: Prisma.unidad_medidaCreateNestedOneWithoutProductos_productos_unidad_medidaTounidad_medidaInput
+}
+
+export type ProductoUncheckedCreateWithoutDetallesInput = {
+  id?: string
+  nombre: string
+  descripcion?: string | null
+  marcaId: string
+  codigoBarra?: string | null
+  categoriaId: string
+  unidadId: string
+  precioVenta: number
+  stock?: number
+  controlaStock?: boolean
+  urlImagen?: string | null
+  costo?: number
+  contenido?: number | null
+  unidad_medida?: string | null
+  empaque?: string | null
+  id_proveedor?: string | null
+  instancia_producto?: Prisma.instancia_productoUncheckedCreateNestedManyWithoutProductosInput
+  movimiento_de_stock?: Prisma.movimiento_de_stockUncheckedCreateNestedManyWithoutProductosInput
+}
+
+export type ProductoCreateOrConnectWithoutDetallesInput = {
+  where: Prisma.ProductoWhereUniqueInput
+  create: Prisma.XOR<Prisma.ProductoCreateWithoutDetallesInput, Prisma.ProductoUncheckedCreateWithoutDetallesInput>
+}
+
+export type ProductoUpsertWithoutDetallesInput = {
+  update: Prisma.XOR<Prisma.ProductoUpdateWithoutDetallesInput, Prisma.ProductoUncheckedUpdateWithoutDetallesInput>
+  create: Prisma.XOR<Prisma.ProductoCreateWithoutDetallesInput, Prisma.ProductoUncheckedCreateWithoutDetallesInput>
+  where?: Prisma.ProductoWhereInput
+}
+
+export type ProductoUpdateToOneWithWhereWithoutDetallesInput = {
+  where?: Prisma.ProductoWhereInput
+  data: Prisma.XOR<Prisma.ProductoUpdateWithoutDetallesInput, Prisma.ProductoUncheckedUpdateWithoutDetallesInput>
+}
+
+export type ProductoUpdateWithoutDetallesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  nombre?: Prisma.StringFieldUpdateOperationsInput | string
+  descripcion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  codigoBarra?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  precioVenta?: Prisma.IntFieldUpdateOperationsInput | number
+  stock?: Prisma.IntFieldUpdateOperationsInput | number
+  controlaStock?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  urlImagen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  costo?: Prisma.IntFieldUpdateOperationsInput | number
+  contenido?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  instancia_producto?: Prisma.instancia_productoUpdateManyWithoutProductosNestedInput
+  movimiento_de_stock?: Prisma.movimiento_de_stockUpdateManyWithoutProductosNestedInput
+  categoria?: Prisma.CategoriaUpdateOneRequiredWithoutProductosNestedInput
+  empaque_productos_empaqueToempaque?: Prisma.empaqueUpdateOneWithoutProductos_productos_empaqueToempaqueNestedInput
+  marca?: Prisma.MarcaUpdateOneRequiredWithoutProductosNestedInput
+  proveedores?: Prisma.proveedoresUpdateOneWithoutProductosNestedInput
+  unidad?: Prisma.UnidadUpdateOneRequiredWithoutProductosNestedInput
+  unidad_medida_productos_unidad_medidaTounidad_medida?: Prisma.unidad_medidaUpdateOneWithoutProductos_productos_unidad_medidaTounidad_medidaNestedInput
+}
+
+export type ProductoUncheckedUpdateWithoutDetallesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  nombre?: Prisma.StringFieldUpdateOperationsInput | string
+  descripcion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  marcaId?: Prisma.StringFieldUpdateOperationsInput | string
+  codigoBarra?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  categoriaId?: Prisma.StringFieldUpdateOperationsInput | string
+  unidadId?: Prisma.StringFieldUpdateOperationsInput | string
+  precioVenta?: Prisma.IntFieldUpdateOperationsInput | number
+  stock?: Prisma.IntFieldUpdateOperationsInput | number
+  controlaStock?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  urlImagen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  costo?: Prisma.IntFieldUpdateOperationsInput | number
+  contenido?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  unidad_medida?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  empaque?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  id_proveedor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  instancia_producto?: Prisma.instancia_productoUncheckedUpdateManyWithoutProductosNestedInput
+  movimiento_de_stock?: Prisma.movimiento_de_stockUncheckedUpdateManyWithoutProductosNestedInput
+}
+
 export type ProductoCreateManyMarcaInput = {
   id?: string
   nombre: string
@@ -1522,6 +1710,7 @@ export type ProductoCreateManyMarcaInput = {
   unidadId: string
   precioVenta: number
   stock?: number
+  controlaStock?: boolean
   urlImagen?: string | null
   costo?: number
   contenido?: number | null
@@ -1537,11 +1726,13 @@ export type ProductoUpdateWithoutMarcaInput = {
   codigoBarra?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   precioVenta?: Prisma.IntFieldUpdateOperationsInput | number
   stock?: Prisma.IntFieldUpdateOperationsInput | number
+  controlaStock?: Prisma.BoolFieldUpdateOperationsInput | boolean
   urlImagen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   costo?: Prisma.IntFieldUpdateOperationsInput | number
   contenido?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   instancia_producto?: Prisma.instancia_productoUpdateManyWithoutProductosNestedInput
   movimiento_de_stock?: Prisma.movimiento_de_stockUpdateManyWithoutProductosNestedInput
+  detalles?: Prisma.detalleUpdateManyWithoutProductoNestedInput
   categoria?: Prisma.CategoriaUpdateOneRequiredWithoutProductosNestedInput
   empaque_productos_empaqueToempaque?: Prisma.empaqueUpdateOneWithoutProductos_productos_empaqueToempaqueNestedInput
   proveedores?: Prisma.proveedoresUpdateOneWithoutProductosNestedInput
@@ -1558,6 +1749,7 @@ export type ProductoUncheckedUpdateWithoutMarcaInput = {
   unidadId?: Prisma.StringFieldUpdateOperationsInput | string
   precioVenta?: Prisma.IntFieldUpdateOperationsInput | number
   stock?: Prisma.IntFieldUpdateOperationsInput | number
+  controlaStock?: Prisma.BoolFieldUpdateOperationsInput | boolean
   urlImagen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   costo?: Prisma.IntFieldUpdateOperationsInput | number
   contenido?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -1566,6 +1758,7 @@ export type ProductoUncheckedUpdateWithoutMarcaInput = {
   id_proveedor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   instancia_producto?: Prisma.instancia_productoUncheckedUpdateManyWithoutProductosNestedInput
   movimiento_de_stock?: Prisma.movimiento_de_stockUncheckedUpdateManyWithoutProductosNestedInput
+  detalles?: Prisma.detalleUncheckedUpdateManyWithoutProductoNestedInput
 }
 
 export type ProductoUncheckedUpdateManyWithoutMarcaInput = {
@@ -1577,6 +1770,7 @@ export type ProductoUncheckedUpdateManyWithoutMarcaInput = {
   unidadId?: Prisma.StringFieldUpdateOperationsInput | string
   precioVenta?: Prisma.IntFieldUpdateOperationsInput | number
   stock?: Prisma.IntFieldUpdateOperationsInput | number
+  controlaStock?: Prisma.BoolFieldUpdateOperationsInput | boolean
   urlImagen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   costo?: Prisma.IntFieldUpdateOperationsInput | number
   contenido?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -1594,6 +1788,7 @@ export type ProductoCreateManyCategoriaInput = {
   unidadId: string
   precioVenta: number
   stock?: number
+  controlaStock?: boolean
   urlImagen?: string | null
   costo?: number
   contenido?: number | null
@@ -1609,11 +1804,13 @@ export type ProductoUpdateWithoutCategoriaInput = {
   codigoBarra?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   precioVenta?: Prisma.IntFieldUpdateOperationsInput | number
   stock?: Prisma.IntFieldUpdateOperationsInput | number
+  controlaStock?: Prisma.BoolFieldUpdateOperationsInput | boolean
   urlImagen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   costo?: Prisma.IntFieldUpdateOperationsInput | number
   contenido?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   instancia_producto?: Prisma.instancia_productoUpdateManyWithoutProductosNestedInput
   movimiento_de_stock?: Prisma.movimiento_de_stockUpdateManyWithoutProductosNestedInput
+  detalles?: Prisma.detalleUpdateManyWithoutProductoNestedInput
   empaque_productos_empaqueToempaque?: Prisma.empaqueUpdateOneWithoutProductos_productos_empaqueToempaqueNestedInput
   marca?: Prisma.MarcaUpdateOneRequiredWithoutProductosNestedInput
   proveedores?: Prisma.proveedoresUpdateOneWithoutProductosNestedInput
@@ -1630,6 +1827,7 @@ export type ProductoUncheckedUpdateWithoutCategoriaInput = {
   unidadId?: Prisma.StringFieldUpdateOperationsInput | string
   precioVenta?: Prisma.IntFieldUpdateOperationsInput | number
   stock?: Prisma.IntFieldUpdateOperationsInput | number
+  controlaStock?: Prisma.BoolFieldUpdateOperationsInput | boolean
   urlImagen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   costo?: Prisma.IntFieldUpdateOperationsInput | number
   contenido?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -1638,6 +1836,7 @@ export type ProductoUncheckedUpdateWithoutCategoriaInput = {
   id_proveedor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   instancia_producto?: Prisma.instancia_productoUncheckedUpdateManyWithoutProductosNestedInput
   movimiento_de_stock?: Prisma.movimiento_de_stockUncheckedUpdateManyWithoutProductosNestedInput
+  detalles?: Prisma.detalleUncheckedUpdateManyWithoutProductoNestedInput
 }
 
 export type ProductoUncheckedUpdateManyWithoutCategoriaInput = {
@@ -1649,6 +1848,7 @@ export type ProductoUncheckedUpdateManyWithoutCategoriaInput = {
   unidadId?: Prisma.StringFieldUpdateOperationsInput | string
   precioVenta?: Prisma.IntFieldUpdateOperationsInput | number
   stock?: Prisma.IntFieldUpdateOperationsInput | number
+  controlaStock?: Prisma.BoolFieldUpdateOperationsInput | boolean
   urlImagen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   costo?: Prisma.IntFieldUpdateOperationsInput | number
   contenido?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -1666,6 +1866,7 @@ export type ProductoCreateManyUnidadInput = {
   categoriaId: string
   precioVenta: number
   stock?: number
+  controlaStock?: boolean
   urlImagen?: string | null
   costo?: number
   contenido?: number | null
@@ -1681,11 +1882,13 @@ export type ProductoUpdateWithoutUnidadInput = {
   codigoBarra?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   precioVenta?: Prisma.IntFieldUpdateOperationsInput | number
   stock?: Prisma.IntFieldUpdateOperationsInput | number
+  controlaStock?: Prisma.BoolFieldUpdateOperationsInput | boolean
   urlImagen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   costo?: Prisma.IntFieldUpdateOperationsInput | number
   contenido?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   instancia_producto?: Prisma.instancia_productoUpdateManyWithoutProductosNestedInput
   movimiento_de_stock?: Prisma.movimiento_de_stockUpdateManyWithoutProductosNestedInput
+  detalles?: Prisma.detalleUpdateManyWithoutProductoNestedInput
   categoria?: Prisma.CategoriaUpdateOneRequiredWithoutProductosNestedInput
   empaque_productos_empaqueToempaque?: Prisma.empaqueUpdateOneWithoutProductos_productos_empaqueToempaqueNestedInput
   marca?: Prisma.MarcaUpdateOneRequiredWithoutProductosNestedInput
@@ -1702,6 +1905,7 @@ export type ProductoUncheckedUpdateWithoutUnidadInput = {
   categoriaId?: Prisma.StringFieldUpdateOperationsInput | string
   precioVenta?: Prisma.IntFieldUpdateOperationsInput | number
   stock?: Prisma.IntFieldUpdateOperationsInput | number
+  controlaStock?: Prisma.BoolFieldUpdateOperationsInput | boolean
   urlImagen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   costo?: Prisma.IntFieldUpdateOperationsInput | number
   contenido?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -1710,6 +1914,7 @@ export type ProductoUncheckedUpdateWithoutUnidadInput = {
   id_proveedor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   instancia_producto?: Prisma.instancia_productoUncheckedUpdateManyWithoutProductosNestedInput
   movimiento_de_stock?: Prisma.movimiento_de_stockUncheckedUpdateManyWithoutProductosNestedInput
+  detalles?: Prisma.detalleUncheckedUpdateManyWithoutProductoNestedInput
 }
 
 export type ProductoUncheckedUpdateManyWithoutUnidadInput = {
@@ -1721,6 +1926,7 @@ export type ProductoUncheckedUpdateManyWithoutUnidadInput = {
   categoriaId?: Prisma.StringFieldUpdateOperationsInput | string
   precioVenta?: Prisma.IntFieldUpdateOperationsInput | number
   stock?: Prisma.IntFieldUpdateOperationsInput | number
+  controlaStock?: Prisma.BoolFieldUpdateOperationsInput | boolean
   urlImagen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   costo?: Prisma.IntFieldUpdateOperationsInput | number
   contenido?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -1739,6 +1945,7 @@ export type ProductoCreateManyUnidad_medida_productos_unidad_medidaTounidad_medi
   unidadId: string
   precioVenta: number
   stock?: number
+  controlaStock?: boolean
   urlImagen?: string | null
   costo?: number
   contenido?: number | null
@@ -1753,11 +1960,13 @@ export type ProductoUpdateWithoutUnidad_medida_productos_unidad_medidaTounidad_m
   codigoBarra?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   precioVenta?: Prisma.IntFieldUpdateOperationsInput | number
   stock?: Prisma.IntFieldUpdateOperationsInput | number
+  controlaStock?: Prisma.BoolFieldUpdateOperationsInput | boolean
   urlImagen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   costo?: Prisma.IntFieldUpdateOperationsInput | number
   contenido?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   instancia_producto?: Prisma.instancia_productoUpdateManyWithoutProductosNestedInput
   movimiento_de_stock?: Prisma.movimiento_de_stockUpdateManyWithoutProductosNestedInput
+  detalles?: Prisma.detalleUpdateManyWithoutProductoNestedInput
   categoria?: Prisma.CategoriaUpdateOneRequiredWithoutProductosNestedInput
   empaque_productos_empaqueToempaque?: Prisma.empaqueUpdateOneWithoutProductos_productos_empaqueToempaqueNestedInput
   marca?: Prisma.MarcaUpdateOneRequiredWithoutProductosNestedInput
@@ -1775,6 +1984,7 @@ export type ProductoUncheckedUpdateWithoutUnidad_medida_productos_unidad_medidaT
   unidadId?: Prisma.StringFieldUpdateOperationsInput | string
   precioVenta?: Prisma.IntFieldUpdateOperationsInput | number
   stock?: Prisma.IntFieldUpdateOperationsInput | number
+  controlaStock?: Prisma.BoolFieldUpdateOperationsInput | boolean
   urlImagen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   costo?: Prisma.IntFieldUpdateOperationsInput | number
   contenido?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -1782,6 +1992,7 @@ export type ProductoUncheckedUpdateWithoutUnidad_medida_productos_unidad_medidaT
   id_proveedor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   instancia_producto?: Prisma.instancia_productoUncheckedUpdateManyWithoutProductosNestedInput
   movimiento_de_stock?: Prisma.movimiento_de_stockUncheckedUpdateManyWithoutProductosNestedInput
+  detalles?: Prisma.detalleUncheckedUpdateManyWithoutProductoNestedInput
 }
 
 export type ProductoUncheckedUpdateManyWithoutUnidad_medida_productos_unidad_medidaTounidad_medidaInput = {
@@ -1794,6 +2005,7 @@ export type ProductoUncheckedUpdateManyWithoutUnidad_medida_productos_unidad_med
   unidadId?: Prisma.StringFieldUpdateOperationsInput | string
   precioVenta?: Prisma.IntFieldUpdateOperationsInput | number
   stock?: Prisma.IntFieldUpdateOperationsInput | number
+  controlaStock?: Prisma.BoolFieldUpdateOperationsInput | boolean
   urlImagen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   costo?: Prisma.IntFieldUpdateOperationsInput | number
   contenido?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -1811,6 +2023,7 @@ export type ProductoCreateManyEmpaque_productos_empaqueToempaqueInput = {
   unidadId: string
   precioVenta: number
   stock?: number
+  controlaStock?: boolean
   urlImagen?: string | null
   costo?: number
   contenido?: number | null
@@ -1825,11 +2038,13 @@ export type ProductoUpdateWithoutEmpaque_productos_empaqueToempaqueInput = {
   codigoBarra?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   precioVenta?: Prisma.IntFieldUpdateOperationsInput | number
   stock?: Prisma.IntFieldUpdateOperationsInput | number
+  controlaStock?: Prisma.BoolFieldUpdateOperationsInput | boolean
   urlImagen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   costo?: Prisma.IntFieldUpdateOperationsInput | number
   contenido?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   instancia_producto?: Prisma.instancia_productoUpdateManyWithoutProductosNestedInput
   movimiento_de_stock?: Prisma.movimiento_de_stockUpdateManyWithoutProductosNestedInput
+  detalles?: Prisma.detalleUpdateManyWithoutProductoNestedInput
   categoria?: Prisma.CategoriaUpdateOneRequiredWithoutProductosNestedInput
   marca?: Prisma.MarcaUpdateOneRequiredWithoutProductosNestedInput
   proveedores?: Prisma.proveedoresUpdateOneWithoutProductosNestedInput
@@ -1847,6 +2062,7 @@ export type ProductoUncheckedUpdateWithoutEmpaque_productos_empaqueToempaqueInpu
   unidadId?: Prisma.StringFieldUpdateOperationsInput | string
   precioVenta?: Prisma.IntFieldUpdateOperationsInput | number
   stock?: Prisma.IntFieldUpdateOperationsInput | number
+  controlaStock?: Prisma.BoolFieldUpdateOperationsInput | boolean
   urlImagen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   costo?: Prisma.IntFieldUpdateOperationsInput | number
   contenido?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -1854,6 +2070,7 @@ export type ProductoUncheckedUpdateWithoutEmpaque_productos_empaqueToempaqueInpu
   id_proveedor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   instancia_producto?: Prisma.instancia_productoUncheckedUpdateManyWithoutProductosNestedInput
   movimiento_de_stock?: Prisma.movimiento_de_stockUncheckedUpdateManyWithoutProductosNestedInput
+  detalles?: Prisma.detalleUncheckedUpdateManyWithoutProductoNestedInput
 }
 
 export type ProductoUncheckedUpdateManyWithoutEmpaque_productos_empaqueToempaqueInput = {
@@ -1866,6 +2083,7 @@ export type ProductoUncheckedUpdateManyWithoutEmpaque_productos_empaqueToempaque
   unidadId?: Prisma.StringFieldUpdateOperationsInput | string
   precioVenta?: Prisma.IntFieldUpdateOperationsInput | number
   stock?: Prisma.IntFieldUpdateOperationsInput | number
+  controlaStock?: Prisma.BoolFieldUpdateOperationsInput | boolean
   urlImagen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   costo?: Prisma.IntFieldUpdateOperationsInput | number
   contenido?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -1883,6 +2101,7 @@ export type ProductoCreateManyProveedoresInput = {
   unidadId: string
   precioVenta: number
   stock?: number
+  controlaStock?: boolean
   urlImagen?: string | null
   costo?: number
   contenido?: number | null
@@ -1897,11 +2116,13 @@ export type ProductoUpdateWithoutProveedoresInput = {
   codigoBarra?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   precioVenta?: Prisma.IntFieldUpdateOperationsInput | number
   stock?: Prisma.IntFieldUpdateOperationsInput | number
+  controlaStock?: Prisma.BoolFieldUpdateOperationsInput | boolean
   urlImagen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   costo?: Prisma.IntFieldUpdateOperationsInput | number
   contenido?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   instancia_producto?: Prisma.instancia_productoUpdateManyWithoutProductosNestedInput
   movimiento_de_stock?: Prisma.movimiento_de_stockUpdateManyWithoutProductosNestedInput
+  detalles?: Prisma.detalleUpdateManyWithoutProductoNestedInput
   categoria?: Prisma.CategoriaUpdateOneRequiredWithoutProductosNestedInput
   empaque_productos_empaqueToempaque?: Prisma.empaqueUpdateOneWithoutProductos_productos_empaqueToempaqueNestedInput
   marca?: Prisma.MarcaUpdateOneRequiredWithoutProductosNestedInput
@@ -1919,6 +2140,7 @@ export type ProductoUncheckedUpdateWithoutProveedoresInput = {
   unidadId?: Prisma.StringFieldUpdateOperationsInput | string
   precioVenta?: Prisma.IntFieldUpdateOperationsInput | number
   stock?: Prisma.IntFieldUpdateOperationsInput | number
+  controlaStock?: Prisma.BoolFieldUpdateOperationsInput | boolean
   urlImagen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   costo?: Prisma.IntFieldUpdateOperationsInput | number
   contenido?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -1926,6 +2148,7 @@ export type ProductoUncheckedUpdateWithoutProveedoresInput = {
   empaque?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   instancia_producto?: Prisma.instancia_productoUncheckedUpdateManyWithoutProductosNestedInput
   movimiento_de_stock?: Prisma.movimiento_de_stockUncheckedUpdateManyWithoutProductosNestedInput
+  detalles?: Prisma.detalleUncheckedUpdateManyWithoutProductoNestedInput
 }
 
 export type ProductoUncheckedUpdateManyWithoutProveedoresInput = {
@@ -1938,6 +2161,7 @@ export type ProductoUncheckedUpdateManyWithoutProveedoresInput = {
   unidadId?: Prisma.StringFieldUpdateOperationsInput | string
   precioVenta?: Prisma.IntFieldUpdateOperationsInput | number
   stock?: Prisma.IntFieldUpdateOperationsInput | number
+  controlaStock?: Prisma.BoolFieldUpdateOperationsInput | boolean
   urlImagen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   costo?: Prisma.IntFieldUpdateOperationsInput | number
   contenido?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -1953,11 +2177,13 @@ export type ProductoUncheckedUpdateManyWithoutProveedoresInput = {
 export type ProductoCountOutputType = {
   instancia_producto: number
   movimiento_de_stock: number
+  detalles: number
 }
 
 export type ProductoCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   instancia_producto?: boolean | ProductoCountOutputTypeCountInstancia_productoArgs
   movimiento_de_stock?: boolean | ProductoCountOutputTypeCountMovimiento_de_stockArgs
+  detalles?: boolean | ProductoCountOutputTypeCountDetallesArgs
 }
 
 /**
@@ -1984,6 +2210,13 @@ export type ProductoCountOutputTypeCountMovimiento_de_stockArgs<ExtArgs extends 
   where?: Prisma.movimiento_de_stockWhereInput
 }
 
+/**
+ * ProductoCountOutputType without action
+ */
+export type ProductoCountOutputTypeCountDetallesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.detalleWhereInput
+}
+
 
 export type ProductoSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -1995,6 +2228,7 @@ export type ProductoSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs
   unidadId?: boolean
   precioVenta?: boolean
   stock?: boolean
+  controlaStock?: boolean
   urlImagen?: boolean
   costo?: boolean
   contenido?: boolean
@@ -2003,6 +2237,7 @@ export type ProductoSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs
   id_proveedor?: boolean
   instancia_producto?: boolean | Prisma.Producto$instancia_productoArgs<ExtArgs>
   movimiento_de_stock?: boolean | Prisma.Producto$movimiento_de_stockArgs<ExtArgs>
+  detalles?: boolean | Prisma.Producto$detallesArgs<ExtArgs>
   categoria?: boolean | Prisma.CategoriaDefaultArgs<ExtArgs>
   empaque_productos_empaqueToempaque?: boolean | Prisma.Producto$empaque_productos_empaqueToempaqueArgs<ExtArgs>
   marca?: boolean | Prisma.MarcaDefaultArgs<ExtArgs>
@@ -2022,6 +2257,7 @@ export type ProductoSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exte
   unidadId?: boolean
   precioVenta?: boolean
   stock?: boolean
+  controlaStock?: boolean
   urlImagen?: boolean
   costo?: boolean
   contenido?: boolean
@@ -2046,6 +2282,7 @@ export type ProductoSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exte
   unidadId?: boolean
   precioVenta?: boolean
   stock?: boolean
+  controlaStock?: boolean
   urlImagen?: boolean
   costo?: boolean
   contenido?: boolean
@@ -2070,6 +2307,7 @@ export type ProductoSelectScalar = {
   unidadId?: boolean
   precioVenta?: boolean
   stock?: boolean
+  controlaStock?: boolean
   urlImagen?: boolean
   costo?: boolean
   contenido?: boolean
@@ -2078,10 +2316,11 @@ export type ProductoSelectScalar = {
   id_proveedor?: boolean
 }
 
-export type ProductoOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "nombre" | "descripcion" | "marcaId" | "codigoBarra" | "categoriaId" | "unidadId" | "precioVenta" | "stock" | "urlImagen" | "costo" | "contenido" | "unidad_medida" | "empaque" | "id_proveedor", ExtArgs["result"]["producto"]>
+export type ProductoOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "nombre" | "descripcion" | "marcaId" | "codigoBarra" | "categoriaId" | "unidadId" | "precioVenta" | "stock" | "controlaStock" | "urlImagen" | "costo" | "contenido" | "unidad_medida" | "empaque" | "id_proveedor", ExtArgs["result"]["producto"]>
 export type ProductoInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   instancia_producto?: boolean | Prisma.Producto$instancia_productoArgs<ExtArgs>
   movimiento_de_stock?: boolean | Prisma.Producto$movimiento_de_stockArgs<ExtArgs>
+  detalles?: boolean | Prisma.Producto$detallesArgs<ExtArgs>
   categoria?: boolean | Prisma.CategoriaDefaultArgs<ExtArgs>
   empaque_productos_empaqueToempaque?: boolean | Prisma.Producto$empaque_productos_empaqueToempaqueArgs<ExtArgs>
   marca?: boolean | Prisma.MarcaDefaultArgs<ExtArgs>
@@ -2112,6 +2351,7 @@ export type $ProductoPayload<ExtArgs extends runtime.Types.Extensions.InternalAr
   objects: {
     instancia_producto: Prisma.$instancia_productoPayload<ExtArgs>[]
     movimiento_de_stock: Prisma.$movimiento_de_stockPayload<ExtArgs>[]
+    detalles: Prisma.$detallePayload<ExtArgs>[]
     categoria: Prisma.$CategoriaPayload<ExtArgs>
     empaque_productos_empaqueToempaque: Prisma.$empaquePayload<ExtArgs> | null
     marca: Prisma.$MarcaPayload<ExtArgs>
@@ -2129,6 +2369,7 @@ export type $ProductoPayload<ExtArgs extends runtime.Types.Extensions.InternalAr
     unidadId: string
     precioVenta: number
     stock: number
+    controlaStock: boolean
     urlImagen: string | null
     costo: number
     contenido: number | null
@@ -2531,6 +2772,7 @@ export interface Prisma__ProductoClient<T, Null = never, ExtArgs extends runtime
   readonly [Symbol.toStringTag]: "PrismaPromise"
   instancia_producto<T extends Prisma.Producto$instancia_productoArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Producto$instancia_productoArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$instancia_productoPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   movimiento_de_stock<T extends Prisma.Producto$movimiento_de_stockArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Producto$movimiento_de_stockArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$movimiento_de_stockPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  detalles<T extends Prisma.Producto$detallesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Producto$detallesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$detallePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   categoria<T extends Prisma.CategoriaDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.CategoriaDefaultArgs<ExtArgs>>): Prisma.Prisma__CategoriaClient<runtime.Types.Result.GetResult<Prisma.$CategoriaPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   empaque_productos_empaqueToempaque<T extends Prisma.Producto$empaque_productos_empaqueToempaqueArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Producto$empaque_productos_empaqueToempaqueArgs<ExtArgs>>): Prisma.Prisma__empaqueClient<runtime.Types.Result.GetResult<Prisma.$empaquePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   marca<T extends Prisma.MarcaDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.MarcaDefaultArgs<ExtArgs>>): Prisma.Prisma__MarcaClient<runtime.Types.Result.GetResult<Prisma.$MarcaPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
@@ -2575,6 +2817,7 @@ export interface ProductoFieldRefs {
   readonly unidadId: Prisma.FieldRef<"Producto", 'String'>
   readonly precioVenta: Prisma.FieldRef<"Producto", 'Int'>
   readonly stock: Prisma.FieldRef<"Producto", 'Int'>
+  readonly controlaStock: Prisma.FieldRef<"Producto", 'Boolean'>
   readonly urlImagen: Prisma.FieldRef<"Producto", 'String'>
   readonly costo: Prisma.FieldRef<"Producto", 'Int'>
   readonly contenido: Prisma.FieldRef<"Producto", 'Int'>
@@ -3027,6 +3270,30 @@ export type Producto$movimiento_de_stockArgs<ExtArgs extends runtime.Types.Exten
   take?: number
   skip?: number
   distinct?: Prisma.Movimiento_de_stockScalarFieldEnum | Prisma.Movimiento_de_stockScalarFieldEnum[]
+}
+
+/**
+ * Producto.detalles
+ */
+export type Producto$detallesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the detalle
+   */
+  select?: Prisma.detalleSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the detalle
+   */
+  omit?: Prisma.detalleOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.detalleInclude<ExtArgs> | null
+  where?: Prisma.detalleWhereInput
+  orderBy?: Prisma.detalleOrderByWithRelationInput | Prisma.detalleOrderByWithRelationInput[]
+  cursor?: Prisma.detalleWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.DetalleScalarFieldEnum | Prisma.DetalleScalarFieldEnum[]
 }
 
 /**

@@ -18,6 +18,7 @@ type Producto = {
   contenido: number | null;
   unidad_medida: string | null;
   stock: number;
+  controlaStock: boolean;
   costo: number;
   precioVenta: number;
   urlImagen: string | null;
@@ -652,6 +653,9 @@ export default function ProductoPage() {
   }
 
   function openStockModal(type: StockModal) {
+    if (selectedProduct && !selectedProduct.controlaStock && type !== "movements") {
+      return;
+    }
     setStockModal(type);
     setStockQuantity("");
     setStockExpirationDate("");
@@ -1080,6 +1084,7 @@ export default function ProductoPage() {
   async function saveAddedStock() {
     if (
       !selectedProduct ||
+      !selectedProduct.controlaStock ||
       !isPositiveIntegerText(stockQuantity) ||
       !isFutureExpirationDate(stockExpirationDate, chileToday)
     ) {
@@ -1152,7 +1157,7 @@ export default function ProductoPage() {
   }
 
   async function saveWasteStock() {
-    if (!selectedProduct || !isPositiveIntegerText(stockQuantity)) {
+    if (!selectedProduct || !selectedProduct.controlaStock || !isPositiveIntegerText(stockQuantity)) {
       return;
     }
 
@@ -1466,7 +1471,7 @@ export default function ProductoPage() {
                           </div>
                         </div>
                       </td>
-                      <td>{producto.stock}</td>
+                      <td>{producto.controlaStock ? producto.stock : "Sin control"}</td>
                       <td>${producto.precioVenta.toLocaleString("es-CL")}</td>
                     </tr>
                     );
@@ -1681,7 +1686,7 @@ function ExpiringProductsTable({
                       </div>
                     </div>
                   </td>
-                  <td>{producto.stock}</td>
+                  <td>{producto.controlaStock ? producto.stock : "Sin control"}</td>
                 </tr>
                 {isOpen ? (
                   <tr className="expiring-lots-row">
@@ -2735,16 +2740,22 @@ function ProductDetail({
         {openAccordion === "inventario" ? (
           <section className="inventory-detail-section">
             <div className="inventory-status">
-              <span>Disponible</span>
-              <strong>{product.stock}</strong>
+              <span>{product.controlaStock ? "Disponible" : "Inventario"}</span>
+              <strong className={product.controlaStock ? undefined : "is-untracked"}>
+                {product.controlaStock ? product.stock : "Sin control de stock"}
+              </strong>
             </div>
             <div className="inventory-actions">
-              <button type="button" onClick={() => onOpenStockModal("add")}>
-                Añadir stock
-              </button>
-              <button type="button" onClick={() => onOpenStockModal("waste")}>
-                Ingresar merma
-              </button>
+              {product.controlaStock ? (
+                <>
+                  <button type="button" onClick={() => onOpenStockModal("add")}>
+                    Añadir stock
+                  </button>
+                  <button type="button" onClick={() => onOpenStockModal("waste")}>
+                    Ingresar merma
+                  </button>
+                </>
+              ) : null}
               <button type="button" onClick={() => onOpenStockModal("movements")}>
                 Movimiento de stock
               </button>

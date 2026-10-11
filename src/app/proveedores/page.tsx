@@ -9,6 +9,7 @@ type ProviderProduct = {
   id: string;
   nombre: string;
   stock: number;
+  controlaStock: boolean;
   costoConIva: number;
   contenido: number | null;
   nombreEmpaque: string | null;
@@ -528,6 +529,7 @@ export default function ProvidersPage() {
                 id,
                 nombre,
                 stock,
+                controlaStock,
                 costoConIva,
                 contenido,
                 nombreEmpaque,
@@ -536,6 +538,7 @@ export default function ProvidersPage() {
               id,
               nombre,
               stock,
+              controlaStock,
               costoConIva,
                 contenido,
                 nombreEmpaque,
@@ -1183,7 +1186,7 @@ export default function ProvidersPage() {
                     >
                       <div>
                         <strong>{product.nombre}</strong>
-                        <span>Stock: {product.stock}</span>
+                        <span>{product.controlaStock ? `Stock: ${product.stock}` : "Sin control de stock"}</span>
                       </div>
                       <button
                         type="button"
