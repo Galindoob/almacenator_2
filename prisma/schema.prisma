@@ -212,6 +212,7 @@ model ConfiguracionUsuario {
   usuarioId  String   @id @map("id_usuario") @db.Uuid
   tema       String   @default("green") @db.VarChar(20)
   escala     Float    @default(1) @map("escala_fuente")
+  escalaInterfaz Float @default(1) @map("escala_interfaz")
   nombreTienda String @default("nombre_tienda") @map("nombre_tienda") @db.VarChar(25)
   altoContraste Boolean @default(false) @map("alto_contraste")
   modoOscuro Boolean @default(false) @map("modo_oscuro")

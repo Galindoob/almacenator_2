@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { Check, Moon, Sun } from "lucide-react";
+import { Check, Maximize2, Minimize2, Moon, Sun } from "lucide-react";
 import { Navbar } from "../components/Navbar";
 import {
   useAppearance,
@@ -62,6 +62,7 @@ export default function ConfiguracionPage() {
   const {
     colorTheme,
     fontScale,
+    interfaceScale,
     storeName,
     highContrast,
     darkMode,
@@ -175,8 +176,8 @@ export default function ConfiguracionPage() {
                 <h1>Preferencias</h1>
               </header>
               <AppearanceSettings
-                key={`${colorTheme}-${fontScale}-${highContrast}-${darkMode}`}
-                preferences={{ colorTheme, fontScale, storeName, highContrast, darkMode }}
+                key={`${colorTheme}-${fontScale}-${interfaceScale}-${highContrast}-${darkMode}`}
+                preferences={{ colorTheme, fontScale, interfaceScale, storeName, highContrast, darkMode }}
                 onPreview={previewAppearance}
                 onCancel={clearAppearancePreview}
                 onSave={savePreferences}
@@ -423,25 +424,27 @@ function AppearanceSettings({
   onSave,
 }: {
   preferences: AppearancePreferences;
-  onPreview: (theme: ColorTheme, scale: number) => void;
+  onPreview: (theme: ColorTheme, scale: number, interfaceScale: number) => void;
   onCancel: () => void;
   onSave: (preferences: AppearancePreferences) => Promise<void>;
 }) {
   const [theme, setTheme] = useState(preferences.colorTheme);
   const [scale, setScale] = useState(preferences.fontScale);
+  const [interfaceScale, setInterfaceScale] = useState(preferences.interfaceScale);
   const [highContrast, setHighContrast] = useState(preferences.highContrast);
   const [darkMode, setDarkMode] = useState(preferences.darkMode);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
-  const hasChanges = theme !== preferences.colorTheme || scale !== preferences.fontScale || highContrast !== preferences.highContrast || darkMode !== preferences.darkMode;
+  const hasChanges = theme !== preferences.colorTheme || scale !== preferences.fontScale || interfaceScale !== preferences.interfaceScale || highContrast !== preferences.highContrast || darkMode !== preferences.darkMode;
 
   useEffect(() => () => onCancel(), [onCancel]);
 
-  function updateDraft(nextTheme: ColorTheme, nextScale: number, nextHighContrast: boolean) {
+  function updateDraft(nextTheme: ColorTheme, nextScale: number, nextHighContrast: boolean, nextInterfaceScale = interfaceScale) {
     setTheme(nextTheme);
     setScale(nextScale);
     setHighContrast(nextHighContrast);
-    onPreview(nextTheme, nextScale);
+    setInterfaceScale(nextInterfaceScale);
+    onPreview(nextTheme, nextScale, nextInterfaceScale);
     setError("");
   }
 
@@ -449,7 +452,7 @@ function AppearanceSettings({
     setSaving(true);
     setError("");
     try {
-      await onSave({ ...preferences, colorTheme: theme, fontScale: scale, highContrast, darkMode });
+      await onSave({ ...preferences, colorTheme: theme, fontScale: scale, interfaceScale, highContrast, darkMode });
     } catch (saveError) {
       setError(saveError instanceof Error ? saveError.message : "No se pudo guardar.");
     } finally {
@@ -460,6 +463,7 @@ function AppearanceSettings({
   function cancel() {
     setTheme(preferences.colorTheme);
     setScale(preferences.fontScale);
+    setInterfaceScale(preferences.interfaceScale);
     setHighContrast(preferences.highContrast);
     setDarkMode(preferences.darkMode);
     setError("");
@@ -491,6 +495,30 @@ function AppearanceSettings({
             aria-label="Tamaño global de letra"
           />
           <strong aria-hidden="true">A</strong>
+        </div>
+      </section>
+
+      <section className="settings-section" aria-labelledby="interface-scale-heading">
+        <div className="settings-section-heading">
+          <h2 id="interface-scale-heading">Tamaño de la interfaz</h2>
+          <output htmlFor="interface-scale" className="settings-scale-output">
+            {Math.round(interfaceScale * 100)}%
+          </output>
+        </div>
+        <div className="settings-slider-row">
+          <Minimize2 size={18} aria-hidden="true" />
+          <input
+            id="interface-scale"
+            type="range"
+            min="0.8"
+            max="1.2"
+            step="0.05"
+            value={interfaceScale}
+            onChange={(event) => updateDraft(theme, scale, highContrast, Number(event.target.value))}
+            aria-labelledby="interface-scale-heading"
+            aria-valuetext={`${Math.round(interfaceScale * 100)}%`}
+          />
+          <Maximize2 size={24} aria-hidden="true" />
         </div>
       </section>
 

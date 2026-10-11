@@ -17,13 +17,14 @@ export type ColorTheme = "green" | "blue" | "orange" | "sky";
 export type AppearancePreferences = {
   colorTheme: ColorTheme;
   fontScale: number;
+  interfaceScale: number;
   storeName: string;
   highContrast: boolean;
   darkMode: boolean;
 };
 
 type AppearanceContextValue = AppearancePreferences & {
-  previewAppearance: (theme: ColorTheme, scale: number) => void;
+  previewAppearance: (theme: ColorTheme, scale: number, interfaceScale: number) => void;
   clearAppearancePreview: () => void;
   savePreferences: (preferences: AppearancePreferences) => Promise<void>;
   setStoreName: (name: string) => Promise<void>;
@@ -35,6 +36,7 @@ const STORAGE_KEY = "almacenator-appearance";
 const DEFAULT_PREFERENCES: AppearancePreferences = {
   colorTheme: "green",
   fontScale: 1,
+  interfaceScale: 1,
   storeName: "nombre_tienda",
   highContrast: false,
   darkMode: false,
@@ -95,15 +97,19 @@ function parsePreferences(value: string | null): AppearancePreferences {
         : DEFAULT_PREFERENCES.storeName;
     const highContrast = parsed.highContrast === true;
     const darkMode = parsed.darkMode === true;
+    const interfaceScale =
+      typeof parsed.interfaceScale === "number" && Number.isFinite(parsed.interfaceScale)
+        ? Math.min(1.2, Math.max(0.8, parsed.interfaceScale))
+        : 1;
 
-    return { colorTheme, fontScale, storeName, highContrast, darkMode };
+    return { colorTheme, fontScale, interfaceScale, storeName, highContrast, darkMode };
   } catch {
     return DEFAULT_PREFERENCES;
   }
 }
 
 export function AppearanceProvider({ children }: { children: ReactNode }) {
-  const [preview, setPreview] = useState<Pick<AppearancePreferences, "colorTheme" | "fontScale"> | null>(null);
+  const [preview, setPreview] = useState<Pick<AppearancePreferences, "colorTheme" | "fontScale" | "interfaceScale"> | null>(null);
   const clearAppearancePreview = useCallback(() => setPreview(null), []);
   const storedPreferences = useSyncExternalStore(
     subscribeToAppearance,
@@ -160,6 +166,7 @@ export function AppearanceProvider({ children }: { children: ReactNode }) {
     root.dataset.highContrast = String(preferences.highContrast);
     root.dataset.appearanceMode = preferences.darkMode ? "dark" : "light";
     root.style.setProperty("--app-font-scale", String(preview?.fontScale ?? preferences.fontScale));
+    root.style.setProperty("--app-interface-scale", String(preview?.interfaceScale ?? preferences.interfaceScale));
   }, [preferences, preview]);
 
   async function savePreferences(nextPreferences: AppearancePreferences) {
@@ -190,8 +197,12 @@ export function AppearanceProvider({ children }: { children: ReactNode }) {
 
   const value: AppearanceContextValue = {
     ...preferences,
-    previewAppearance: (colorTheme, fontScale) =>
-      setPreview({ colorTheme, fontScale: Math.min(1.2, Math.max(0.85, fontScale)) }),
+    previewAppearance: (colorTheme, fontScale, interfaceScale) =>
+      setPreview({
+        colorTheme,
+        fontScale: Math.min(1.2, Math.max(0.85, fontScale)),
+        interfaceScale: Math.min(1.2, Math.max(0.8, interfaceScale)),
+      }),
     clearAppearancePreview,
     savePreferences,
     setStoreName: (storeName) => savePreferences({ ...preferences, storeName }),

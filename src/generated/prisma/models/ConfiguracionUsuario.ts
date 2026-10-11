@@ -28,16 +28,19 @@ export type AggregateConfiguracionUsuario = {
 
 export type ConfiguracionUsuarioAvgAggregateOutputType = {
   escala: number | null
+  escalaInterfaz: number | null
 }
 
 export type ConfiguracionUsuarioSumAggregateOutputType = {
   escala: number | null
+  escalaInterfaz: number | null
 }
 
 export type ConfiguracionUsuarioMinAggregateOutputType = {
   usuarioId: string | null
   tema: string | null
   escala: number | null
+  escalaInterfaz: number | null
   nombreTienda: string | null
   altoContraste: boolean | null
   modoOscuro: boolean | null
@@ -56,6 +59,7 @@ export type ConfiguracionUsuarioMaxAggregateOutputType = {
   usuarioId: string | null
   tema: string | null
   escala: number | null
+  escalaInterfaz: number | null
   nombreTienda: string | null
   altoContraste: boolean | null
   modoOscuro: boolean | null
@@ -74,6 +78,7 @@ export type ConfiguracionUsuarioCountAggregateOutputType = {
   usuarioId: number
   tema: number
   escala: number
+  escalaInterfaz: number
   nombreTienda: number
   altoContraste: number
   modoOscuro: number
@@ -92,16 +97,19 @@ export type ConfiguracionUsuarioCountAggregateOutputType = {
 
 export type ConfiguracionUsuarioAvgAggregateInputType = {
   escala?: true
+  escalaInterfaz?: true
 }
 
 export type ConfiguracionUsuarioSumAggregateInputType = {
   escala?: true
+  escalaInterfaz?: true
 }
 
 export type ConfiguracionUsuarioMinAggregateInputType = {
   usuarioId?: true
   tema?: true
   escala?: true
+  escalaInterfaz?: true
   nombreTienda?: true
   altoContraste?: true
   modoOscuro?: true
@@ -120,6 +128,7 @@ export type ConfiguracionUsuarioMaxAggregateInputType = {
   usuarioId?: true
   tema?: true
   escala?: true
+  escalaInterfaz?: true
   nombreTienda?: true
   altoContraste?: true
   modoOscuro?: true
@@ -138,6 +147,7 @@ export type ConfiguracionUsuarioCountAggregateInputType = {
   usuarioId?: true
   tema?: true
   escala?: true
+  escalaInterfaz?: true
   nombreTienda?: true
   altoContraste?: true
   modoOscuro?: true
@@ -243,6 +253,7 @@ export type ConfiguracionUsuarioGroupByOutputType = {
   usuarioId: string
   tema: string
   escala: number
+  escalaInterfaz: number
   nombreTienda: string
   altoContraste: boolean
   modoOscuro: boolean
@@ -284,6 +295,7 @@ export type ConfiguracionUsuarioWhereInput = {
   usuarioId?: Prisma.UuidFilter<"ConfiguracionUsuario"> | string
   tema?: Prisma.StringFilter<"ConfiguracionUsuario"> | string
   escala?: Prisma.FloatFilter<"ConfiguracionUsuario"> | number
+  escalaInterfaz?: Prisma.FloatFilter<"ConfiguracionUsuario"> | number
   nombreTienda?: Prisma.StringFilter<"ConfiguracionUsuario"> | string
   altoContraste?: Prisma.BoolFilter<"ConfiguracionUsuario"> | boolean
   modoOscuro?: Prisma.BoolFilter<"ConfiguracionUsuario"> | boolean
@@ -303,6 +315,7 @@ export type ConfiguracionUsuarioOrderByWithRelationInput = {
   usuarioId?: Prisma.SortOrder
   tema?: Prisma.SortOrder
   escala?: Prisma.SortOrder
+  escalaInterfaz?: Prisma.SortOrder
   nombreTienda?: Prisma.SortOrder
   altoContraste?: Prisma.SortOrder
   modoOscuro?: Prisma.SortOrder
@@ -325,6 +338,7 @@ export type ConfiguracionUsuarioWhereUniqueInput = Prisma.AtLeast<{
   NOT?: Prisma.ConfiguracionUsuarioWhereInput | Prisma.ConfiguracionUsuarioWhereInput[]
   tema?: Prisma.StringFilter<"ConfiguracionUsuario"> | string
   escala?: Prisma.FloatFilter<"ConfiguracionUsuario"> | number
+  escalaInterfaz?: Prisma.FloatFilter<"ConfiguracionUsuario"> | number
   nombreTienda?: Prisma.StringFilter<"ConfiguracionUsuario"> | string
   altoContraste?: Prisma.BoolFilter<"ConfiguracionUsuario"> | boolean
   modoOscuro?: Prisma.BoolFilter<"ConfiguracionUsuario"> | boolean
@@ -344,6 +358,7 @@ export type ConfiguracionUsuarioOrderByWithAggregationInput = {
   usuarioId?: Prisma.SortOrder
   tema?: Prisma.SortOrder
   escala?: Prisma.SortOrder
+  escalaInterfaz?: Prisma.SortOrder
   nombreTienda?: Prisma.SortOrder
   altoContraste?: Prisma.SortOrder
   modoOscuro?: Prisma.SortOrder
@@ -370,6 +385,7 @@ export type ConfiguracionUsuarioScalarWhereWithAggregatesInput = {
   usuarioId?: Prisma.UuidWithAggregatesFilter<"ConfiguracionUsuario"> | string
   tema?: Prisma.StringWithAggregatesFilter<"ConfiguracionUsuario"> | string
   escala?: Prisma.FloatWithAggregatesFilter<"ConfiguracionUsuario"> | number
+  escalaInterfaz?: Prisma.FloatWithAggregatesFilter<"ConfiguracionUsuario"> | number
   nombreTienda?: Prisma.StringWithAggregatesFilter<"ConfiguracionUsuario"> | string
   altoContraste?: Prisma.BoolWithAggregatesFilter<"ConfiguracionUsuario"> | boolean
   modoOscuro?: Prisma.BoolWithAggregatesFilter<"ConfiguracionUsuario"> | boolean
@@ -387,6 +403,7 @@ export type ConfiguracionUsuarioScalarWhereWithAggregatesInput = {
 export type ConfiguracionUsuarioCreateInput = {
   tema?: string
   escala?: number
+  escalaInterfaz?: number
   nombreTienda?: string
   altoContraste?: boolean
   modoOscuro?: boolean
@@ -406,6 +423,7 @@ export type ConfiguracionUsuarioUncheckedCreateInput = {
   usuarioId: string
   tema?: string
   escala?: number
+  escalaInterfaz?: number
   nombreTienda?: string
   altoContraste?: boolean
   modoOscuro?: boolean
@@ -423,6 +441,7 @@ export type ConfiguracionUsuarioUncheckedCreateInput = {
 export type ConfiguracionUsuarioUpdateInput = {
   tema?: Prisma.StringFieldUpdateOperationsInput | string
   escala?: Prisma.FloatFieldUpdateOperationsInput | number
+  escalaInterfaz?: Prisma.FloatFieldUpdateOperationsInput | number
   nombreTienda?: Prisma.StringFieldUpdateOperationsInput | string
   altoContraste?: Prisma.BoolFieldUpdateOperationsInput | boolean
   modoOscuro?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -442,6 +461,7 @@ export type ConfiguracionUsuarioUncheckedUpdateInput = {
   usuarioId?: Prisma.StringFieldUpdateOperationsInput | string
   tema?: Prisma.StringFieldUpdateOperationsInput | string
   escala?: Prisma.FloatFieldUpdateOperationsInput | number
+  escalaInterfaz?: Prisma.FloatFieldUpdateOperationsInput | number
   nombreTienda?: Prisma.StringFieldUpdateOperationsInput | string
   altoContraste?: Prisma.BoolFieldUpdateOperationsInput | boolean
   modoOscuro?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -460,6 +480,7 @@ export type ConfiguracionUsuarioCreateManyInput = {
   usuarioId: string
   tema?: string
   escala?: number
+  escalaInterfaz?: number
   nombreTienda?: string
   altoContraste?: boolean
   modoOscuro?: boolean
@@ -477,6 +498,7 @@ export type ConfiguracionUsuarioCreateManyInput = {
 export type ConfiguracionUsuarioUpdateManyMutationInput = {
   tema?: Prisma.StringFieldUpdateOperationsInput | string
   escala?: Prisma.FloatFieldUpdateOperationsInput | number
+  escalaInterfaz?: Prisma.FloatFieldUpdateOperationsInput | number
   nombreTienda?: Prisma.StringFieldUpdateOperationsInput | string
   altoContraste?: Prisma.BoolFieldUpdateOperationsInput | boolean
   modoOscuro?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -495,6 +517,7 @@ export type ConfiguracionUsuarioUncheckedUpdateManyInput = {
   usuarioId?: Prisma.StringFieldUpdateOperationsInput | string
   tema?: Prisma.StringFieldUpdateOperationsInput | string
   escala?: Prisma.FloatFieldUpdateOperationsInput | number
+  escalaInterfaz?: Prisma.FloatFieldUpdateOperationsInput | number
   nombreTienda?: Prisma.StringFieldUpdateOperationsInput | string
   altoContraste?: Prisma.BoolFieldUpdateOperationsInput | boolean
   modoOscuro?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -518,6 +541,7 @@ export type ConfiguracionUsuarioCountOrderByAggregateInput = {
   usuarioId?: Prisma.SortOrder
   tema?: Prisma.SortOrder
   escala?: Prisma.SortOrder
+  escalaInterfaz?: Prisma.SortOrder
   nombreTienda?: Prisma.SortOrder
   altoContraste?: Prisma.SortOrder
   modoOscuro?: Prisma.SortOrder
@@ -534,12 +558,14 @@ export type ConfiguracionUsuarioCountOrderByAggregateInput = {
 
 export type ConfiguracionUsuarioAvgOrderByAggregateInput = {
   escala?: Prisma.SortOrder
+  escalaInterfaz?: Prisma.SortOrder
 }
 
 export type ConfiguracionUsuarioMaxOrderByAggregateInput = {
   usuarioId?: Prisma.SortOrder
   tema?: Prisma.SortOrder
   escala?: Prisma.SortOrder
+  escalaInterfaz?: Prisma.SortOrder
   nombreTienda?: Prisma.SortOrder
   altoContraste?: Prisma.SortOrder
   modoOscuro?: Prisma.SortOrder
@@ -558,6 +584,7 @@ export type ConfiguracionUsuarioMinOrderByAggregateInput = {
   usuarioId?: Prisma.SortOrder
   tema?: Prisma.SortOrder
   escala?: Prisma.SortOrder
+  escalaInterfaz?: Prisma.SortOrder
   nombreTienda?: Prisma.SortOrder
   altoContraste?: Prisma.SortOrder
   modoOscuro?: Prisma.SortOrder
@@ -574,6 +601,7 @@ export type ConfiguracionUsuarioMinOrderByAggregateInput = {
 
 export type ConfiguracionUsuarioSumOrderByAggregateInput = {
   escala?: Prisma.SortOrder
+  escalaInterfaz?: Prisma.SortOrder
 }
 
 export type ConfiguracionUsuarioCreateNestedOneWithoutUsuarioInput = {
@@ -619,6 +647,7 @@ export type FloatFieldUpdateOperationsInput = {
 export type ConfiguracionUsuarioCreateWithoutUsuarioInput = {
   tema?: string
   escala?: number
+  escalaInterfaz?: number
   nombreTienda?: string
   altoContraste?: boolean
   modoOscuro?: boolean
@@ -636,6 +665,7 @@ export type ConfiguracionUsuarioCreateWithoutUsuarioInput = {
 export type ConfiguracionUsuarioUncheckedCreateWithoutUsuarioInput = {
   tema?: string
   escala?: number
+  escalaInterfaz?: number
   nombreTienda?: string
   altoContraste?: boolean
   modoOscuro?: boolean
@@ -669,6 +699,7 @@ export type ConfiguracionUsuarioUpdateToOneWithWhereWithoutUsuarioInput = {
 export type ConfiguracionUsuarioUpdateWithoutUsuarioInput = {
   tema?: Prisma.StringFieldUpdateOperationsInput | string
   escala?: Prisma.FloatFieldUpdateOperationsInput | number
+  escalaInterfaz?: Prisma.FloatFieldUpdateOperationsInput | number
   nombreTienda?: Prisma.StringFieldUpdateOperationsInput | string
   altoContraste?: Prisma.BoolFieldUpdateOperationsInput | boolean
   modoOscuro?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -686,6 +717,7 @@ export type ConfiguracionUsuarioUpdateWithoutUsuarioInput = {
 export type ConfiguracionUsuarioUncheckedUpdateWithoutUsuarioInput = {
   tema?: Prisma.StringFieldUpdateOperationsInput | string
   escala?: Prisma.FloatFieldUpdateOperationsInput | number
+  escalaInterfaz?: Prisma.FloatFieldUpdateOperationsInput | number
   nombreTienda?: Prisma.StringFieldUpdateOperationsInput | string
   altoContraste?: Prisma.BoolFieldUpdateOperationsInput | boolean
   modoOscuro?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -706,6 +738,7 @@ export type ConfiguracionUsuarioSelect<ExtArgs extends runtime.Types.Extensions.
   usuarioId?: boolean
   tema?: boolean
   escala?: boolean
+  escalaInterfaz?: boolean
   nombreTienda?: boolean
   altoContraste?: boolean
   modoOscuro?: boolean
@@ -725,6 +758,7 @@ export type ConfiguracionUsuarioSelectCreateManyAndReturn<ExtArgs extends runtim
   usuarioId?: boolean
   tema?: boolean
   escala?: boolean
+  escalaInterfaz?: boolean
   nombreTienda?: boolean
   altoContraste?: boolean
   modoOscuro?: boolean
@@ -744,6 +778,7 @@ export type ConfiguracionUsuarioSelectUpdateManyAndReturn<ExtArgs extends runtim
   usuarioId?: boolean
   tema?: boolean
   escala?: boolean
+  escalaInterfaz?: boolean
   nombreTienda?: boolean
   altoContraste?: boolean
   modoOscuro?: boolean
@@ -763,6 +798,7 @@ export type ConfiguracionUsuarioSelectScalar = {
   usuarioId?: boolean
   tema?: boolean
   escala?: boolean
+  escalaInterfaz?: boolean
   nombreTienda?: boolean
   altoContraste?: boolean
   modoOscuro?: boolean
@@ -777,7 +813,7 @@ export type ConfiguracionUsuarioSelectScalar = {
   actualizado?: boolean
 }
 
-export type ConfiguracionUsuarioOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"usuarioId" | "tema" | "escala" | "nombreTienda" | "altoContraste" | "modoOscuro" | "empresaRut" | "empresaNombre" | "empresaGiro" | "empresaActividad" | "empresaEmail" | "empresaTelefono" | "empresaDireccion" | "empresaComuna" | "actualizado", ExtArgs["result"]["configuracionUsuario"]>
+export type ConfiguracionUsuarioOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"usuarioId" | "tema" | "escala" | "escalaInterfaz" | "nombreTienda" | "altoContraste" | "modoOscuro" | "empresaRut" | "empresaNombre" | "empresaGiro" | "empresaActividad" | "empresaEmail" | "empresaTelefono" | "empresaDireccion" | "empresaComuna" | "actualizado", ExtArgs["result"]["configuracionUsuario"]>
 export type ConfiguracionUsuarioInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   usuario?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
@@ -797,6 +833,7 @@ export type $ConfiguracionUsuarioPayload<ExtArgs extends runtime.Types.Extension
     usuarioId: string
     tema: string
     escala: number
+    escalaInterfaz: number
     nombreTienda: string
     altoContraste: boolean
     modoOscuro: boolean
@@ -1236,6 +1273,7 @@ export interface ConfiguracionUsuarioFieldRefs {
   readonly usuarioId: Prisma.FieldRef<"ConfiguracionUsuario", 'String'>
   readonly tema: Prisma.FieldRef<"ConfiguracionUsuario", 'String'>
   readonly escala: Prisma.FieldRef<"ConfiguracionUsuario", 'Float'>
+  readonly escalaInterfaz: Prisma.FieldRef<"ConfiguracionUsuario", 'Float'>
   readonly nombreTienda: Prisma.FieldRef<"ConfiguracionUsuario", 'String'>
   readonly altoContraste: Prisma.FieldRef<"ConfiguracionUsuario", 'Boolean'>
   readonly modoOscuro: Prisma.FieldRef<"ConfiguracionUsuario", 'Boolean'>

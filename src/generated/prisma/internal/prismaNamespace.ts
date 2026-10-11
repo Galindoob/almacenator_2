@@ -2009,6 +2009,7 @@ export const ConfiguracionUsuarioScalarFieldEnum = {
   usuarioId: 'usuarioId',
   tema: 'tema',
   escala: 'escala',
+  escalaInterfaz: 'escalaInterfaz',
   nombreTienda: 'nombreTienda',
   altoContraste: 'altoContraste',
   modoOscuro: 'modoOscuro',
