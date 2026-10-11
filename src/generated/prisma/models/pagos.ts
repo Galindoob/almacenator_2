@@ -39,6 +39,7 @@ export type PagosMinAggregateOutputType = {
   id_venta: string | null
   id_medio_pago: string | null
   pago: number | null
+  clave_operacion: string | null
 }
 
 export type PagosMaxAggregateOutputType = {
@@ -46,6 +47,7 @@ export type PagosMaxAggregateOutputType = {
   id_venta: string | null
   id_medio_pago: string | null
   pago: number | null
+  clave_operacion: string | null
 }
 
 export type PagosCountAggregateOutputType = {
@@ -53,6 +55,7 @@ export type PagosCountAggregateOutputType = {
   id_venta: number
   id_medio_pago: number
   pago: number
+  clave_operacion: number
   _all: number
 }
 
@@ -70,6 +73,7 @@ export type PagosMinAggregateInputType = {
   id_venta?: true
   id_medio_pago?: true
   pago?: true
+  clave_operacion?: true
 }
 
 export type PagosMaxAggregateInputType = {
@@ -77,6 +81,7 @@ export type PagosMaxAggregateInputType = {
   id_venta?: true
   id_medio_pago?: true
   pago?: true
+  clave_operacion?: true
 }
 
 export type PagosCountAggregateInputType = {
@@ -84,6 +89,7 @@ export type PagosCountAggregateInputType = {
   id_venta?: true
   id_medio_pago?: true
   pago?: true
+  clave_operacion?: true
   _all?: true
 }
 
@@ -178,6 +184,7 @@ export type PagosGroupByOutputType = {
   id_venta: string
   id_medio_pago: string
   pago: number
+  clave_operacion: string | null
   _count: PagosCountAggregateOutputType | null
   _avg: PagosAvgAggregateOutputType | null
   _sum: PagosSumAggregateOutputType | null
@@ -208,6 +215,7 @@ export type pagosWhereInput = {
   id_venta?: Prisma.UuidFilter<"pagos"> | string
   id_medio_pago?: Prisma.UuidFilter<"pagos"> | string
   pago?: Prisma.IntFilter<"pagos"> | number
+  clave_operacion?: Prisma.UuidNullableFilter<"pagos"> | string | null
   venta?: Prisma.XOR<Prisma.VentaScalarRelationFilter, Prisma.ventaWhereInput>
   medio_pago?: Prisma.XOR<Prisma.Medio_pagoScalarRelationFilter, Prisma.medio_pagoWhereInput>
 }
@@ -217,12 +225,14 @@ export type pagosOrderByWithRelationInput = {
   id_venta?: Prisma.SortOrder
   id_medio_pago?: Prisma.SortOrder
   pago?: Prisma.SortOrder
+  clave_operacion?: Prisma.SortOrderInput | Prisma.SortOrder
   venta?: Prisma.ventaOrderByWithRelationInput
   medio_pago?: Prisma.medio_pagoOrderByWithRelationInput
 }
 
 export type pagosWhereUniqueInput = Prisma.AtLeast<{
   id_pago?: string
+  clave_operacion?: string
   AND?: Prisma.pagosWhereInput | Prisma.pagosWhereInput[]
   OR?: Prisma.pagosWhereInput[]
   NOT?: Prisma.pagosWhereInput | Prisma.pagosWhereInput[]
@@ -231,13 +241,14 @@ export type pagosWhereUniqueInput = Prisma.AtLeast<{
   pago?: Prisma.IntFilter<"pagos"> | number
   venta?: Prisma.XOR<Prisma.VentaScalarRelationFilter, Prisma.ventaWhereInput>
   medio_pago?: Prisma.XOR<Prisma.Medio_pagoScalarRelationFilter, Prisma.medio_pagoWhereInput>
-}, "id_pago">
+}, "id_pago" | "clave_operacion">
 
 export type pagosOrderByWithAggregationInput = {
   id_pago?: Prisma.SortOrder
   id_venta?: Prisma.SortOrder
   id_medio_pago?: Prisma.SortOrder
   pago?: Prisma.SortOrder
+  clave_operacion?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.pagosCountOrderByAggregateInput
   _avg?: Prisma.pagosAvgOrderByAggregateInput
   _max?: Prisma.pagosMaxOrderByAggregateInput
@@ -253,11 +264,13 @@ export type pagosScalarWhereWithAggregatesInput = {
   id_venta?: Prisma.UuidWithAggregatesFilter<"pagos"> | string
   id_medio_pago?: Prisma.UuidWithAggregatesFilter<"pagos"> | string
   pago?: Prisma.IntWithAggregatesFilter<"pagos"> | number
+  clave_operacion?: Prisma.UuidNullableWithAggregatesFilter<"pagos"> | string | null
 }
 
 export type pagosCreateInput = {
   id_pago?: string
   pago: number
+  clave_operacion?: string | null
   venta: Prisma.ventaCreateNestedOneWithoutPagosInput
   medio_pago: Prisma.medio_pagoCreateNestedOneWithoutPagosInput
 }
@@ -267,11 +280,13 @@ export type pagosUncheckedCreateInput = {
   id_venta: string
   id_medio_pago: string
   pago: number
+  clave_operacion?: string | null
 }
 
 export type pagosUpdateInput = {
   id_pago?: Prisma.StringFieldUpdateOperationsInput | string
   pago?: Prisma.IntFieldUpdateOperationsInput | number
+  clave_operacion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   venta?: Prisma.ventaUpdateOneRequiredWithoutPagosNestedInput
   medio_pago?: Prisma.medio_pagoUpdateOneRequiredWithoutPagosNestedInput
 }
@@ -281,6 +296,7 @@ export type pagosUncheckedUpdateInput = {
   id_venta?: Prisma.StringFieldUpdateOperationsInput | string
   id_medio_pago?: Prisma.StringFieldUpdateOperationsInput | string
   pago?: Prisma.IntFieldUpdateOperationsInput | number
+  clave_operacion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type pagosCreateManyInput = {
@@ -288,11 +304,13 @@ export type pagosCreateManyInput = {
   id_venta: string
   id_medio_pago: string
   pago: number
+  clave_operacion?: string | null
 }
 
 export type pagosUpdateManyMutationInput = {
   id_pago?: Prisma.StringFieldUpdateOperationsInput | string
   pago?: Prisma.IntFieldUpdateOperationsInput | number
+  clave_operacion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type pagosUncheckedUpdateManyInput = {
@@ -300,6 +318,7 @@ export type pagosUncheckedUpdateManyInput = {
   id_venta?: Prisma.StringFieldUpdateOperationsInput | string
   id_medio_pago?: Prisma.StringFieldUpdateOperationsInput | string
   pago?: Prisma.IntFieldUpdateOperationsInput | number
+  clave_operacion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type PagosListRelationFilter = {
@@ -317,6 +336,7 @@ export type pagosCountOrderByAggregateInput = {
   id_venta?: Prisma.SortOrder
   id_medio_pago?: Prisma.SortOrder
   pago?: Prisma.SortOrder
+  clave_operacion?: Prisma.SortOrder
 }
 
 export type pagosAvgOrderByAggregateInput = {
@@ -328,6 +348,7 @@ export type pagosMaxOrderByAggregateInput = {
   id_venta?: Prisma.SortOrder
   id_medio_pago?: Prisma.SortOrder
   pago?: Prisma.SortOrder
+  clave_operacion?: Prisma.SortOrder
 }
 
 export type pagosMinOrderByAggregateInput = {
@@ -335,6 +356,7 @@ export type pagosMinOrderByAggregateInput = {
   id_venta?: Prisma.SortOrder
   id_medio_pago?: Prisma.SortOrder
   pago?: Prisma.SortOrder
+  clave_operacion?: Prisma.SortOrder
 }
 
 export type pagosSumOrderByAggregateInput = {
@@ -428,6 +450,7 @@ export type pagosUncheckedUpdateManyWithoutVentaNestedInput = {
 export type pagosCreateWithoutMedio_pagoInput = {
   id_pago?: string
   pago: number
+  clave_operacion?: string | null
   venta: Prisma.ventaCreateNestedOneWithoutPagosInput
 }
 
@@ -435,6 +458,7 @@ export type pagosUncheckedCreateWithoutMedio_pagoInput = {
   id_pago?: string
   id_venta: string
   pago: number
+  clave_operacion?: string | null
 }
 
 export type pagosCreateOrConnectWithoutMedio_pagoInput = {
@@ -471,11 +495,13 @@ export type pagosScalarWhereInput = {
   id_venta?: Prisma.UuidFilter<"pagos"> | string
   id_medio_pago?: Prisma.UuidFilter<"pagos"> | string
   pago?: Prisma.IntFilter<"pagos"> | number
+  clave_operacion?: Prisma.UuidNullableFilter<"pagos"> | string | null
 }
 
 export type pagosCreateWithoutVentaInput = {
   id_pago?: string
   pago: number
+  clave_operacion?: string | null
   medio_pago: Prisma.medio_pagoCreateNestedOneWithoutPagosInput
 }
 
@@ -483,6 +509,7 @@ export type pagosUncheckedCreateWithoutVentaInput = {
   id_pago?: string
   id_medio_pago: string
   pago: number
+  clave_operacion?: string | null
 }
 
 export type pagosCreateOrConnectWithoutVentaInput = {
@@ -515,11 +542,13 @@ export type pagosCreateManyMedio_pagoInput = {
   id_pago?: string
   id_venta: string
   pago: number
+  clave_operacion?: string | null
 }
 
 export type pagosUpdateWithoutMedio_pagoInput = {
   id_pago?: Prisma.StringFieldUpdateOperationsInput | string
   pago?: Prisma.IntFieldUpdateOperationsInput | number
+  clave_operacion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   venta?: Prisma.ventaUpdateOneRequiredWithoutPagosNestedInput
 }
 
@@ -527,23 +556,27 @@ export type pagosUncheckedUpdateWithoutMedio_pagoInput = {
   id_pago?: Prisma.StringFieldUpdateOperationsInput | string
   id_venta?: Prisma.StringFieldUpdateOperationsInput | string
   pago?: Prisma.IntFieldUpdateOperationsInput | number
+  clave_operacion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type pagosUncheckedUpdateManyWithoutMedio_pagoInput = {
   id_pago?: Prisma.StringFieldUpdateOperationsInput | string
   id_venta?: Prisma.StringFieldUpdateOperationsInput | string
   pago?: Prisma.IntFieldUpdateOperationsInput | number
+  clave_operacion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type pagosCreateManyVentaInput = {
   id_pago?: string
   id_medio_pago: string
   pago: number
+  clave_operacion?: string | null
 }
 
 export type pagosUpdateWithoutVentaInput = {
   id_pago?: Prisma.StringFieldUpdateOperationsInput | string
   pago?: Prisma.IntFieldUpdateOperationsInput | number
+  clave_operacion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   medio_pago?: Prisma.medio_pagoUpdateOneRequiredWithoutPagosNestedInput
 }
 
@@ -551,12 +584,14 @@ export type pagosUncheckedUpdateWithoutVentaInput = {
   id_pago?: Prisma.StringFieldUpdateOperationsInput | string
   id_medio_pago?: Prisma.StringFieldUpdateOperationsInput | string
   pago?: Prisma.IntFieldUpdateOperationsInput | number
+  clave_operacion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type pagosUncheckedUpdateManyWithoutVentaInput = {
   id_pago?: Prisma.StringFieldUpdateOperationsInput | string
   id_medio_pago?: Prisma.StringFieldUpdateOperationsInput | string
   pago?: Prisma.IntFieldUpdateOperationsInput | number
+  clave_operacion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 
@@ -566,6 +601,7 @@ export type pagosSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   id_venta?: boolean
   id_medio_pago?: boolean
   pago?: boolean
+  clave_operacion?: boolean
   venta?: boolean | Prisma.ventaDefaultArgs<ExtArgs>
   medio_pago?: boolean | Prisma.medio_pagoDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["pagos"]>
@@ -575,6 +611,7 @@ export type pagosSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   id_venta?: boolean
   id_medio_pago?: boolean
   pago?: boolean
+  clave_operacion?: boolean
   venta?: boolean | Prisma.ventaDefaultArgs<ExtArgs>
   medio_pago?: boolean | Prisma.medio_pagoDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["pagos"]>
@@ -584,6 +621,7 @@ export type pagosSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   id_venta?: boolean
   id_medio_pago?: boolean
   pago?: boolean
+  clave_operacion?: boolean
   venta?: boolean | Prisma.ventaDefaultArgs<ExtArgs>
   medio_pago?: boolean | Prisma.medio_pagoDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["pagos"]>
@@ -593,9 +631,10 @@ export type pagosSelectScalar = {
   id_venta?: boolean
   id_medio_pago?: boolean
   pago?: boolean
+  clave_operacion?: boolean
 }
 
-export type pagosOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id_pago" | "id_venta" | "id_medio_pago" | "pago", ExtArgs["result"]["pagos"]>
+export type pagosOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id_pago" | "id_venta" | "id_medio_pago" | "pago" | "clave_operacion", ExtArgs["result"]["pagos"]>
 export type pagosInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   venta?: boolean | Prisma.ventaDefaultArgs<ExtArgs>
   medio_pago?: boolean | Prisma.medio_pagoDefaultArgs<ExtArgs>
@@ -620,6 +659,7 @@ export type $pagosPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
     id_venta: string
     id_medio_pago: string
     pago: number
+    clave_operacion: string | null
   }, ExtArgs["result"]["pagos"]>
   composites: {}
 }
@@ -1049,6 +1089,7 @@ export interface pagosFieldRefs {
   readonly id_venta: Prisma.FieldRef<"pagos", 'String'>
   readonly id_medio_pago: Prisma.FieldRef<"pagos", 'String'>
   readonly pago: Prisma.FieldRef<"pagos", 'Int'>
+  readonly clave_operacion: Prisma.FieldRef<"pagos", 'String'>
 }
     
 

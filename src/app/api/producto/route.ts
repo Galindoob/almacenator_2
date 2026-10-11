@@ -118,7 +118,6 @@ function buildProductUpdateData(
       typeof product.precioVenta === "number"
         ? Math.round(product.precioVenta)
         : undefined,
-    stock: controlaStock && typeof product.stock === "number" ? Math.round(product.stock) : undefined,
     controlaStock,
     urlImagen: product.urlImagen,
     costo: typeof product.costo === "number" ? Math.round(product.costo) : undefined,
@@ -694,10 +693,21 @@ export const PUT = withAuth(async (request) => {
       product.urlImagen = null;
     }
 
-    const updatedProductBase = await prisma.producto.update({
-      where: { id: product.id },
-      data: buildProductUpdateData(product, controlaStock),
-      select: productSelect,
+    const updatedProductBase = await prisma.$transaction(async (tx) => {
+      await tx.$queryRaw`SELECT id_productos FROM productos WHERE id_productos = ${product.id}::uuid FOR UPDATE`;
+      const current = await tx.producto.findUniqueOrThrow({ where: { id: product.id } });
+      if (current.controlaStock !== controlaStock) {
+        const pending = await tx.detalle.count({ where: { id_producto: product.id, venta: { estado: "pendiente" } } });
+        const instances = await tx.instancia_producto.count({ where: { id_producto: product.id } });
+        if (pending || instances || current.stock > 0) {
+          throw new Error("PRODUCT_STOCK_MODE_IN_USE");
+        }
+      }
+      return tx.producto.update({
+        where: { id: product.id },
+        data: buildProductUpdateData(product, controlaStock),
+        select: productSelect,
+      });
     });
     await setProductPackaging(updatedProductBase.id, product.empaque ?? null);
     await setProductProvider(updatedProductBase.id, product.id_proveedor ?? null);
@@ -715,6 +725,13 @@ export const PUT = withAuth(async (request) => {
     return NextResponse.json({ status: "ok", producto: updatedProduct });
   } catch (error) {
     console.error("Error actualizando producto:", error);
+
+    if (error instanceof Error && error.message === "PRODUCT_STOCK_MODE_IN_USE") {
+      return NextResponse.json(
+        { status: "error", message: "No puedes cambiar el control de stock mientras existan lotes o ventas pendientes de este producto." },
+        { status: 409 },
+      );
+    }
 
     if (error instanceof AppInputValidationError) {
       return NextResponse.json(

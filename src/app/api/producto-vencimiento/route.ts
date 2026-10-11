@@ -120,6 +120,7 @@ export const GET = withAuth(async () => {
       prisma.instancia_producto.groupBy({
         by: ["id_producto", "fecha_vencimiento"],
         where: {
+          id_detalle_reserva: null,
           productos: {
             stock: { gt: 0 },
             controlaStock: true,
@@ -199,6 +200,7 @@ export const DELETE = withAuth(async (request: AuthenticatedRequest) => {
     }
 
     const result = await prisma.$transaction(async (tx) => {
+      await tx.$queryRaw`SELECT id_productos FROM productos WHERE id_productos = ${payload.productoId}::uuid FOR UPDATE`;
       const [producto, lotCount] = await Promise.all([
         tx.producto.findUnique({
           where: { id: payload.productoId },
@@ -208,6 +210,7 @@ export const DELETE = withAuth(async (request: AuthenticatedRequest) => {
           where: {
             id_producto: payload.productoId,
             fecha_vencimiento: expirationDate,
+            id_detalle_reserva: null,
           },
         }),
       ]);
@@ -228,6 +231,7 @@ export const DELETE = withAuth(async (request: AuthenticatedRequest) => {
         where: {
           id_producto: payload.productoId,
           fecha_vencimiento: expirationDate,
+          id_detalle_reserva: null,
         },
       });
 

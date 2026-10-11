@@ -159,17 +159,20 @@ export const POST = withAuth(async (request: AuthenticatedRequest) => {
     }
 
     const result = await prisma.$transaction(async (tx) => {
+      await tx.$queryRaw`SELECT id_productos FROM productos WHERE id_productos = ${payload.producto}::uuid FOR UPDATE`;
       const product = await tx.producto.findUnique({
         where: { id: payload.producto },
-        select: { controlaStock: true },
+        select: { controlaStock: true, stock: true },
       });
       if (!product?.controlaStock) {
         throw new Error("Este producto no controla stock.");
       }
 
-      if (tipo === 1) {
+      const resultingStock = product.stock + (tipo === 2 ? cantidad : -cantidad);
+      if (resultingStock < 0) throw new Error("No hay suficientes instancias para descontar la merma.");
+      if (tipo === 1 || tipo === 3) {
         const instancesToDelete = await tx.instancia_producto.findMany({
-          where: { id_producto: payload.producto },
+          where: { id_producto: payload.producto, id_detalle_reserva: null },
           orderBy: { fecha_vencimiento: "asc" },
           take: cantidad,
           select: { id_instancia: true },
@@ -203,7 +206,7 @@ export const POST = withAuth(async (request: AuthenticatedRequest) => {
           costo_sin_iva: costoSinIva,
           costo_con_iva: costoConIva,
           cantidad,
-          stock_restante: stockRestante,
+          stock_restante: resultingStock,
           usuario: user.id,
           producto: payload.producto ?? "",
           comentario: payload.comentario?.trim() || null,
@@ -229,7 +232,7 @@ export const POST = withAuth(async (request: AuthenticatedRequest) => {
 
       const producto = await tx.producto.update({
         where: { id: payload.producto },
-        data: { stock: stockRestante },
+        data: { stock: resultingStock },
         select: {
           id: true,
           stock: true,

@@ -180,7 +180,8 @@ export type Unidad_medidaScalarFieldEnum = (typeof Unidad_medidaScalarFieldEnum)
 export const Instancia_productoScalarFieldEnum = {
   id_instancia: 'id_instancia',
   id_producto: 'id_producto',
-  fecha_vencimiento: 'fecha_vencimiento'
+  fecha_vencimiento: 'fecha_vencimiento',
+  id_detalle_reserva: 'id_detalle_reserva'
 } as const
 
 export type Instancia_productoScalarFieldEnum = (typeof Instancia_productoScalarFieldEnum)[keyof typeof Instancia_productoScalarFieldEnum]
@@ -258,7 +259,9 @@ export const VentaScalarFieldEnum = {
   fecha_de_creacion: 'fecha_de_creacion',
   fecha_pago: 'fecha_pago',
   estado: 'estado',
-  vuelto: 'vuelto'
+  vuelto: 'vuelto',
+  clave_cliente: 'clave_cliente',
+  revision: 'revision'
 } as const
 
 export type VentaScalarFieldEnum = (typeof VentaScalarFieldEnum)[keyof typeof VentaScalarFieldEnum]
@@ -281,7 +284,8 @@ export const PagosScalarFieldEnum = {
   id_pago: 'id_pago',
   id_venta: 'id_venta',
   id_medio_pago: 'id_medio_pago',
-  pago: 'pago'
+  pago: 'pago',
+  clave_operacion: 'clave_operacion'
 } as const
 
 export type PagosScalarFieldEnum = (typeof PagosScalarFieldEnum)[keyof typeof PagosScalarFieldEnum]

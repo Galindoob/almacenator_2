@@ -2,7 +2,8 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { ArrowLeft, ArrowLeftRight, Banknote, CreditCard, Wallet } from "lucide-react";
+import { ArrowLeft, ArrowLeftRight, Banknote, CreditCard, Wallet, Plus, Trash2, ShoppingBasket, CheckCircle } from "lucide-react";
+import type { SaleCommand } from "@/lib/sales";
 import { Navbar } from "../components/Navbar";
 import { useAppearance } from "../components/AppearanceProvider";
 import { isSafeAppInput } from "@/lib/input-validation";
@@ -55,6 +56,28 @@ type PaymentMethod = {
   id_medio: string;
   medio_de_pago: string;
 };
+
+type Sale = {
+  id_venta: string;
+  num_venta: number;
+  revision: number;
+  valor_total: number;
+  estado: string;
+  vuelto: number;
+  detalles: { id_producto: string; cantidad: string; precio_actual: number; subtotal_venta: number; producto: Producto }[];
+  pagos: { pago: number }[];
+};
+
+function saleCart(sale: Sale): CartItem[] {
+  return sale.detalles.map((detail) => {
+    const quantity = Number(detail.cantidad);
+    const product = { ...detail.producto, precioVenta: detail.precio_actual,
+      stock: detail.producto.stock + (detail.producto.controlaStock ? quantity : 0) };
+    return product.controlaStock ? { kind: "unit", product, quantity } : {
+      kind: "weight", product, quantityText: formatQuantity(quantity), priceText: String(detail.subtotal_venta),
+    };
+  });
+}
 
 const PAYMENT_METHOD_ORDER: Record<string, number> = {
   efectivo: 0,
@@ -152,14 +175,6 @@ function getLineTotal(item: CartItem) {
   return Math.round(parseDecimal(item.priceText));
 }
 
-function createCartItem(product: Producto): CartItem {
-  if (isVariableWeight(product)) {
-    return { kind: "weight", product, priceText: "0", quantityText: "0" };
-  }
-
-  return { kind: "unit", product, quantity: 1 };
-}
-
 function ProductDetails({ product }: { product: Producto }) {
   const contentLabel = isVariableWeight(product) ? null : getContentLabel(product);
 
@@ -192,6 +207,15 @@ export default function SalesPage() {
   const { storeName } = useAppearance();
   const [productos, setProductos] = useState<Producto[]>([]);
   const [cart, setCart] = useState<CartItem[]>([]);
+  const [sales, setSales] = useState<Sale[]>([]);
+  const [activeSale, setActiveSale] = useState<Sale | null>(null);
+  const [busy, setBusy] = useState(false);
+  const busyRef = useRef(false);
+  const draftKey = useRef<string | null>(null);
+  const paymentAttempt = useRef<{ fingerprint: string; key: string } | null>(null);
+  const [operationError, setOperationError] = useState("");
+  const [cashAmount, setCashAmount] = useState("");
+  const [completedSale, setCompletedSale] = useState<Sale | null>(null);
   const [search, setSearch] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
@@ -235,6 +259,14 @@ export default function SalesPage() {
         }
 
         setProductos(data.productos ?? []);
+        const salesResponse = await fetch("/api/ventas", { headers: { Authorization: `Bearer ${token}` }, cache: "no-store" });
+        if (!salesResponse.ok) throw new Error("No se pudieron cargar las ventas.");
+        const saved = await salesResponse.json() as { ventas: Sale[] };
+        setSales(saved.ventas);
+        if (saved.ventas[0]) {
+          setActiveSale(saved.ventas[0]);
+          setCart(saleCart(saved.ventas[0]));
+        }
       } catch {
         setError("No se pudo conectar con el servidor.");
       } finally {
@@ -294,12 +326,119 @@ export default function SalesPage() {
     () => cart.reduce((sum, item) => sum + getLineTotal(item), 0),
     [cart],
   );
-  const amountPaid = 0;
+  const amountPaid = activeSale?.pagos.reduce((sum, payment) => sum + payment.pago, 0) ?? 0;
+  const locked = amountPaid > 0;
   const amountDue = Math.max(0, cartTotal - amountPaid);
   const showPaymentDetails = rightPanel === "payment" && cartTotal > 0;
+  const selectedMethod = paymentMethods.find((method) => method.id_medio === selectedPaymentMethodId);
+  const isCash = selectedMethod?.medio_de_pago.toLowerCase().trim() === "efectivo";
+  const change = isCash ? Math.max(0, Number(cashAmount) - amountDue) : 0;
+
+  function selectSale(sale: Sale | null) {
+    if (busyRef.current) return;
+    setActiveSale(sale);
+    setCart(sale ? saleCart(sale).map((item) => {
+      const available = productos.find((product) => product.id === item.product.id);
+      return available && item.kind === "unit" ? { ...item, product: { ...item.product, stock: available.stock + item.quantity } } : item;
+    }) : []);
+    setRightPanel("catalog");
+    setSelectedPaymentMethodId(null);
+    setCashAmount("");
+    setOperationError("");
+    setCompletedSale(null);
+    draftKey.current = null;
+    paymentAttempt.current = null;
+  }
+
+  async function refreshInventory() {
+    const response = await fetch("/api/producto", { headers: { Authorization: `Bearer ${localStorage.getItem("jwt")}` }, cache: "no-store" });
+    if (response.ok) {
+      const data = await response.json();
+      setProductos(data.productos ?? []);
+    }
+  }
+
+  async function mutate(command: SaleCommand) {
+    if (busyRef.current) return;
+    busyRef.current = true;
+    setBusy(true);
+    setOperationError("");
+    try {
+      const response = await fetch("/api/ventas", {
+        method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${localStorage.getItem("jwt")}` },
+        body: JSON.stringify(command),
+      });
+      const data = await response.json() as { venta: Sale | null; message?: string };
+      if (!response.ok) {
+        if (response.status === 401) router.replace("/login");
+        if (response.status === 409) {
+          const updated = await fetch("/api/ventas", { headers: { Authorization: `Bearer ${localStorage.getItem("jwt")}` }, cache: "no-store" });
+          if (updated.ok) {
+            const { ventas } = await updated.json() as { ventas: Sale[] };
+            setSales(ventas);
+            const current = ventas.find((sale) => sale.id_venta === activeSale?.id_venta) ?? null;
+            setActiveSale(current);
+            setCart(current ? saleCart(current) : []);
+          }
+        }
+        throw new Error(data.message ?? "No se pudo guardar la venta.");
+      }
+      const sale = data.venta;
+      if (!sale || sale.estado === "completado") {
+        const removedId = sale?.id_venta ?? activeSale?.id_venta;
+        setSales((current) => current.filter((item) => item.id_venta !== removedId));
+        setActiveSale(null);
+        setCart([]);
+        setCompletedSale(sale);
+        setRightPanel("catalog");
+        draftKey.current = null;
+      } else {
+        setSales((current) => [...current.filter((item) => item.id_venta !== sale.id_venta), sale].sort((a, b) => a.num_venta - b.num_venta));
+        setActiveSale(sale);
+        setCart(saleCart(sale));
+        setCompletedSale(null);
+      }
+      setSelectedPaymentMethodId(null);
+      setCashAmount("");
+      paymentAttempt.current = null;
+      // A failed catalogue refresh must not turn a successful payment into a retry.
+      await refreshInventory().catch(() => undefined);
+    } catch (err) {
+      setOperationError(err instanceof Error ? err.message : "No se pudo conectar. Reintenta la operacion.");
+    } finally {
+      busyRef.current = false;
+      setBusy(false);
+    }
+  }
+
+  function saveQuantity(productId: string, quantity: number) {
+    if (locked || busyRef.current) return;
+    if (activeSale) {
+      void mutate({ action: "item", saleId: activeSale.id_venta, revision: activeSale.revision, productId, quantity });
+    } else {
+      draftKey.current ??= crypto.randomUUID();
+      void mutate({ action: "create", key: draftKey.current, productId, quantity });
+    }
+  }
+
+  function cancelSale() {
+    if (!activeSale || locked || busyRef.current) return;
+    if (window.confirm(`¿Eliminar la venta ${activeSale.num_venta}? Se liberara todo su stock reservado.`)) {
+      void mutate({ action: "cancel", saleId: activeSale.id_venta, revision: activeSale.revision });
+    }
+  }
+
+  function registerPayment() {
+    if (!activeSale || !selectedMethod || busyRef.current) return;
+    const amount = isCash ? Number(cashAmount) : undefined;
+    const fingerprint = JSON.stringify([activeSale.id_venta, activeSale.revision, selectedMethod.id_medio, amount]);
+    if (paymentAttempt.current?.fingerprint !== fingerprint) paymentAttempt.current = { fingerprint, key: crypto.randomUUID() };
+    void mutate({ action: "pay", saleId: activeSale.id_venta, revision: activeSale.revision,
+      methodId: selectedMethod.id_medio, amount, key: paymentAttempt.current.key });
+  }
 
   function openPaymentDetails() {
-    if (cartTotal <= 0 || rightPanel === "payment") return;
+    if (busyRef.current || !activeSale || cartTotal <= 0 || rightPanel === "payment") return;
     setPaymentMethodsLoading(true);
     setPaymentMethodsError("");
     setRightPanel("payment");
@@ -316,15 +455,12 @@ export default function SalesPage() {
   }
 
   function addToCart(product: Producto) {
+    if (locked || busyRef.current) return;
     if (cartTotal <= 0) setRightPanel("catalog");
     const existing = cart.find((item) => item.product.id === product.id);
 
     if (!existing) {
-      setCart((items) => [...items, createCartItem(product)]);
-      if (isVariableWeight(product)) {
-        // Focus once the new row has been rendered.
-        requestAnimationFrame(() => focusWeightInput(product.id));
-      }
+      saveQuantity(product.id, 1);
       return;
     }
 
@@ -341,27 +477,19 @@ export default function SalesPage() {
     if (item?.kind === "unit" && cartTotal - item.product.precioVenta <= 0 && delta < 0) {
       setRightPanel("catalog");
     }
-    setCart((items) =>
-      items.flatMap((item) => {
-        if (item.product.id !== productId || item.kind !== "unit") {
-          return [item];
-        }
-
-        const quantity = Math.min(item.quantity + delta, item.product.stock);
-        return quantity <= 0 ? [] : [{ ...item, quantity }];
-      }),
-    );
+    if (item?.kind === "unit") saveQuantity(productId, Math.max(0, item.quantity + delta));
   }
 
   function removeFromCart(productId: string) {
     const item = cart.find((entry) => entry.product.id === productId);
     if (item && cartTotal - getLineTotal(item) <= 0) setRightPanel("catalog");
     weightInputs.current.delete(productId);
-    setCart((items) => items.filter((item) => item.product.id !== productId));
+    saveQuantity(productId, 0);
   }
 
   // Price field edited: keep the raw text and recompute the quantity.
   function updateWeightPrice(productId: string, text: string) {
+    if (locked || busyRef.current) return;
     if (!isSafeAppInput(text) || !PRICE_PATTERN.test(text)) {
       return;
     }
@@ -386,6 +514,7 @@ export default function SalesPage() {
 
   // Quantity field edited: keep the raw text and recompute the price.
   function updateWeightQuantity(productId: string, text: string) {
+    if (locked || busyRef.current) return;
     if (!isSafeAppInput(text) || !QUANTITY_PATTERN.test(text)) {
       return;
     }
@@ -407,6 +536,18 @@ export default function SalesPage() {
     );
   }
 
+  function saveWeight(item: CartItem) {
+    if (item.kind !== "weight" || locked) return;
+    const quantity = Math.round(parseDecimal(item.quantityText) * 1000) / 1000;
+    const saved = activeSale?.detalles.find((detail) => detail.id_producto === item.product.id);
+    if (saved && quantity === Number(saved.cantidad)) {
+      setCart((current) => current.map((entry) => entry.product.id === item.product.id ?
+        { ...item, quantityText: formatQuantity(quantity), priceText: String(saved.subtotal_venta) } : entry));
+      return;
+    }
+    saveQuantity(item.product.id, quantity);
+  }
+
   function getCartQuantity(productId: string) {
     const item = cart.find((cartItem) => cartItem.product.id === productId);
 
@@ -420,19 +561,46 @@ export default function SalesPage() {
   return (
     <main className="sales-view-shell">
       <Navbar compact showLogout={false} />
-
-      <section className="sales-view-layout">
+      {operationError && <p className="sales-operation-error" role="alert">{operationError}</p>}
+      <section className="sales-view-layout sales-with-tabs" aria-busy={busy}>
+        <nav className="sales-tabs" aria-label="Ventas pendientes">
+          {sales.map((sale) => (
+            <button key={sale.id_venta} type="button" disabled={busy}
+              aria-current={activeSale?.id_venta === sale.id_venta ? "page" : undefined}
+              title={`Venta ${sale.num_venta}: ${formatPrice(sale.valor_total)}`}
+              onClick={() => selectSale(sale)}>
+              <ShoppingBasket aria-hidden="true" /><span>#{sale.num_venta}</span>
+            </button>
+          ))}
+          {!activeSale && sales.length < 5 && <button type="button" aria-current="page" title="Nueva venta" disabled><Plus aria-hidden="true" /><span>Nueva</span></button>}
+        </nav>
         <section className="sales-view-cart" aria-label="Carrito de venta">
           <div className="sales-view-heading">
             <div>
-              <span>Nueva venta</span>
+              <span>{activeSale ? `Venta #${activeSale.num_venta}` : "Nueva venta"}</span>
               <h1>Carrito</h1>
             </div>
-            <strong>{cart.length}</strong>
+            <button className="sales-action" type="button" disabled={busy || isLoading || sales.length >= 5 || !activeSale}
+              onClick={() => selectSale(null)} title={sales.length >= 5 ? "Limite de cinco ventas pendientes" : "Nueva venta"}>
+              <Plus aria-hidden="true" /> Nueva venta
+            </button>
+            <button className="sales-action sales-delete" type="button" onClick={cancelSale} disabled={busy || locked || !activeSale}
+              title={locked ? "No se puede eliminar una venta con pagos" : "Eliminar venta"} aria-label="Eliminar venta">
+              <Trash2 aria-hidden="true" />
+            </button>
           </div>
+          {locked && <p className="sales-locked" role="status">Venta con pagos registrados. Los productos no se pueden modificar.</p>}
 
           <div className={`sales-view-cart-scroll${cart.length === 0 ? " is-empty" : ""}`}>
-            {cart.length === 0 ? (
+            {completedSale ? (
+              <div className="sales-view-empty sales-thanks" role="status">
+                <CheckCircle size={56} aria-hidden="true" />
+                <h2>Gracias por la compra</h2>
+                <p>Venta #{completedSale.num_venta} completada</p>
+                <strong>{formatPrice(completedSale.valor_total)}</strong>
+                {completedSale.vuelto > 0 && <p>Vuelto: {formatPrice(completedSale.vuelto)}</p>}
+              </div>
+            ) : cart.length === 0 ? (
               <div className="sales-view-empty">
                 <strong className="sales-view-empty-store">{storeName}</strong>
                 <svg className="sales-view-empty-icon" viewBox="0 0 64 64" fill="none" aria-hidden="true">
@@ -456,6 +624,8 @@ export default function SalesPage() {
                     <CartRow
                       key={item.product.id}
                       item={item}
+                      disabled={busy || locked}
+                      onWeightBlur={() => saveWeight(item)}
                       onIncrement={() => updateUnitQuantity(item.product.id, 1)}
                       onDecrement={() => updateUnitQuantity(item.product.id, -1)}
                       onRemove={() => removeFromCart(item.product.id)}
@@ -476,7 +646,7 @@ export default function SalesPage() {
           <button
             type="button"
             className="sales-view-total"
-            disabled={cartTotal <= 0}
+            disabled={cartTotal <= 0 || busy || !activeSale}
             onClick={openPaymentDetails}
             aria-label={`Ver detalle del carrito. Total ${formatPrice(cartTotal)}`}
           >
@@ -489,13 +659,28 @@ export default function SalesPage() {
           {showPaymentDetails ? (
             <>
               <header className="sales-payment-heading">
-                <button type="button" onClick={() => setRightPanel("catalog")} aria-label="Volver a productos" title="Volver a productos">
+                <button type="button" disabled={busy} onClick={() => selectedMethod ? setSelectedPaymentMethodId(null) : setRightPanel("catalog")} aria-label={selectedMethod ? "Cambiar metodo de pago" : "Volver a productos"} title="Volver">
                   <ArrowLeft aria-hidden="true" />
                 </button>
-                <h2>Detalle del carrito</h2>
+                <h2>{selectedMethod ? "Cambiar método de pago" : "Detalle del carrito"}</h2>
               </header>
 
               <div className="sales-payment-scroll">
+                {selectedMethod ? (
+                  <form className="sales-collection" onSubmit={(event) => { event.preventDefault(); registerPayment(); }}>
+                    <h3>Total a cobrar con {formatPaymentMethodName(selectedMethod.medio_de_pago)}</h3>
+                    <output className="sales-collection-total">{formatPrice(amountDue)}</output>
+                    {isCash && <label>
+                      <span>Ingresar monto entregado</span>
+                      <input aria-label="Monto entregado" autoFocus inputMode="numeric" value={cashAmount} disabled={busy}
+                        maxLength={10} onChange={(event) => { if (PRICE_PATTERN.test(event.target.value)) setCashAmount(event.target.value); }} />
+                    </label>}
+                    {change > 0 && <p className="sales-change" role="status">Vuelto a entregar <strong>{formatPrice(change)}</strong></p>}
+                    <button className="sales-register-payment" type="submit" disabled={busy || (isCash && (!Number(cashAmount) || Number(cashAmount) > 2147483647))}>
+                      {busy ? "Registrando..." : "Registrar cobro"}
+                    </button>
+                  </form>
+                ) : <>
                 <dl className="sales-payment-summary">
                   <div>
                     <dt>Productos por cobrar ({cart.length})</dt>
@@ -528,7 +713,8 @@ export default function SalesPage() {
                         type="button"
                         className="sales-payment-method"
                         aria-pressed={selectedPaymentMethodId === method.id_medio}
-                        onClick={() => setSelectedPaymentMethodId(method.id_medio)}
+                        disabled={busy}
+                        onClick={() => { setSelectedPaymentMethodId(method.id_medio); setCashAmount(""); }}
                       >
                         <PaymentMethodIcon name={method.medio_de_pago} />
                         <span>{formatPaymentMethodName(method.medio_de_pago)}</span>
@@ -536,6 +722,7 @@ export default function SalesPage() {
                     ))}
                   </div>
                 )}
+                </>}
               </div>
             </>
           ) : (
@@ -569,10 +756,7 @@ export default function SalesPage() {
               <div className="sales-view-grid">
                 {availableProducts.map((product) => {
                   const cartQuantity = getCartQuantity(product.id);
-                  const isMaxed =
-                    !isVariableWeight(product) &&
-                    cartQuantity !== null &&
-                    cartQuantity >= product.stock;
+                  const isMaxed = product.controlaStock && product.stock <= 0;
 
                   return (
                     <button
@@ -580,7 +764,7 @@ export default function SalesPage() {
                       type="button"
                       className={`sales-view-card${cartQuantity !== null ? " is-in-cart" : ""}`}
                       onClick={() => addToCart(product)}
-                      disabled={isMaxed}
+                      disabled={isMaxed || busy || locked || isLoading || (!activeSale && sales.length >= 5)}
                       title={isMaxed ? "Stock maximo agregado al carrito" : "Agregar al carrito"}
                     >
                       <span className="sales-view-card-image">
@@ -618,6 +802,8 @@ export default function SalesPage() {
 
 type CartRowProps = {
   item: CartItem;
+  disabled: boolean;
+  onWeightBlur: () => void;
   onIncrement: () => void;
   onDecrement: () => void;
   onRemove: () => void;
@@ -628,6 +814,8 @@ type CartRowProps = {
 
 function CartRow({
   item,
+  disabled,
+  onWeightBlur,
   onIncrement,
   onDecrement,
   onRemove,
@@ -659,6 +847,7 @@ function CartRow({
               <button
                 type="button"
                 onClick={onDecrement}
+                disabled={disabled}
                 aria-label={item.quantity === 1 ? "Quitar del carrito" : "Disminuir cantidad"}
                 title={item.quantity === 1 ? "Quitar del carrito" : "Disminuir cantidad"}
                 className={item.quantity === 1 ? "is-remove" : ""}
@@ -669,7 +858,7 @@ function CartRow({
               <button
                 type="button"
                 onClick={onIncrement}
-                disabled={item.quantity >= product.stock}
+                disabled={disabled || item.quantity >= product.stock}
                 aria-label="Aumentar cantidad"
                 title={item.quantity >= product.stock ? "Stock maximo alcanzado" : "Aumentar cantidad"}
               >
@@ -689,6 +878,8 @@ function CartRow({
                 <em>$</em>
                 <input
                   inputMode="numeric"
+                  disabled={disabled}
+                  onBlur={onWeightBlur}
                   value={item.priceText}
                   onChange={(event) => onPriceChange(event.target.value)}
                   onFocus={(event) => event.target.select()}
@@ -702,6 +893,8 @@ function CartRow({
                 <input
                   ref={quantityInputRef}
                   inputMode="decimal"
+                  disabled={disabled}
+                  onBlur={onWeightBlur}
                   value={item.quantityText}
                   onChange={(event) => onQuantityChange(event.target.value)}
                   onFocus={(event) => event.target.select()}
@@ -723,6 +916,7 @@ function CartRow({
           type="button"
           className="sales-view-remove"
           onClick={onRemove}
+          disabled={disabled}
           aria-label={`Quitar ${product.nombre} del carrito`}
           title="Quitar del carrito"
         >
