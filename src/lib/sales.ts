@@ -1,7 +1,8 @@
 import { z } from "zod";
 import type { Prisma } from "@/generated/prisma/client";
+import { roundCashAmount } from "@/lib/cash-rounding";
 
-const money = z.number().int().min(1).max(2147483647);
+const money = z.number().int().min(0).max(2147483647);
 const quantity = z.number().finite().min(0).max(999999).refine(
   (value) => Math.abs(value * 1000 - Math.round(value * 1000)) < 0.000001,
   "La cantidad admite hasta tres decimales.",
@@ -43,14 +44,19 @@ function validMoney(value: number) {
 }
 
 export function calculatePayment(total: number, alreadyPaid: number, amount: number, cash: boolean, onlyCash: boolean) {
-  const due = total - alreadyPaid;
-  if (due <= 0 || amount <= 0 || (!cash && amount !== due)) {
+  const originalDue = total - alreadyPaid;
+  const rounded = cash ? roundCashAmount(originalDue) : { total: originalDue, adjustment: 0 };
+  const due = rounded.total;
+  if (!Number.isSafeInteger(amount) || originalDue <= 0 || amount < 0 ||
+      (amount === 0 && due > 0) || (!cash && amount !== due)) {
     throw new SaleError("El monto del cobro no es valido.", 400);
   }
+  if (cash && amount % 10 !== 0) throw new SaleError("Monto ingresado debe terminar en 0.", 400);
   if (amount > due && (!cash || !onlyCash)) {
     throw new SaleError("Esta venta no admite un pago mayor al saldo pendiente.", 400);
   }
-  return { completed: amount >= due, change: Math.max(0, amount - due) };
+  const completed = amount >= due;
+  return { completed, change: Math.max(0, amount - due), adjustment: completed ? rounded.adjustment : 0 };
 }
 
 async function lockProducts(tx: Tx, ids: string[]) {
@@ -161,7 +167,7 @@ export async function executeSaleCommand(tx: Tx, userId: string, command: SaleCo
   const cash = method.medio_de_pago.toLowerCase().trim() === "efectivo";
   const amount = cash ? command.amount : total - paid;
   if (amount === undefined) throw new SaleError("Ingresa el monto recibido.", 400);
-  const { completed, change } = calculatePayment(total, paid, validMoney(amount), cash,
+  const { completed, change, adjustment } = calculatePayment(total, paid, validMoney(amount), cash,
     sale.pagos.every((p) => p.medio_pago.medio_de_pago.toLowerCase().trim() === "efectivo"));
   await tx.pagos.create({ data: { id_venta: sale.id_venta, id_medio_pago: method.id_medio, pago: amount, clave_operacion: command.key } });
   if (completed) {
@@ -180,7 +186,7 @@ export async function executeSaleCommand(tx: Tx, userId: string, command: SaleCo
     }
   }
   await tx.venta.update({ where: { id_venta: sale.id_venta }, data: {
-    valor_total: total, estado: completed ? "completado" : "pendiente",
+    valor_total: validMoney(total + adjustment), redondeo: adjustment, estado: completed ? "completado" : "pendiente",
     fecha_pago: completed ? new Date() : null, vuelto: change, revision: { increment: 1 },
   } });
   return readSale(tx, sale.id_venta);

@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, RefreshCw, X } from "lucide-react";
+import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Eye, RefreshCw, X } from "lucide-react";
 import { Navbar } from "../components/Navbar";
 
 const columns = [
@@ -25,6 +25,7 @@ type Transaction = {
   fecha_de_creacion: string;
   fecha_pago: string | null;
   valor_total: number;
+  recibo: string | null;
   cajero: string;
   pagos: { id_pago: string; id_medio_pago: string; medio_de_pago: string; pago: number }[];
 };
@@ -62,6 +63,7 @@ export default function TransaccionesPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [refresh, setRefresh] = useState(0);
+  const [selectedReceipt, setSelectedReceipt] = useState<{ url: string; saleNumber: number } | null>(null);
   const invalidDateRange = Boolean(startDate && endDate && startDate > endDate);
 
   useEffect(() => {
@@ -162,6 +164,24 @@ export default function TransaccionesPage() {
     window.addEventListener("focus", update);
     return () => window.removeEventListener("focus", update);
   }, []);
+
+  useEffect(() => {
+    if (!selectedReceipt) return;
+    const previousBodyOverflow = document.body.style.overflow;
+    const previousRootOverflow = document.documentElement.style.overflow;
+    document.body.style.overflow = "hidden";
+    document.documentElement.style.overflow = "hidden";
+
+    function closeOnEscape(event: KeyboardEvent) {
+      if (event.key === "Escape") setSelectedReceipt(null);
+    }
+    window.addEventListener("keydown", closeOnEscape);
+    return () => {
+      window.removeEventListener("keydown", closeOnEscape);
+      document.body.style.overflow = previousBodyOverflow;
+      document.documentElement.style.overflow = previousRootOverflow;
+    };
+  }, [selectedReceipt]);
 
   function changeFilter(update: () => void) {
     update();
@@ -295,7 +315,17 @@ export default function TransaccionesPage() {
                 </td></tr> : results.transactions.length ? results.transactions.map((transaction) => (
                   <tr key={transaction.id_venta}>
                     <td>{transaction.num_venta}</td>
-                    <td />
+                    <td>
+                      {transaction.recibo ? (
+                        <button
+                          className="transactions-receipt-button"
+                          type="button"
+                          onClick={() => setSelectedReceipt({ url: transaction.recibo as string, saleNumber: transaction.num_venta })}
+                        >
+                          <Eye size={17} aria-hidden="true" /> Ver
+                        </button>
+                      ) : null}
+                    </td>
                     <td className="transactions-sale-status">{transaction.estado}</td>
                     <td className="transactions-date">{formatDate(transaction.fecha_de_creacion)}</td>
                     <td className="transactions-date">{formatDate(transaction.fecha_pago)}</td>
@@ -348,6 +378,34 @@ export default function TransaccionesPage() {
           </footer>
         </div>
       </section>
+      {selectedReceipt ? (
+        <div
+          className="transactions-receipt-overlay"
+          role="presentation"
+          onMouseDown={(event) => {
+            if (event.target === event.currentTarget) setSelectedReceipt(null);
+          }}
+        >
+          <section
+            className="transactions-receipt-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="transactions-receipt-title"
+          >
+            <header>
+              <h2 id="transactions-receipt-title">Recibo N° {selectedReceipt.saleNumber}</h2>
+              <button type="button" onClick={() => setSelectedReceipt(null)} title="Cerrar recibo" aria-label="Cerrar recibo">
+                <X size={22} aria-hidden="true" />
+              </button>
+            </header>
+            <div className="transactions-receipt-image-scroll">
+              {/* The generated receipt has a variable intrinsic height. */}
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={selectedReceipt.url} alt={`Recibo de la venta ${selectedReceipt.saleNumber}`} />
+            </div>
+          </section>
+        </div>
+      ) : null}
     </main>
   );
 }

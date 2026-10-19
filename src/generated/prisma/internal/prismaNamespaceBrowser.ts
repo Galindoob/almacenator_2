@@ -52,6 +52,7 @@ export const AnyNull = runtime.AnyNull
 
 export const ModelName = {
   User: 'User',
+  Empresa: 'Empresa',
   Role: 'Role',
   Marca: 'Marca',
   Categoria: 'Categoria',
@@ -97,6 +98,22 @@ export const UserScalarFieldEnum = {
 } as const
 
 export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
+
+
+export const EmpresaScalarFieldEnum = {
+  idEmpresa: 'idEmpresa',
+  nombreFantasia: 'nombreFantasia',
+  rut: 'rut',
+  nombre: 'nombre',
+  giro: 'giro',
+  actividad: 'actividad',
+  email: 'email',
+  telefono: 'telefono',
+  direccion: 'direccion',
+  comuna: 'comuna'
+} as const
+
+export type EmpresaScalarFieldEnum = (typeof EmpresaScalarFieldEnum)[keyof typeof EmpresaScalarFieldEnum]
 
 
 export const RoleScalarFieldEnum = {
@@ -260,6 +277,8 @@ export const VentaScalarFieldEnum = {
   fecha_pago: 'fecha_pago',
   estado: 'estado',
   vuelto: 'vuelto',
+  redondeo: 'redondeo',
+  recibo: 'recibo',
   clave_cliente: 'clave_cliente',
   revision: 'revision'
 } as const
@@ -296,17 +315,9 @@ export const ConfiguracionUsuarioScalarFieldEnum = {
   tema: 'tema',
   escala: 'escala',
   escalaInterfaz: 'escalaInterfaz',
-  nombreTienda: 'nombreTienda',
   altoContraste: 'altoContraste',
   modoOscuro: 'modoOscuro',
-  empresaRut: 'empresaRut',
-  empresaNombre: 'empresaNombre',
-  empresaGiro: 'empresaGiro',
-  empresaActividad: 'empresaActividad',
-  empresaEmail: 'empresaEmail',
-  empresaTelefono: 'empresaTelefono',
-  empresaDireccion: 'empresaDireccion',
-  empresaComuna: 'empresaComuna',
+  empresaId: 'empresaId',
   actualizado: 'actualizado'
 } as const
 

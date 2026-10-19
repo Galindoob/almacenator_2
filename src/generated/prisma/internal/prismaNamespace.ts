@@ -398,6 +398,7 @@ type FieldRefInputType<Model, FieldType> = Model extends never ? never : FieldRe
 
 export const ModelName = {
   User: 'User',
+  Empresa: 'Empresa',
   Role: 'Role',
   Marca: 'Marca',
   Categoria: 'Categoria',
@@ -430,7 +431,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "role" | "marca" | "categoria" | "unidad" | "producto" | "movimiento_de_stock" | "unidad_medida" | "instancia_producto" | "empaque" | "apertura_caja" | "historia_caja" | "proveedores" | "medio_pago" | "venta" | "detalle" | "pagos" | "configuracionUsuario"
+    modelProps: "user" | "empresa" | "role" | "marca" | "categoria" | "unidad" | "producto" | "movimiento_de_stock" | "unidad_medida" | "instancia_producto" | "empaque" | "apertura_caja" | "historia_caja" | "proveedores" | "medio_pago" | "venta" | "detalle" | "pagos" | "configuracionUsuario"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -505,6 +506,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.UserCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.UserCountAggregateOutputType> | number
+        }
+      }
+    }
+    Empresa: {
+      payload: Prisma.$EmpresaPayload<ExtArgs>
+      fields: Prisma.EmpresaFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.EmpresaFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EmpresaPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.EmpresaFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EmpresaPayload>
+        }
+        findFirst: {
+          args: Prisma.EmpresaFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EmpresaPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.EmpresaFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EmpresaPayload>
+        }
+        findMany: {
+          args: Prisma.EmpresaFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EmpresaPayload>[]
+        }
+        create: {
+          args: Prisma.EmpresaCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EmpresaPayload>
+        }
+        createMany: {
+          args: Prisma.EmpresaCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.EmpresaCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EmpresaPayload>[]
+        }
+        delete: {
+          args: Prisma.EmpresaDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EmpresaPayload>
+        }
+        update: {
+          args: Prisma.EmpresaUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EmpresaPayload>
+        }
+        deleteMany: {
+          args: Prisma.EmpresaDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.EmpresaUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.EmpresaUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EmpresaPayload>[]
+        }
+        upsert: {
+          args: Prisma.EmpresaUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EmpresaPayload>
+        }
+        aggregate: {
+          args: Prisma.EmpresaAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateEmpresa>
+        }
+        groupBy: {
+          args: Prisma.EmpresaGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.EmpresaGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.EmpresaCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.EmpresaCountAggregateOutputType> | number
         }
       }
     }
@@ -1817,6 +1892,22 @@ export const UserScalarFieldEnum = {
 export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
 
 
+export const EmpresaScalarFieldEnum = {
+  idEmpresa: 'idEmpresa',
+  nombreFantasia: 'nombreFantasia',
+  rut: 'rut',
+  nombre: 'nombre',
+  giro: 'giro',
+  actividad: 'actividad',
+  email: 'email',
+  telefono: 'telefono',
+  direccion: 'direccion',
+  comuna: 'comuna'
+} as const
+
+export type EmpresaScalarFieldEnum = (typeof EmpresaScalarFieldEnum)[keyof typeof EmpresaScalarFieldEnum]
+
+
 export const RoleScalarFieldEnum = {
   id: 'id',
   role: 'role'
@@ -1978,6 +2069,8 @@ export const VentaScalarFieldEnum = {
   fecha_pago: 'fecha_pago',
   estado: 'estado',
   vuelto: 'vuelto',
+  redondeo: 'redondeo',
+  recibo: 'recibo',
   clave_cliente: 'clave_cliente',
   revision: 'revision'
 } as const
@@ -2014,17 +2107,9 @@ export const ConfiguracionUsuarioScalarFieldEnum = {
   tema: 'tema',
   escala: 'escala',
   escalaInterfaz: 'escalaInterfaz',
-  nombreTienda: 'nombreTienda',
   altoContraste: 'altoContraste',
   modoOscuro: 'modoOscuro',
-  empresaRut: 'empresaRut',
-  empresaNombre: 'empresaNombre',
-  empresaGiro: 'empresaGiro',
-  empresaActividad: 'empresaActividad',
-  empresaEmail: 'empresaEmail',
-  empresaTelefono: 'empresaTelefono',
-  empresaDireccion: 'empresaDireccion',
-  empresaComuna: 'empresaComuna',
+  empresaId: 'empresaId',
   actualizado: 'actualizado'
 } as const
 
@@ -2289,6 +2374,7 @@ export interface PrismaClientOptionsWithAdapter extends PrismaClientBaseOptions 
 export type PrismaClientOptions = PrismaClientOptionsWithAccelerateUrl | PrismaClientOptionsWithAdapter
 export type GlobalOmitConfig = {
   user?: Prisma.UserOmit
+  empresa?: Prisma.EmpresaOmit
   role?: Prisma.RoleOmit
   marca?: Prisma.MarcaOmit
   categoria?: Prisma.CategoriaOmit

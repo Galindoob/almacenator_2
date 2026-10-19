@@ -12,6 +12,7 @@ const jiti = createJiti(import.meta.url, { alias: { "@": path.resolve("src") }, 
 const { PrismaClient } = await jiti.import("../src/generated/prisma/client.ts");
 const { executeSaleCommand, saleCommandSchema, calculatePayment } = await jiti.import("../src/lib/sales.ts");
 const { listTransactions, transactionQuerySchema } = await jiti.import("../src/lib/transactions.ts");
+  const { getInstantReport, reportQuerySchema } = await jiti.import("../src/lib/reports.ts");
 const db = await PGlite.create();
 const server = new PGLiteSocketServer({ db, port: 0, host: "127.0.0.1" });
 let prisma;
@@ -47,7 +48,7 @@ try {
 
   assert.equal(saleCommandSchema.safeParse({ action: "create", key: randomUUID(), productId: product.id, quantity: -1 }).success, false);
   assert.equal(saleCommandSchema.safeParse({ action: "create", key: randomUUID(), productId: product.id, quantity: 0.1234 }).success, false);
-  assert.deepEqual(calculatePayment(1000, 0, 1500, true, true), { completed: true, change: 500 });
+  assert.deepEqual(calculatePayment(1000, 0, 1500, true, true), { completed: true, change: 500, adjustment: 0 });
   assert.throws(() => calculatePayment(1000, 500, 1000, true, false));
   await assert.rejects(create(product.id, 0.5), /enteras/);
   await assert.rejects(create(product.id, 21), /stock suficiente/);
@@ -144,6 +145,8 @@ try {
   assert(mixed);
   assert.equal(mixed.cajero, "Test Sales");
   assert.equal(mixed.pagos.reduce((sum, p) => sum + p.pago, 0), 2000);
+  await prisma.venta.update({ where: { id_venta: mixed.id_venta }, data: { recibo: "https://res.cloudinary.com/test/image/upload/recibo.png" } });
+  assert.equal((await history({ saleNumber: String(mixed.num_venta) })).transactions[0].recibo, "https://res.cloudinary.com/test/image/upload/recibo.png");
   const cashHistory = await history({ paymentMethod: cash.id_medio });
   assert.equal(cashHistory.total, 2);
   assert.equal(cashHistory.transactions.find(t => t.id_venta === mixed.id_venta).pagos.length, 2, "Filtering by cash must retain the other payments of that sale");
@@ -169,6 +172,67 @@ try {
   assert.equal(transactionQuerySchema.safeParse({ startDate: "2026-10-12", endDate: "2026-10-11" }).success, false);
   assert.equal(transactionQuerySchema.safeParse({ saleNumber: "' OR TRUE --" }).success, false);
   console.log("PASS transaction joins, split payments, filters, Chile calendar bounds, pagination and validation");
+
+  const chileMonthParts = new Intl.DateTimeFormat("en-US", {
+    timeZone: "America/Santiago", year: "numeric", month: "2-digit",
+  }).formatToParts(new Date());
+  const reportMonth = `${chileMonthParts.find(part => part.type === "year").value}-${chileMonthParts.find(part => part.type === "month").value}`;
+  const instantReport = (params = {}) => prisma.$transaction(tx =>
+    getInstantReport(tx, reportQuerySchema.parse({ month: reportMonth, ...params })));
+  const report = await instantReport();
+  assert.equal(report.periodSummary.sales, 3);
+  assert.equal(report.periodSummary.total, 5239);
+  assert.equal(report.periodSummary.margin, 2614);
+  assert.equal(report.days.reduce((sum, day) => sum + day.sales, 0), 3);
+  assert.equal(report.paymentMethods.length, 2);
+  const cashReport = await instantReport({ paymentMethod: cash.id_medio });
+  assert.equal(cashReport.periodSummary.sales, 2);
+  assert.equal(cashReport.periodSummary.total, 3000);
+  assert.equal(cashReport.periodSummary.margin, 1500);
+  assert.equal(reportQuerySchema.safeParse({ month: "2026-13" }).success, false);
+  console.log("PASS instant reports by Chile payment date, historical detail totals, margin and payment filter");
+
+  for (let digit = 0; digit <= 9; digit++) {
+    const expected = digit <= 5 ? -digit : 10 - digit;
+    const result = calculatePayment(1320 + digit, 0, 2000, true, true);
+    assert.equal(result.adjustment, expected || 0);
+    assert.equal(result.change, 2000 - (1320 + digit + expected));
+  }
+  assert.throws(() => calculatePayment(1325, 0, 1325, true, true), /terminar en 0/);
+  assert.throws(() => calculatePayment(1325, 0, 0, true, true), /no es valido/);
+  assert.deepEqual(calculatePayment(1325, 0, 1325, false, false), { completed: true, change: 0, adjustment: 0 });
+  // Use another seller: the pagination fixtures deliberately contain many pending sales.
+  const roundingSale = async (price) => {
+    await prisma.producto.update({ where: { id: weight.id }, data: { precioVenta: price } });
+    return run({ action: "create", key: randomUUID(), productId: weight.id, quantity: 1 }, other.id);
+  };
+  const payRounding = (entry, amount, methodId = cash.id_medio) => run({ action: "pay", saleId: entry.id_venta, revision: entry.revision, key: randomUUID(), methodId, amount }, other.id);
+  for (const [price, finalTotal, delta] of [[1325, 1320, -5], [1326, 1330, 4], [2, 0, -2]]) {
+    const pendingSale = await roundingSale(price);
+    const paidSale = await payRounding(pendingSale, finalTotal);
+    assert.equal(paidSale.estado, "completado");
+    assert.equal(paidSale.valor_total, finalTotal);
+    assert.equal(paidSale.redondeo, delta);
+    assert.equal(paidSale.detalles[0].subtotal_venta, price);
+    assert.equal(paidSale.pagos[0].pago, finalTotal);
+    assert.equal(paidSale.vuelto, 0);
+  }
+  let roundedSale = await roundingSale(1326);
+  roundedSale = await payRounding(roundedSale, 500);
+  assert.equal(roundedSale.estado, "pendiente");
+  assert.equal(roundedSale.redondeo, 0);
+  assert.equal(roundedSale.valor_total, 1326);
+  roundedSale = await payRounding(roundedSale, 1000);
+  assert.equal(roundedSale.valor_total, 1330);
+  assert.equal(roundedSale.vuelto, 170);
+  assert.equal(roundedSale.redondeo, 4);
+  roundedSale = await roundingSale(1325);
+  roundedSale = await payRounding(roundedSale, 500);
+  roundedSale = await payRounding(roundedSale, undefined, debit.id_medio);
+  assert.equal(roundedSale.valor_total, 1325);
+  assert.equal(roundedSale.redondeo, 0);
+  assert.equal(roundedSale.pagos.reduce((sum, p) => sum + p.pago, 0), 1325);
+  console.log("PASS cash rounding 0-9, zero balance, partial cash, cash/debit, change and stored adjustment");
 } finally {
   if (prisma) await prisma.$disconnect();
   await server.stop();

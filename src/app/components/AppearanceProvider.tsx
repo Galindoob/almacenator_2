@@ -37,7 +37,7 @@ const DEFAULT_PREFERENCES: AppearancePreferences = {
   colorTheme: "green",
   fontScale: 1,
   interfaceScale: 1,
-  storeName: "nombre_tienda",
+  storeName: "Carpediem",
   highContrast: false,
   darkMode: false,
 };

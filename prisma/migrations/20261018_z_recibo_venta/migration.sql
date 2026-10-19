@@ -1,0 +1,1 @@
+ALTER TABLE "venta" ADD COLUMN "recibo" VARCHAR(500);

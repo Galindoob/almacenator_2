@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { withAuth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { executeSaleCommand, saleCommandSchema, saleInclude, SaleError } from "@/lib/sales";
+import { ensureSaleReceipt } from "@/lib/sale-receipt";
 
 export const GET = withAuth(async (request) => {
   const user = await prisma.user.findUnique({ where: { correo: request.correo }, select: { id: true } });
@@ -20,6 +21,19 @@ export const POST = withAuth(async (request) => {
     const user = await prisma.user.findUnique({ where: { correo: request.correo }, select: { id: true } });
     if (!user) return NextResponse.json({ message: "Usuario no encontrado." }, { status: 401 });
     const venta = await prisma.$transaction((tx) => executeSaleCommand(tx, user.id, parsed.data), { timeout: 30000 });
+    if (venta?.estado === "completado" && !venta.recibo) {
+      try {
+        const recibo = await ensureSaleReceipt(venta.id_venta);
+        return NextResponse.json({ status: "ok", venta: { ...venta, recibo } });
+      } catch (receiptError) {
+        console.error("Venta completada, pero no se pudo generar el recibo:", receiptError);
+        return NextResponse.json({
+          status: "ok",
+          venta,
+          receiptWarning: "La venta se completó. El recibo se volverá a generar desde Transacciones.",
+        });
+      }
+    }
     return NextResponse.json({ status: "ok", venta });
   } catch (error) {
     if (error instanceof SaleError) return NextResponse.json({ message: error.message }, { status: error.status });

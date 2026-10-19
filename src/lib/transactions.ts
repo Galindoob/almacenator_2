@@ -21,6 +21,7 @@ type TransactionRow = {
   fecha_de_creacion: Date;
   fecha_pago: Date | null;
   valor_total: number;
+  recibo: string | null;
   cajero: string;
   pagos: { id_pago: string; id_medio_pago: string; medio_de_pago: string; pago: number }[];
 };
@@ -41,7 +42,7 @@ export async function listTransactions(tx: Prisma.TransactionClient, query: z.in
   const pages = Math.max(1, Math.ceil(total / query.pageSize));
   const page = Math.min(query.page, pages);
   const transactions = await tx.$queryRaw<TransactionRow[]>`
-    SELECT v.id_venta, v.num_venta, v.estado, v.fecha_de_creacion, v.fecha_pago, v.valor_total,
+    SELECT v.id_venta, v.num_venta, v.estado, v.fecha_de_creacion, v.fecha_pago, v.valor_total, v.recibo,
       concat_ws(' ', u.nombre, u.apellido) AS cajero,
       COALESCE((
         SELECT jsonb_agg(jsonb_build_object(

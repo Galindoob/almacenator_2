@@ -10,6 +10,7 @@ import {
   type ColorTheme,
 } from "../components/AppearanceProvider";
 import { isSafeAppInput } from "@/lib/input-validation";
+import { formatRut, rutSchema } from "@/lib/rut";
 
 const themes: { id: ColorTheme; label: string; color: string }[] = [
   { id: "green", label: "Verde", color: "#008b76" },
@@ -44,8 +45,8 @@ const companyFields: {
   maxLength: number;
   placeholder?: string;
 }[] = [
-  { key: "rut", label: "RUT", maxLength: 12, placeholder: "12345678-9" },
   { key: "nombre", label: "Nombre o razón social", maxLength: 120 },
+  { key: "rut", label: "RUT", maxLength: 12, placeholder: "12.345.678-0" },
   { key: "nombreFantasia", label: "Nombre de fantasía", maxLength: 25 },
   { key: "giro", label: "Giro", maxLength: 120 },
   { key: "actividad", label: "Actividad", maxLength: 120 },
@@ -336,10 +337,12 @@ function CompanySettings({ onSaved }: { onSaved: (name: string, token: string) =
       setError("Ingresa un nombre de fantasía válido, de hasta 25 caracteres.");
       return;
     }
-    if (normalized.rut && !/^(?:\d{1,8}|\d{1,2}(?:\.\d{3}){2})-[\dkK]$/.test(normalized.rut)) {
-      setError("Ingresa un RUT con formato 12345678-9.");
+    const validatedRut = rutSchema.safeParse(normalized.rut);
+    if (!validatedRut.success) {
+      setError(validatedRut.error.issues[0]?.message ?? "Ingresa un RUT válido.");
       return;
     }
+    normalized.rut = validatedRut.data;
 
     setSaving(true);
     setError("");
@@ -370,6 +373,10 @@ function CompanySettings({ onSaved }: { onSaved: (name: string, token: string) =
   }
 
   const hasChanges = saved && draft && JSON.stringify(saved) !== JSON.stringify(draft);
+  const rutValidation = draft ? rutSchema.safeParse(draft.rut) : null;
+  const rutError = rutValidation && !rutValidation.success
+    ? rutValidation.error.issues[0]?.message
+    : "";
 
   return (
     <>
@@ -380,15 +387,26 @@ function CompanySettings({ onSaved }: { onSaved: (name: string, token: string) =
         <form className="settings-company-form" onSubmit={(event) => void saveCompany(event)}>
           {companyFields.map((field) => (
             <label className="settings-company-field" key={field.key}>
-              <span>{field.label}{field.key === "nombreFantasia" ? " *" : ""}</span>
+              <span>{field.label}{field.key === "nombreFantasia" || field.key === "rut" ? " *" : ""}</span>
               <input
                 type={field.type ?? "text"}
                 value={draft[field.key]}
                 maxLength={field.maxLength}
                 placeholder={field.placeholder}
-                required={field.key === "nombreFantasia"}
+                required={field.key === "nombreFantasia" || field.key === "rut"}
+                disabled={field.key === "nombre"}
+                aria-invalid={field.key === "rut" && Boolean(rutError)}
+                aria-describedby={field.key === "rut" && rutError ? "company-rut-error" : undefined}
                 onChange={(event) => updateField(field.key, event.target.value)}
+                onBlur={() => {
+                  if (field.key === "rut" && draft.rut) updateField("rut", formatRut(draft.rut));
+                }}
               />
+              {field.key === "rut" && rutError ? (
+                <small id="company-rut-error" className="settings-company-field-error" role="alert">
+                  {rutError}
+                </small>
+              ) : null}
             </label>
           ))}
           <div className="settings-company-actions">

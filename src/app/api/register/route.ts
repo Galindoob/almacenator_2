@@ -77,13 +77,24 @@ export async function POST(request: NextRequest) {
   try {
     const hashedPassword = await bcrypt.hash(contrasena, 10);
 
-    await prisma.user.create({
-      data: {
-        nombre,
-        apellido,
-        correo: validatedEmail.data,
-        contrasena: hashedPassword,
-      },
+    await prisma.$transaction(async (transaction) => {
+      const company = await transaction.empresa.findFirst({
+        orderBy: { idEmpresa: "asc" },
+        select: { idEmpresa: true },
+      });
+      if (!company) throw new Error("No existe una empresa configurada.");
+
+      await transaction.user.create({
+        data: {
+          nombre,
+          apellido,
+          correo: validatedEmail.data,
+          contrasena: hashedPassword,
+          configuracion: {
+            create: { empresaId: company.idEmpresa },
+          },
+        },
+      });
     });
 
     return NextResponse.json(

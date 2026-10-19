@@ -23,6 +23,22 @@ model User {
   @@map("users")
 }
 
+model Empresa {
+  idEmpresa       String                 @id @default(dbgenerated("gen_random_uuid()")) @map("id_empresa") @db.Uuid
+  nombreFantasia  String                 @map("nombre_fantasia") @db.VarChar(25)
+  rut             String                 @unique @db.VarChar(12)
+  nombre          String                 @db.VarChar(120)
+  giro            String?                @db.VarChar(120)
+  actividad       String?                @db.VarChar(120)
+  email           String?                @db.VarChar(255)
+  telefono        String?                @db.VarChar(50)
+  direccion       String?                @db.VarChar(200)
+  comuna          String?                @db.VarChar(100)
+  configuraciones ConfiguracionUsuario[]
+
+  @@map("empresa")
+}
+
 model Role {
   id    String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   role  String @unique @db.VarChar(50)
@@ -65,7 +81,7 @@ model Producto {
   unidadId                                             String                @map("id_unidad") @db.Uuid
   precioVenta                                          Int                   @map("precio_venta")
   stock                                                Int                   @default(0)
-  controlaStock                                         Boolean               @default(true) @map("controla_stock")
+  controlaStock                                        Boolean               @default(true) @map("controla_stock")
   urlImagen                                            String?               @map("url_imagen") @db.VarChar(500)
   costo                                                Int                   @default(0)
   contenido                                            Int?
@@ -108,12 +124,13 @@ model unidad_medida {
 }
 
 model instancia_producto {
-  id_instancia      String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  id_producto       String   @db.Uuid
-  fecha_vencimiento DateTime @db.Timestamp(6)
-  id_detalle_reserva String? @db.Uuid
-  reserva           detalle? @relation(fields: [id_detalle_reserva], references: [id_detalle], onDelete: Restrict)
-  productos         Producto @relation(fields: [id_producto], references: [id], map: "fk_instancia_producto_producto")
+  id_instancia       String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  id_producto        String   @db.Uuid
+  fecha_vencimiento  DateTime @db.Timestamp(6)
+  id_detalle_reserva String?  @db.Uuid
+  reserva            detalle? @relation(fields: [id_detalle_reserva], references: [id_detalle], onDelete: Restrict)
+  productos          Producto @relation(fields: [id_producto], references: [id], map: "fk_instancia_producto_producto")
+
   @@index([id_detalle_reserva])
 }
 
@@ -167,8 +184,8 @@ model proveedores {
 }
 
 model medio_pago {
-  id_medio      String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  medio_de_pago String @unique @db.VarChar(50)
+  id_medio      String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  medio_de_pago String  @unique @db.VarChar(50)
   pagos         pagos[]
 }
 
@@ -181,6 +198,8 @@ model venta {
   fecha_pago        DateTime? @db.Timestamptz(6)
   estado            String    @db.VarChar(30)
   vuelto            Int       @default(0)
+  redondeo          Int       @default(0)
+  recibo            String?   @db.VarChar(500)
   clave_cliente     String?   @unique @db.Uuid
   revision          Int       @default(0)
   vendedor          User      @relation(fields: [id_vendedor], references: [id], onDelete: Restrict, map: "fk_venta_vendedor")
@@ -189,51 +208,44 @@ model venta {
 }
 
 model detalle {
-  id_detalle                String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  id_venta                  String   @db.Uuid
-  id_producto               String   @db.Uuid
-  costo_adquisicion_actual  Int
-  cantidad                  Decimal  @db.Decimal(12, 3)
-  precio_actual             Int
-  subtotal_venta            Int
-  instancias_reservadas      instancia_producto[]
-  venta                     venta    @relation(fields: [id_venta], references: [id_venta], onDelete: Restrict, map: "fk_detalle_venta")
-  producto                  Producto @relation(fields: [id_producto], references: [id], onDelete: Restrict, map: "fk_detalle_producto")
+  id_detalle               String               @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  id_venta                 String               @db.Uuid
+  id_producto              String               @db.Uuid
+  costo_adquisicion_actual Int
+  cantidad                 Decimal              @db.Decimal(12, 3)
+  precio_actual            Int
+  subtotal_venta           Int
+  instancias_reservadas    instancia_producto[]
+  venta                    venta                @relation(fields: [id_venta], references: [id_venta], onDelete: Restrict, map: "fk_detalle_venta")
+  producto                 Producto             @relation(fields: [id_producto], references: [id], onDelete: Restrict, map: "fk_detalle_producto")
 
-  @@index([id_venta])
   @@unique([id_venta, id_producto])
+  @@index([id_venta])
 }
 
 model pagos {
-  id_pago       String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  id_venta      String     @db.Uuid
-  id_medio_pago String     @db.Uuid
-  pago          Int
-  clave_operacion String? @unique @db.Uuid
-  venta         venta      @relation(fields: [id_venta], references: [id_venta], onDelete: Restrict, map: "fk_pagos_venta")
-  medio_pago    medio_pago @relation(fields: [id_medio_pago], references: [id_medio], onDelete: Restrict, map: "fk_pagos_medio_pago")
+  id_pago         String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  id_venta        String     @db.Uuid
+  id_medio_pago   String     @db.Uuid
+  pago            Int
+  clave_operacion String?    @unique @db.Uuid
+  venta           venta      @relation(fields: [id_venta], references: [id_venta], onDelete: Restrict, map: "fk_pagos_venta")
+  medio_pago      medio_pago @relation(fields: [id_medio_pago], references: [id_medio], onDelete: Restrict, map: "fk_pagos_medio_pago")
 
   @@index([id_venta])
 }
 
 model ConfiguracionUsuario {
-  usuarioId  String   @id @map("id_usuario") @db.Uuid
-  tema       String   @default("green") @db.VarChar(20)
-  escala     Float    @default(1) @map("escala_fuente")
-  escalaInterfaz Float @default(1) @map("escala_interfaz")
-  nombreTienda String @default("nombre_tienda") @map("nombre_tienda") @db.VarChar(25)
-  altoContraste Boolean @default(false) @map("alto_contraste")
-  modoOscuro Boolean @default(false) @map("modo_oscuro")
-  empresaRut String? @map("empresa_rut") @db.VarChar(12)
-  empresaNombre String? @map("empresa_nombre") @db.VarChar(120)
-  empresaGiro String? @map("empresa_giro") @db.VarChar(120)
-  empresaActividad String? @map("empresa_actividad") @db.VarChar(120)
-  empresaEmail String? @map("empresa_email") @db.VarChar(255)
-  empresaTelefono String? @map("empresa_telefono") @db.VarChar(50)
-  empresaDireccion String? @map("empresa_direccion") @db.VarChar(200)
-  empresaComuna String? @map("empresa_comuna") @db.VarChar(100)
-  actualizado DateTime @default(now()) @map("actualizado") @db.Timestamptz(6)
-  usuario    User     @relation(fields: [usuarioId], references: [id], onDelete: Cascade, map: "fk_configuracion_usuario")
+  usuarioId      String   @id @map("id_usuario") @db.Uuid
+  tema           String   @default("green") @db.VarChar(20)
+  escala         Float    @default(1) @map("escala_fuente")
+  escalaInterfaz Float    @default(1) @map("escala_interfaz")
+  altoContraste  Boolean  @default(false) @map("alto_contraste")
+  modoOscuro     Boolean  @default(false) @map("modo_oscuro")
+  empresaId      String   @map("empresa") @db.Uuid
+  actualizado    DateTime @default(now()) @map("actualizado") @db.Timestamptz(6)
+  usuario        User     @relation(fields: [usuarioId], references: [id], onDelete: Cascade, map: "fk_configuracion_usuario")
+  datosEmpresa   Empresa  @relation(fields: [empresaId], references: [idEmpresa], onDelete: Restrict, map: "fk_configuracion_usuario_empresa")
 
   @@map("configuracion_usuario")
 }

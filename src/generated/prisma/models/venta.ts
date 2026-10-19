@@ -30,6 +30,7 @@ export type VentaAvgAggregateOutputType = {
   num_venta: number | null
   valor_total: number | null
   vuelto: number | null
+  redondeo: number | null
   revision: number | null
 }
 
@@ -37,6 +38,7 @@ export type VentaSumAggregateOutputType = {
   num_venta: number | null
   valor_total: number | null
   vuelto: number | null
+  redondeo: number | null
   revision: number | null
 }
 
@@ -49,6 +51,8 @@ export type VentaMinAggregateOutputType = {
   fecha_pago: Date | null
   estado: string | null
   vuelto: number | null
+  redondeo: number | null
+  recibo: string | null
   clave_cliente: string | null
   revision: number | null
 }
@@ -62,6 +66,8 @@ export type VentaMaxAggregateOutputType = {
   fecha_pago: Date | null
   estado: string | null
   vuelto: number | null
+  redondeo: number | null
+  recibo: string | null
   clave_cliente: string | null
   revision: number | null
 }
@@ -75,6 +81,8 @@ export type VentaCountAggregateOutputType = {
   fecha_pago: number
   estado: number
   vuelto: number
+  redondeo: number
+  recibo: number
   clave_cliente: number
   revision: number
   _all: number
@@ -85,6 +93,7 @@ export type VentaAvgAggregateInputType = {
   num_venta?: true
   valor_total?: true
   vuelto?: true
+  redondeo?: true
   revision?: true
 }
 
@@ -92,6 +101,7 @@ export type VentaSumAggregateInputType = {
   num_venta?: true
   valor_total?: true
   vuelto?: true
+  redondeo?: true
   revision?: true
 }
 
@@ -104,6 +114,8 @@ export type VentaMinAggregateInputType = {
   fecha_pago?: true
   estado?: true
   vuelto?: true
+  redondeo?: true
+  recibo?: true
   clave_cliente?: true
   revision?: true
 }
@@ -117,6 +129,8 @@ export type VentaMaxAggregateInputType = {
   fecha_pago?: true
   estado?: true
   vuelto?: true
+  redondeo?: true
+  recibo?: true
   clave_cliente?: true
   revision?: true
 }
@@ -130,6 +144,8 @@ export type VentaCountAggregateInputType = {
   fecha_pago?: true
   estado?: true
   vuelto?: true
+  redondeo?: true
+  recibo?: true
   clave_cliente?: true
   revision?: true
   _all?: true
@@ -230,6 +246,8 @@ export type VentaGroupByOutputType = {
   fecha_pago: Date | null
   estado: string
   vuelto: number
+  redondeo: number
+  recibo: string | null
   clave_cliente: string | null
   revision: number
   _count: VentaCountAggregateOutputType | null
@@ -266,6 +284,8 @@ export type ventaWhereInput = {
   fecha_pago?: Prisma.DateTimeNullableFilter<"venta"> | Date | string | null
   estado?: Prisma.StringFilter<"venta"> | string
   vuelto?: Prisma.IntFilter<"venta"> | number
+  redondeo?: Prisma.IntFilter<"venta"> | number
+  recibo?: Prisma.StringNullableFilter<"venta"> | string | null
   clave_cliente?: Prisma.UuidNullableFilter<"venta"> | string | null
   revision?: Prisma.IntFilter<"venta"> | number
   vendedor?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
@@ -282,6 +302,8 @@ export type ventaOrderByWithRelationInput = {
   fecha_pago?: Prisma.SortOrderInput | Prisma.SortOrder
   estado?: Prisma.SortOrder
   vuelto?: Prisma.SortOrder
+  redondeo?: Prisma.SortOrder
+  recibo?: Prisma.SortOrderInput | Prisma.SortOrder
   clave_cliente?: Prisma.SortOrderInput | Prisma.SortOrder
   revision?: Prisma.SortOrder
   vendedor?: Prisma.UserOrderByWithRelationInput
@@ -302,6 +324,8 @@ export type ventaWhereUniqueInput = Prisma.AtLeast<{
   fecha_pago?: Prisma.DateTimeNullableFilter<"venta"> | Date | string | null
   estado?: Prisma.StringFilter<"venta"> | string
   vuelto?: Prisma.IntFilter<"venta"> | number
+  redondeo?: Prisma.IntFilter<"venta"> | number
+  recibo?: Prisma.StringNullableFilter<"venta"> | string | null
   revision?: Prisma.IntFilter<"venta"> | number
   vendedor?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   detalles?: Prisma.DetalleListRelationFilter
@@ -317,6 +341,8 @@ export type ventaOrderByWithAggregationInput = {
   fecha_pago?: Prisma.SortOrderInput | Prisma.SortOrder
   estado?: Prisma.SortOrder
   vuelto?: Prisma.SortOrder
+  redondeo?: Prisma.SortOrder
+  recibo?: Prisma.SortOrderInput | Prisma.SortOrder
   clave_cliente?: Prisma.SortOrderInput | Prisma.SortOrder
   revision?: Prisma.SortOrder
   _count?: Prisma.ventaCountOrderByAggregateInput
@@ -338,6 +364,8 @@ export type ventaScalarWhereWithAggregatesInput = {
   fecha_pago?: Prisma.DateTimeNullableWithAggregatesFilter<"venta"> | Date | string | null
   estado?: Prisma.StringWithAggregatesFilter<"venta"> | string
   vuelto?: Prisma.IntWithAggregatesFilter<"venta"> | number
+  redondeo?: Prisma.IntWithAggregatesFilter<"venta"> | number
+  recibo?: Prisma.StringNullableWithAggregatesFilter<"venta"> | string | null
   clave_cliente?: Prisma.UuidNullableWithAggregatesFilter<"venta"> | string | null
   revision?: Prisma.IntWithAggregatesFilter<"venta"> | number
 }
@@ -350,6 +378,8 @@ export type ventaCreateInput = {
   fecha_pago?: Date | string | null
   estado: string
   vuelto?: number
+  redondeo?: number
+  recibo?: string | null
   clave_cliente?: string | null
   revision?: number
   vendedor: Prisma.UserCreateNestedOneWithoutVentasInput
@@ -366,6 +396,8 @@ export type ventaUncheckedCreateInput = {
   fecha_pago?: Date | string | null
   estado: string
   vuelto?: number
+  redondeo?: number
+  recibo?: string | null
   clave_cliente?: string | null
   revision?: number
   detalles?: Prisma.detalleUncheckedCreateNestedManyWithoutVentaInput
@@ -379,6 +411,8 @@ export type ventaUpdateInput = {
   fecha_pago?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   estado?: Prisma.StringFieldUpdateOperationsInput | string
   vuelto?: Prisma.IntFieldUpdateOperationsInput | number
+  redondeo?: Prisma.IntFieldUpdateOperationsInput | number
+  recibo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   clave_cliente?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   revision?: Prisma.IntFieldUpdateOperationsInput | number
   vendedor?: Prisma.UserUpdateOneRequiredWithoutVentasNestedInput
@@ -395,6 +429,8 @@ export type ventaUncheckedUpdateInput = {
   fecha_pago?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   estado?: Prisma.StringFieldUpdateOperationsInput | string
   vuelto?: Prisma.IntFieldUpdateOperationsInput | number
+  redondeo?: Prisma.IntFieldUpdateOperationsInput | number
+  recibo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   clave_cliente?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   revision?: Prisma.IntFieldUpdateOperationsInput | number
   detalles?: Prisma.detalleUncheckedUpdateManyWithoutVentaNestedInput
@@ -410,6 +446,8 @@ export type ventaCreateManyInput = {
   fecha_pago?: Date | string | null
   estado: string
   vuelto?: number
+  redondeo?: number
+  recibo?: string | null
   clave_cliente?: string | null
   revision?: number
 }
@@ -421,6 +459,8 @@ export type ventaUpdateManyMutationInput = {
   fecha_pago?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   estado?: Prisma.StringFieldUpdateOperationsInput | string
   vuelto?: Prisma.IntFieldUpdateOperationsInput | number
+  redondeo?: Prisma.IntFieldUpdateOperationsInput | number
+  recibo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   clave_cliente?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   revision?: Prisma.IntFieldUpdateOperationsInput | number
 }
@@ -434,6 +474,8 @@ export type ventaUncheckedUpdateManyInput = {
   fecha_pago?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   estado?: Prisma.StringFieldUpdateOperationsInput | string
   vuelto?: Prisma.IntFieldUpdateOperationsInput | number
+  redondeo?: Prisma.IntFieldUpdateOperationsInput | number
+  recibo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   clave_cliente?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   revision?: Prisma.IntFieldUpdateOperationsInput | number
 }
@@ -457,6 +499,8 @@ export type ventaCountOrderByAggregateInput = {
   fecha_pago?: Prisma.SortOrder
   estado?: Prisma.SortOrder
   vuelto?: Prisma.SortOrder
+  redondeo?: Prisma.SortOrder
+  recibo?: Prisma.SortOrder
   clave_cliente?: Prisma.SortOrder
   revision?: Prisma.SortOrder
 }
@@ -465,6 +509,7 @@ export type ventaAvgOrderByAggregateInput = {
   num_venta?: Prisma.SortOrder
   valor_total?: Prisma.SortOrder
   vuelto?: Prisma.SortOrder
+  redondeo?: Prisma.SortOrder
   revision?: Prisma.SortOrder
 }
 
@@ -477,6 +522,8 @@ export type ventaMaxOrderByAggregateInput = {
   fecha_pago?: Prisma.SortOrder
   estado?: Prisma.SortOrder
   vuelto?: Prisma.SortOrder
+  redondeo?: Prisma.SortOrder
+  recibo?: Prisma.SortOrder
   clave_cliente?: Prisma.SortOrder
   revision?: Prisma.SortOrder
 }
@@ -490,6 +537,8 @@ export type ventaMinOrderByAggregateInput = {
   fecha_pago?: Prisma.SortOrder
   estado?: Prisma.SortOrder
   vuelto?: Prisma.SortOrder
+  redondeo?: Prisma.SortOrder
+  recibo?: Prisma.SortOrder
   clave_cliente?: Prisma.SortOrder
   revision?: Prisma.SortOrder
 }
@@ -498,6 +547,7 @@ export type ventaSumOrderByAggregateInput = {
   num_venta?: Prisma.SortOrder
   valor_total?: Prisma.SortOrder
   vuelto?: Prisma.SortOrder
+  redondeo?: Prisma.SortOrder
   revision?: Prisma.SortOrder
 }
 
@@ -584,6 +634,8 @@ export type ventaCreateWithoutVendedorInput = {
   fecha_pago?: Date | string | null
   estado: string
   vuelto?: number
+  redondeo?: number
+  recibo?: string | null
   clave_cliente?: string | null
   revision?: number
   detalles?: Prisma.detalleCreateNestedManyWithoutVentaInput
@@ -598,6 +650,8 @@ export type ventaUncheckedCreateWithoutVendedorInput = {
   fecha_pago?: Date | string | null
   estado: string
   vuelto?: number
+  redondeo?: number
+  recibo?: string | null
   clave_cliente?: string | null
   revision?: number
   detalles?: Prisma.detalleUncheckedCreateNestedManyWithoutVentaInput
@@ -642,6 +696,8 @@ export type ventaScalarWhereInput = {
   fecha_pago?: Prisma.DateTimeNullableFilter<"venta"> | Date | string | null
   estado?: Prisma.StringFilter<"venta"> | string
   vuelto?: Prisma.IntFilter<"venta"> | number
+  redondeo?: Prisma.IntFilter<"venta"> | number
+  recibo?: Prisma.StringNullableFilter<"venta"> | string | null
   clave_cliente?: Prisma.UuidNullableFilter<"venta"> | string | null
   revision?: Prisma.IntFilter<"venta"> | number
 }
@@ -654,6 +710,8 @@ export type ventaCreateWithoutDetallesInput = {
   fecha_pago?: Date | string | null
   estado: string
   vuelto?: number
+  redondeo?: number
+  recibo?: string | null
   clave_cliente?: string | null
   revision?: number
   vendedor: Prisma.UserCreateNestedOneWithoutVentasInput
@@ -669,6 +727,8 @@ export type ventaUncheckedCreateWithoutDetallesInput = {
   fecha_pago?: Date | string | null
   estado: string
   vuelto?: number
+  redondeo?: number
+  recibo?: string | null
   clave_cliente?: string | null
   revision?: number
   pagos?: Prisma.pagosUncheckedCreateNestedManyWithoutVentaInput
@@ -697,6 +757,8 @@ export type ventaUpdateWithoutDetallesInput = {
   fecha_pago?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   estado?: Prisma.StringFieldUpdateOperationsInput | string
   vuelto?: Prisma.IntFieldUpdateOperationsInput | number
+  redondeo?: Prisma.IntFieldUpdateOperationsInput | number
+  recibo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   clave_cliente?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   revision?: Prisma.IntFieldUpdateOperationsInput | number
   vendedor?: Prisma.UserUpdateOneRequiredWithoutVentasNestedInput
@@ -712,6 +774,8 @@ export type ventaUncheckedUpdateWithoutDetallesInput = {
   fecha_pago?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   estado?: Prisma.StringFieldUpdateOperationsInput | string
   vuelto?: Prisma.IntFieldUpdateOperationsInput | number
+  redondeo?: Prisma.IntFieldUpdateOperationsInput | number
+  recibo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   clave_cliente?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   revision?: Prisma.IntFieldUpdateOperationsInput | number
   pagos?: Prisma.pagosUncheckedUpdateManyWithoutVentaNestedInput
@@ -725,6 +789,8 @@ export type ventaCreateWithoutPagosInput = {
   fecha_pago?: Date | string | null
   estado: string
   vuelto?: number
+  redondeo?: number
+  recibo?: string | null
   clave_cliente?: string | null
   revision?: number
   vendedor: Prisma.UserCreateNestedOneWithoutVentasInput
@@ -740,6 +806,8 @@ export type ventaUncheckedCreateWithoutPagosInput = {
   fecha_pago?: Date | string | null
   estado: string
   vuelto?: number
+  redondeo?: number
+  recibo?: string | null
   clave_cliente?: string | null
   revision?: number
   detalles?: Prisma.detalleUncheckedCreateNestedManyWithoutVentaInput
@@ -768,6 +836,8 @@ export type ventaUpdateWithoutPagosInput = {
   fecha_pago?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   estado?: Prisma.StringFieldUpdateOperationsInput | string
   vuelto?: Prisma.IntFieldUpdateOperationsInput | number
+  redondeo?: Prisma.IntFieldUpdateOperationsInput | number
+  recibo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   clave_cliente?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   revision?: Prisma.IntFieldUpdateOperationsInput | number
   vendedor?: Prisma.UserUpdateOneRequiredWithoutVentasNestedInput
@@ -783,6 +853,8 @@ export type ventaUncheckedUpdateWithoutPagosInput = {
   fecha_pago?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   estado?: Prisma.StringFieldUpdateOperationsInput | string
   vuelto?: Prisma.IntFieldUpdateOperationsInput | number
+  redondeo?: Prisma.IntFieldUpdateOperationsInput | number
+  recibo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   clave_cliente?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   revision?: Prisma.IntFieldUpdateOperationsInput | number
   detalles?: Prisma.detalleUncheckedUpdateManyWithoutVentaNestedInput
@@ -796,6 +868,8 @@ export type ventaCreateManyVendedorInput = {
   fecha_pago?: Date | string | null
   estado: string
   vuelto?: number
+  redondeo?: number
+  recibo?: string | null
   clave_cliente?: string | null
   revision?: number
 }
@@ -807,6 +881,8 @@ export type ventaUpdateWithoutVendedorInput = {
   fecha_pago?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   estado?: Prisma.StringFieldUpdateOperationsInput | string
   vuelto?: Prisma.IntFieldUpdateOperationsInput | number
+  redondeo?: Prisma.IntFieldUpdateOperationsInput | number
+  recibo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   clave_cliente?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   revision?: Prisma.IntFieldUpdateOperationsInput | number
   detalles?: Prisma.detalleUpdateManyWithoutVentaNestedInput
@@ -821,6 +897,8 @@ export type ventaUncheckedUpdateWithoutVendedorInput = {
   fecha_pago?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   estado?: Prisma.StringFieldUpdateOperationsInput | string
   vuelto?: Prisma.IntFieldUpdateOperationsInput | number
+  redondeo?: Prisma.IntFieldUpdateOperationsInput | number
+  recibo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   clave_cliente?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   revision?: Prisma.IntFieldUpdateOperationsInput | number
   detalles?: Prisma.detalleUncheckedUpdateManyWithoutVentaNestedInput
@@ -835,6 +913,8 @@ export type ventaUncheckedUpdateManyWithoutVendedorInput = {
   fecha_pago?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   estado?: Prisma.StringFieldUpdateOperationsInput | string
   vuelto?: Prisma.IntFieldUpdateOperationsInput | number
+  redondeo?: Prisma.IntFieldUpdateOperationsInput | number
+  recibo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   clave_cliente?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   revision?: Prisma.IntFieldUpdateOperationsInput | number
 }
@@ -888,6 +968,8 @@ export type ventaSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   fecha_pago?: boolean
   estado?: boolean
   vuelto?: boolean
+  redondeo?: boolean
+  recibo?: boolean
   clave_cliente?: boolean
   revision?: boolean
   vendedor?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -905,6 +987,8 @@ export type ventaSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   fecha_pago?: boolean
   estado?: boolean
   vuelto?: boolean
+  redondeo?: boolean
+  recibo?: boolean
   clave_cliente?: boolean
   revision?: boolean
   vendedor?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -919,6 +1003,8 @@ export type ventaSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   fecha_pago?: boolean
   estado?: boolean
   vuelto?: boolean
+  redondeo?: boolean
+  recibo?: boolean
   clave_cliente?: boolean
   revision?: boolean
   vendedor?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -933,11 +1019,13 @@ export type ventaSelectScalar = {
   fecha_pago?: boolean
   estado?: boolean
   vuelto?: boolean
+  redondeo?: boolean
+  recibo?: boolean
   clave_cliente?: boolean
   revision?: boolean
 }
 
-export type ventaOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id_venta" | "num_venta" | "id_vendedor" | "valor_total" | "fecha_de_creacion" | "fecha_pago" | "estado" | "vuelto" | "clave_cliente" | "revision", ExtArgs["result"]["venta"]>
+export type ventaOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id_venta" | "num_venta" | "id_vendedor" | "valor_total" | "fecha_de_creacion" | "fecha_pago" | "estado" | "vuelto" | "redondeo" | "recibo" | "clave_cliente" | "revision", ExtArgs["result"]["venta"]>
 export type ventaInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   vendedor?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   detalles?: boolean | Prisma.venta$detallesArgs<ExtArgs>
@@ -967,6 +1055,8 @@ export type $ventaPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
     fecha_pago: Date | null
     estado: string
     vuelto: number
+    redondeo: number
+    recibo: string | null
     clave_cliente: string | null
     revision: number
   }, ExtArgs["result"]["venta"]>
@@ -1403,6 +1493,8 @@ export interface ventaFieldRefs {
   readonly fecha_pago: Prisma.FieldRef<"venta", 'DateTime'>
   readonly estado: Prisma.FieldRef<"venta", 'String'>
   readonly vuelto: Prisma.FieldRef<"venta", 'Int'>
+  readonly redondeo: Prisma.FieldRef<"venta", 'Int'>
+  readonly recibo: Prisma.FieldRef<"venta", 'String'>
   readonly clave_cliente: Prisma.FieldRef<"venta", 'String'>
   readonly revision: Prisma.FieldRef<"venta", 'Int'>
 }

@@ -68,6 +68,36 @@ export async function uploadCloudinaryImage(
   });
 }
 
+export async function uploadGeneratedImage(
+  image: Buffer,
+  folder: string,
+  publicId: string,
+) {
+  configureCloudinary();
+
+  return new Promise<string>((resolve, reject) => {
+    const upload = cloudinary.uploader.upload_stream(
+      {
+        folder,
+        public_id: publicId,
+        resource_type: "image",
+        format: "png",
+        overwrite: true,
+      },
+      (error, result?: UploadApiResponse) => {
+        if (error || !result?.secure_url) {
+          reject(error ?? new Error("Cloudinary no retorno una URL para el recibo."));
+          return;
+        }
+
+        resolve(result.secure_url);
+      },
+    );
+
+    upload.end(image);
+  });
+}
+
 function getCloudinaryPublicId(imageUrl: string) {
   try {
     const pathname = new URL(imageUrl).pathname;

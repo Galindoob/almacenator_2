@@ -2,15 +2,14 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { withAuth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
+import { ensureUserCompany } from "@/lib/company";
+import { rutSchema } from "@/lib/rut";
 
 const optionalText = (max: number) =>
   z.string().trim().max(max).refine((value) => !/['"]/.test(value));
 
 const companySchema = z.object({
-  rut: optionalText(12).refine(
-    (value) => !value || /^(?:\d{1,8}|\d{1,2}(?:\.\d{3}){2})-[\dkK]$/.test(value),
-    "Ingresa un RUT con formato 12345678-9.",
-  ),
+  rut: rutSchema,
   nombre: optionalText(120),
   nombreFantasia: z.string().trim().min(1).max(25).refine((value) => !/['"]/.test(value)),
   giro: optionalText(120),
@@ -26,15 +25,15 @@ const companySchema = z.object({
 
 type UserRow = { id: string };
 type CompanyRow = {
-  nombre_tienda: string;
-  empresa_rut: string | null;
-  empresa_nombre: string | null;
-  empresa_giro: string | null;
-  empresa_actividad: string | null;
-  empresa_email: string | null;
-  empresa_telefono: string | null;
-  empresa_direccion: string | null;
-  empresa_comuna: string | null;
+  nombre_fantasia: string;
+  rut: string;
+  nombre: string;
+  giro: string | null;
+  actividad: string | null;
+  email: string | null;
+  telefono: string | null;
+  direccion: string | null;
+  comuna: string | null;
 };
 
 async function getUserId(correo: string) {
@@ -46,15 +45,15 @@ async function getUserId(correo: string) {
 
 function toCompany(row?: CompanyRow) {
   return {
-    rut: row?.empresa_rut ?? "",
-    nombre: row?.empresa_nombre ?? "",
-    nombreFantasia: row?.nombre_tienda ?? "nombre_tienda",
-    giro: row?.empresa_giro ?? "",
-    actividad: row?.empresa_actividad ?? "",
-    email: row?.empresa_email ?? "",
-    telefono: row?.empresa_telefono ?? "",
-    direccion: row?.empresa_direccion ?? "",
-    comuna: row?.empresa_comuna ?? "",
+    rut: row?.rut ?? "",
+    nombre: row?.nombre ?? "",
+    nombreFantasia: row?.nombre_fantasia ?? "Carpediem",
+    giro: row?.giro ?? "",
+    actividad: row?.actividad ?? "",
+    email: row?.email ?? "",
+    telefono: row?.telefono ?? "",
+    direccion: row?.direccion ?? "",
+    comuna: row?.comuna ?? "",
   };
 }
 
@@ -63,12 +62,12 @@ export const GET = withAuth(async (request) => {
     const userId = await getUserId(request.correo);
     if (!userId) return NextResponse.json({ message: "Usuario no encontrado." }, { status: 404 });
 
+    const company = await ensureUserCompany(userId);
     const [row] = await prisma.$queryRaw<CompanyRow[]>`
-      SELECT nombre_tienda, empresa_rut, empresa_nombre, empresa_giro,
-             empresa_actividad, empresa_email, empresa_telefono,
-             empresa_direccion, empresa_comuna
-      FROM configuracion_usuario
-      WHERE id_usuario = ${userId}::uuid
+      SELECT nombre_fantasia, rut, nombre, giro, actividad, email,
+             telefono, direccion, comuna
+      FROM empresa
+      WHERE id_empresa = ${company.id}::uuid
       LIMIT 1
     `;
     return NextResponse.json({ company: toCompany(row) });
@@ -91,31 +90,21 @@ export const PUT = withAuth(async (request) => {
     const userId = await getUserId(request.correo);
     if (!userId) return NextResponse.json({ message: "Usuario no encontrado." }, { status: 404 });
 
-    const { rut, nombre, nombreFantasia, giro, actividad, email, telefono, direccion, comuna } = input.data;
+    const company = await ensureUserCompany(userId);
+    const { rut, nombreFantasia, giro, actividad, email, telefono, direccion, comuna } = input.data;
     const [row] = await prisma.$queryRaw<CompanyRow[]>`
-      INSERT INTO configuracion_usuario (
-        id_usuario, nombre_tienda, empresa_rut, empresa_nombre, empresa_giro,
-        empresa_actividad, empresa_email, empresa_telefono, empresa_direccion,
-        empresa_comuna, actualizado
-      ) VALUES (
-        ${userId}::uuid, ${nombreFantasia}, ${rut.replaceAll(".", "").toUpperCase() || null},
-        ${nombre || null}, ${giro || null}, ${actividad || null}, ${email || null},
-        ${telefono || null}, ${direccion || null}, ${comuna || null}, CURRENT_TIMESTAMP
-      )
-      ON CONFLICT (id_usuario) DO UPDATE SET
-        nombre_tienda = EXCLUDED.nombre_tienda,
-        empresa_rut = EXCLUDED.empresa_rut,
-        empresa_nombre = EXCLUDED.empresa_nombre,
-        empresa_giro = EXCLUDED.empresa_giro,
-        empresa_actividad = EXCLUDED.empresa_actividad,
-        empresa_email = EXCLUDED.empresa_email,
-        empresa_telefono = EXCLUDED.empresa_telefono,
-        empresa_direccion = EXCLUDED.empresa_direccion,
-        empresa_comuna = EXCLUDED.empresa_comuna,
-        actualizado = CURRENT_TIMESTAMP
-      RETURNING nombre_tienda, empresa_rut, empresa_nombre, empresa_giro,
-                empresa_actividad, empresa_email, empresa_telefono,
-                empresa_direccion, empresa_comuna
+      UPDATE empresa SET
+        rut = ${rut},
+        nombre_fantasia = ${nombreFantasia},
+        giro = ${giro || null},
+        actividad = ${actividad || null},
+        email = ${email || null},
+        telefono = ${telefono || null},
+        direccion = ${direccion || null},
+        comuna = ${comuna || null}
+      WHERE id_empresa = ${company.id}::uuid
+      RETURNING nombre_fantasia, rut, nombre, giro, actividad, email,
+                telefono, direccion, comuna
     `;
 
     return NextResponse.json({ company: toCompany(row) });
