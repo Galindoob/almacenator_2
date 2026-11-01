@@ -1,6 +1,7 @@
 import { z } from "zod";
 import type { Prisma } from "@/generated/prisma/client";
 import { roundCashAmount } from "@/lib/cash-rounding";
+import { calculatePromotion, promotionCondition } from "@/lib/promotion-pricing";
 
 const money = z.number().int().min(0).max(2147483647);
 const quantity = z.number().finite().min(0).max(999999).refine(
@@ -25,6 +26,7 @@ export const saleInclude = {
     orderBy: { id_detalle: "asc" },
     include: { producto: { include: {
       marca: true, unidad: true, categoria: true, proveedores: true,
+      promociones: { include: { tipo_promocion: true } },
       empaque_productos_empaqueToempaque: true,
       unidad_medida_productos_unidad_medidaTounidad_medida: true,
     } } },
@@ -47,7 +49,7 @@ export function calculatePayment(total: number, alreadyPaid: number, amount: num
   const originalDue = total - alreadyPaid;
   const rounded = cash ? roundCashAmount(originalDue) : { total: originalDue, adjustment: 0 };
   const due = rounded.total;
-  if (!Number.isSafeInteger(amount) || originalDue <= 0 || amount < 0 ||
+  if (!Number.isSafeInteger(amount) || originalDue < 0 || amount < 0 ||
       (amount === 0 && due > 0) || (!cash && amount !== due)) {
     throw new SaleError("El monto del cobro no es valido.", 400);
   }
@@ -77,11 +79,18 @@ async function setItem(tx: Tx, saleId: string, productId: string, amount: number
   const delta = amount - previous;
   if (product.controlaStock && delta > product.stock) throw new SaleError("No hay stock suficiente.");
   if (!detail && amount === 0) return;
+  const listPrice = detail?.precio_actual ?? product.precioVenta;
+  const promotion = await tx.promociones.findUnique({ where: { id_productos: productId }, include: { tipo_promocion: true } });
+  const pricing = calculatePromotion(listPrice, amount, promotion);
+  const lineTotal = validMoney(pricing.total);
+  const promotionName = pricing.applied?.nombre_promocion ?? null;
+  const condition = pricing.applied ? promotionCondition(pricing.applied) : null;
   if (!detail) {
     detail = await tx.detalle.create({ data: {
       id_venta: saleId, id_producto: productId, cantidad: amount,
-      precio_actual: product.precioVenta, costo_adquisicion_actual: product.costo,
-      subtotal_venta: validMoney(Math.round(product.precioVenta * amount)),
+      precio_actual: listPrice,
+      promocion_nombre: promotionName, promocion_condicion: condition,
+      costo_adquisicion_actual: product.costo, subtotal_venta: lineTotal,
     } });
   }
   if (product.controlaStock && delta !== 0) {
@@ -102,7 +111,8 @@ async function setItem(tx: Tx, saleId: string, productId: string, amount: number
     await tx.detalle.delete({ where: { id_detalle: detail.id_detalle } });
   } else {
     await tx.detalle.update({ where: { id_detalle: detail.id_detalle }, data: {
-      cantidad: amount, subtotal_venta: validMoney(Math.round(detail.precio_actual * amount)),
+      cantidad: amount, subtotal_venta: lineTotal,
+      promocion_nombre: promotionName, promocion_condicion: condition,
     } });
   }
   const sum = await tx.detalle.aggregate({ where: { id_venta: saleId }, _sum: { subtotal_venta: true } });

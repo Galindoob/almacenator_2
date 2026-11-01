@@ -9,6 +9,7 @@ import { useAppearance } from "../components/AppearanceProvider";
 import { isSafeAppInput } from "@/lib/input-validation";
 import { roundCashAmount } from "@/lib/cash-rounding";
 import { CashRoundingNotice } from "../components/CashRoundingNotice";
+import { calculatePromotion, promotionCondition, type PromotionRule } from "@/lib/promotion-pricing";
 
 type Producto = {
   id: string;
@@ -18,6 +19,7 @@ type Producto = {
   stock: number;
   controlaStock: boolean;
   precioVenta: number;
+  promociones?: PromotionRule[];
   urlImagen: string | null;
   unidad: {
     unidad: string;
@@ -43,6 +45,7 @@ type UnitCartItem = {
   kind: "unit";
   product: Producto;
   quantity: number;
+  subtotal: number;
 };
 
 type WeightCartItem = {
@@ -52,7 +55,12 @@ type WeightCartItem = {
   quantityText: string;
 };
 
-type CartItem = UnitCartItem | WeightCartItem;
+type CartItem = (UnitCartItem | WeightCartItem) & {
+  promotionRules: PromotionRule[];
+  promotionName: string | null;
+  promotionCondition: string | null;
+  availablePromotions: { name: string; condition: string }[];
+};
 
 type PaymentMethod = {
   id_medio: string;
@@ -67,7 +75,8 @@ type Sale = {
   estado: string;
   vuelto: number;
   recibo: string | null;
-  detalles: { id_producto: string; cantidad: string; precio_actual: number; subtotal_venta: number; producto: Producto }[];
+  detalles: { id_producto: string; cantidad: string; precio_actual: number; subtotal_venta: number;
+    promocion_nombre: string | null; promocion_condicion: string | null; producto: Producto }[];
   pagos: { pago: number }[];
 };
 
@@ -76,8 +85,17 @@ function saleCart(sale: Sale): CartItem[] {
     const quantity = Number(detail.cantidad);
     const product = { ...detail.producto, precioVenta: detail.precio_actual,
       stock: detail.producto.stock + (detail.producto.controlaStock ? quantity : 0) };
-    return product.controlaStock ? { kind: "unit", product, quantity } : {
+    const promotion = {
+      promotionRules: detail.producto.promociones ?? [],
+      promotionName: detail.promocion_nombre,
+      promotionCondition: detail.promocion_condicion,
+      availablePromotions: (detail.producto.promociones ?? []).map((rule) => ({
+        name: rule.nombre_promocion, condition: promotionCondition(rule),
+      })),
+    };
+    return product.controlaStock ? { kind: "unit", product, quantity, subtotal: detail.subtotal_venta, ...promotion } : {
       kind: "weight", product, quantityText: formatQuantity(quantity), priceText: String(detail.subtotal_venta),
+      ...promotion,
     };
   });
 }
@@ -172,7 +190,7 @@ function formatQuantity(value: number) {
 
 function getLineTotal(item: CartItem) {
   if (item.kind === "unit") {
-    return item.product.precioVenta * item.quantity;
+    return item.subtotal;
   }
 
   return Math.round(parseDecimal(item.priceText));
@@ -332,7 +350,7 @@ export default function SalesPage() {
   const amountPaid = activeSale?.pagos.reduce((sum, payment) => sum + payment.pago, 0) ?? 0;
   const locked = amountPaid > 0;
   const amountDue = Math.max(0, cartTotal - amountPaid);
-  const showPaymentDetails = rightPanel === "payment" && cartTotal > 0;
+  const showPaymentDetails = rightPanel === "payment" && cart.length > 0;
   const showCompletedSale = rightPanel === "complete" && completedSale !== null;
   const selectedMethod = paymentMethods.find((method) => method.id_medio === selectedPaymentMethodId);
   const isCash = selectedMethod?.medio_de_pago.toLowerCase().trim() === "efectivo";
@@ -458,7 +476,7 @@ export default function SalesPage() {
   }
 
   function openPaymentDetails() {
-    if (busyRef.current || !activeSale || cartTotal <= 0 || rightPanel === "payment") return;
+    if (busyRef.current || !activeSale || cart.length === 0 || rightPanel === "payment") return;
     setPaymentMethodsLoading(true);
     setPaymentMethodsError("");
     setRightPanel("payment");
@@ -534,7 +552,7 @@ export default function SalesPage() {
 
   function updateUnitQuantity(productId: string, delta: number) {
     const item = cart.find((entry) => entry.product.id === productId);
-    if (item?.kind === "unit" && cartTotal - item.product.precioVenta <= 0 && delta < 0) {
+    if (item?.kind === "unit" && item.quantity + delta <= 0 && cartTotal - getLineTotal(item) <= 0) {
       setRightPanel("catalog");
     }
     if (item?.kind === "unit") saveQuantity(productId, Math.max(0, item.quantity + delta));
@@ -580,7 +598,7 @@ export default function SalesPage() {
     }
 
     const item = cart.find((entry) => entry.product.id === productId);
-    if (item?.kind === "weight" && cartTotal - getLineTotal(item) + Math.round(item.product.precioVenta * parseDecimal(text)) <= 0) {
+    if (item?.kind === "weight" && cartTotal - getLineTotal(item) + calculatePromotion(item.product.precioVenta, parseDecimal(text), item.promotionRules[0] ?? null).total <= 0) {
       setRightPanel("catalog");
     }
 
@@ -590,7 +608,7 @@ export default function SalesPage() {
           return item;
         }
 
-        const price = Math.round(item.product.precioVenta * parseDecimal(text));
+        const price = calculatePromotion(item.product.precioVenta, parseDecimal(text), item.promotionRules[0] ?? null).total;
         return { ...item, quantityText: text, priceText: String(price) };
       }),
     );
@@ -699,7 +717,7 @@ export default function SalesPage() {
           <button
             type="button"
             className="sales-view-total"
-            disabled={cartTotal <= 0 || busy || !activeSale}
+            disabled={cart.length === 0 || busy || !activeSale}
             onClick={openPaymentDetails}
             aria-label={`Ver detalle del carrito. Total ${formatPrice(displayedCartTotal)}`}
           >
@@ -910,6 +928,11 @@ function CartRow({
           <img src={product.urlImagen || FALLBACK_IMAGE} alt={product.nombre} />
           <div>
             <strong>{product.nombre}</strong>
+            {item.promotionName ? (
+              <span className="sales-promotion-badge is-applied">Promo: {item.promotionName} · {item.promotionCondition}</span>
+            ) : item.availablePromotions.map((promotion, index) => (
+              <span key={`${promotion.name}-${index}`} className="sales-promotion-badge">Promo disponible: {promotion.name} · {promotion.condition}</span>
+            ))}
             <ProductDetails product={product} />
             <span className="sales-view-price">{getPriceLabel(product)}</span>
           </div>
@@ -942,8 +965,7 @@ function CartRow({
               </button>
             </div>
             <small>
-              {formatPrice(product.precioVenta)} x {item.quantity} ={" "}
-              {formatPrice(getLineTotal(item))}
+              {formatPrice(product.precioVenta)} por unidad · Subtotal {formatPrice(getLineTotal(item))}
             </small>
           </div>
         ) : (

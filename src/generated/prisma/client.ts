@@ -48,7 +48,7 @@ export { Prisma }
 export type User = Prisma.UserModel
 /**
  * Model Empresa
- *
+ * 
  */
 export type Empresa = Prisma.EmpresaModel
 /**
@@ -116,6 +116,16 @@ export type proveedores = Prisma.proveedoresModel
  * 
  */
 export type medio_pago = Prisma.medio_pagoModel
+/**
+ * Model tipo_promocion
+ * 
+ */
+export type tipo_promocion = Prisma.tipo_promocionModel
+/**
+ * Model promociones
+ * 
+ */
+export type promociones = Prisma.promocionesModel
 /**
  * Model venta
  * 

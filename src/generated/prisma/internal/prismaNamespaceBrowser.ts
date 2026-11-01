@@ -66,6 +66,8 @@ export const ModelName = {
   historia_caja: 'historia_caja',
   proveedores: 'proveedores',
   medio_pago: 'medio_pago',
+  tipo_promocion: 'tipo_promocion',
+  promociones: 'promociones',
   venta: 'venta',
   detalle: 'detalle',
   pagos: 'pagos',
@@ -268,6 +270,30 @@ export const Medio_pagoScalarFieldEnum = {
 export type Medio_pagoScalarFieldEnum = (typeof Medio_pagoScalarFieldEnum)[keyof typeof Medio_pagoScalarFieldEnum]
 
 
+export const Tipo_promocionScalarFieldEnum = {
+  id_tipo_promocion: 'id_tipo_promocion',
+  tipo: 'tipo'
+} as const
+
+export type Tipo_promocionScalarFieldEnum = (typeof Tipo_promocionScalarFieldEnum)[keyof typeof Tipo_promocionScalarFieldEnum]
+
+
+export const PromocionesScalarFieldEnum = {
+  id_promocion: 'id_promocion',
+  id_tipo_promocion: 'id_tipo_promocion',
+  nombre_promocion: 'nombre_promocion',
+  descripcion: 'descripcion',
+  id_productos: 'id_productos',
+  descuento: 'descuento',
+  cantidad_llevar: 'cantidad_llevar',
+  cantidad_regalo: 'cantidad_regalo',
+  combo: 'combo',
+  precio_combo: 'precio_combo'
+} as const
+
+export type PromocionesScalarFieldEnum = (typeof PromocionesScalarFieldEnum)[keyof typeof PromocionesScalarFieldEnum]
+
+
 export const VentaScalarFieldEnum = {
   id_venta: 'id_venta',
   num_venta: 'num_venta',
@@ -293,6 +319,8 @@ export const DetalleScalarFieldEnum = {
   costo_adquisicion_actual: 'costo_adquisicion_actual',
   cantidad: 'cantidad',
   precio_actual: 'precio_actual',
+  promocion_nombre: 'promocion_nombre',
+  promocion_condicion: 'promocion_condicion',
   subtotal_venta: 'subtotal_venta'
 } as const
 

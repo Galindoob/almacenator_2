@@ -9,7 +9,7 @@ type ReceiptData = {
   commune: string;
   seller: string;
   date: Date;
-  items: { name: string; quantity: string; price: number; total: number }[];
+  items: { name: string; quantity: string; price: number; total: number; promotion: string | null }[];
   subtotal: number;
   total: number;
   payments: { method: string; amount: number }[];
@@ -68,6 +68,7 @@ export function renderSaleReceiptSvg(data: ReceiptData) {
         const y = itemStart + index * itemHeight;
         return `<g>
           <text x="30" y="${y}" class="body">${escapeXml(truncate(item.name, 28))}</text>
+          ${item.promotion ? `<text x="30" y="${y + 23}" class="muted">Promo: ${escapeXml(truncate(item.promotion, 34))}</text>` : ""}
           <text x="405" y="${y}" class="body center">${escapeXml(item.quantity)}</text>
           <text x="550" y="${y}" class="body end">${escapeXml(amount(item.price))}</text>
           <text x="690" y="${y}" class="body end">${escapeXml(amount(item.total))}</text>
@@ -157,6 +158,7 @@ export async function ensureSaleReceipt(saleId: string) {
       quantity: detail.cantidad.toString(),
       price: detail.precio_actual,
       total: detail.subtotal_venta,
+      promotion: detail.promocion_nombre,
     })),
     subtotal,
     total: sale.valor_total,

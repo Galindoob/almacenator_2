@@ -83,6 +83,11 @@ export function Navbar({
     router.push("/producto");
   }
 
+  function goToPromotions() {
+    setIsMenuOpen(false);
+    router.push("/promociones");
+  }
+
   function goToExpiringProducts() {
     setIsMenuOpen(false);
     if (onProductTabChange) {
@@ -169,7 +174,7 @@ export function Navbar({
             >
               Productos
             </button>
-            <button type="button">Promociones</button>
+            <button type="button" className={activeProductTab === "promociones" ? "is-active" : ""} onClick={goToPromotions}>Promociones</button>
             <button
               type="button"
               className={activeProductTab === "vencimiento" ? "is-active" : ""}
@@ -245,7 +250,7 @@ export function Navbar({
                   <button type="button" onClick={goToProducts}>
                     Productos
                   </button>
-                  <button type="button">Promociones</button>
+                  <button type="button" onClick={goToPromotions}>Promociones</button>
                   <button type="button" onClick={goToExpiringProducts}>
                     Producto por vencer
                   </button>

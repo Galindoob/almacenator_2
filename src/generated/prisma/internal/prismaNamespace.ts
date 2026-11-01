@@ -412,6 +412,8 @@ export const ModelName = {
   historia_caja: 'historia_caja',
   proveedores: 'proveedores',
   medio_pago: 'medio_pago',
+  tipo_promocion: 'tipo_promocion',
+  promociones: 'promociones',
   venta: 'venta',
   detalle: 'detalle',
   pagos: 'pagos',
@@ -431,7 +433,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "empresa" | "role" | "marca" | "categoria" | "unidad" | "producto" | "movimiento_de_stock" | "unidad_medida" | "instancia_producto" | "empaque" | "apertura_caja" | "historia_caja" | "proveedores" | "medio_pago" | "venta" | "detalle" | "pagos" | "configuracionUsuario"
+    modelProps: "user" | "empresa" | "role" | "marca" | "categoria" | "unidad" | "producto" | "movimiento_de_stock" | "unidad_medida" | "instancia_producto" | "empaque" | "apertura_caja" | "historia_caja" | "proveedores" | "medio_pago" | "tipo_promocion" | "promociones" | "venta" | "detalle" | "pagos" | "configuracionUsuario"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1545,6 +1547,154 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    tipo_promocion: {
+      payload: Prisma.$tipo_promocionPayload<ExtArgs>
+      fields: Prisma.tipo_promocionFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.tipo_promocionFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$tipo_promocionPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.tipo_promocionFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$tipo_promocionPayload>
+        }
+        findFirst: {
+          args: Prisma.tipo_promocionFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$tipo_promocionPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.tipo_promocionFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$tipo_promocionPayload>
+        }
+        findMany: {
+          args: Prisma.tipo_promocionFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$tipo_promocionPayload>[]
+        }
+        create: {
+          args: Prisma.tipo_promocionCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$tipo_promocionPayload>
+        }
+        createMany: {
+          args: Prisma.tipo_promocionCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.tipo_promocionCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$tipo_promocionPayload>[]
+        }
+        delete: {
+          args: Prisma.tipo_promocionDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$tipo_promocionPayload>
+        }
+        update: {
+          args: Prisma.tipo_promocionUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$tipo_promocionPayload>
+        }
+        deleteMany: {
+          args: Prisma.tipo_promocionDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.tipo_promocionUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.tipo_promocionUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$tipo_promocionPayload>[]
+        }
+        upsert: {
+          args: Prisma.tipo_promocionUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$tipo_promocionPayload>
+        }
+        aggregate: {
+          args: Prisma.Tipo_promocionAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateTipo_promocion>
+        }
+        groupBy: {
+          args: Prisma.tipo_promocionGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.Tipo_promocionGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.tipo_promocionCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.Tipo_promocionCountAggregateOutputType> | number
+        }
+      }
+    }
+    promociones: {
+      payload: Prisma.$promocionesPayload<ExtArgs>
+      fields: Prisma.promocionesFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.promocionesFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$promocionesPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.promocionesFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$promocionesPayload>
+        }
+        findFirst: {
+          args: Prisma.promocionesFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$promocionesPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.promocionesFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$promocionesPayload>
+        }
+        findMany: {
+          args: Prisma.promocionesFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$promocionesPayload>[]
+        }
+        create: {
+          args: Prisma.promocionesCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$promocionesPayload>
+        }
+        createMany: {
+          args: Prisma.promocionesCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.promocionesCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$promocionesPayload>[]
+        }
+        delete: {
+          args: Prisma.promocionesDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$promocionesPayload>
+        }
+        update: {
+          args: Prisma.promocionesUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$promocionesPayload>
+        }
+        deleteMany: {
+          args: Prisma.promocionesDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.promocionesUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.promocionesUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$promocionesPayload>[]
+        }
+        upsert: {
+          args: Prisma.promocionesUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$promocionesPayload>
+        }
+        aggregate: {
+          args: Prisma.PromocionesAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregatePromociones>
+        }
+        groupBy: {
+          args: Prisma.promocionesGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PromocionesGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.promocionesCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PromocionesCountAggregateOutputType> | number
+        }
+      }
+    }
     venta: {
       payload: Prisma.$ventaPayload<ExtArgs>
       fields: Prisma.ventaFieldRefs
@@ -2060,6 +2210,30 @@ export const Medio_pagoScalarFieldEnum = {
 export type Medio_pagoScalarFieldEnum = (typeof Medio_pagoScalarFieldEnum)[keyof typeof Medio_pagoScalarFieldEnum]
 
 
+export const Tipo_promocionScalarFieldEnum = {
+  id_tipo_promocion: 'id_tipo_promocion',
+  tipo: 'tipo'
+} as const
+
+export type Tipo_promocionScalarFieldEnum = (typeof Tipo_promocionScalarFieldEnum)[keyof typeof Tipo_promocionScalarFieldEnum]
+
+
+export const PromocionesScalarFieldEnum = {
+  id_promocion: 'id_promocion',
+  id_tipo_promocion: 'id_tipo_promocion',
+  nombre_promocion: 'nombre_promocion',
+  descripcion: 'descripcion',
+  id_productos: 'id_productos',
+  descuento: 'descuento',
+  cantidad_llevar: 'cantidad_llevar',
+  cantidad_regalo: 'cantidad_regalo',
+  combo: 'combo',
+  precio_combo: 'precio_combo'
+} as const
+
+export type PromocionesScalarFieldEnum = (typeof PromocionesScalarFieldEnum)[keyof typeof PromocionesScalarFieldEnum]
+
+
 export const VentaScalarFieldEnum = {
   id_venta: 'id_venta',
   num_venta: 'num_venta',
@@ -2085,6 +2259,8 @@ export const DetalleScalarFieldEnum = {
   costo_adquisicion_actual: 'costo_adquisicion_actual',
   cantidad: 'cantidad',
   precio_actual: 'precio_actual',
+  promocion_nombre: 'promocion_nombre',
+  promocion_condicion: 'promocion_condicion',
   subtotal_venta: 'subtotal_venta'
 } as const
 
@@ -2196,20 +2372,6 @@ export type ListDateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaM
 
 
 /**
- * Reference to a field of type 'Decimal'
- */
-export type DecimalFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Decimal'>
-    
-
-
-/**
- * Reference to a field of type 'Decimal[]'
- */
-export type ListDecimalFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Decimal[]'>
-    
-
-
-/**
  * Reference to a field of type 'Float'
  */
 export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float'>
@@ -2220,6 +2382,20 @@ export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, '
  * Reference to a field of type 'Float[]'
  */
 export type ListFloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float[]'>
+    
+
+
+/**
+ * Reference to a field of type 'Decimal'
+ */
+export type DecimalFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Decimal'>
+    
+
+
+/**
+ * Reference to a field of type 'Decimal[]'
+ */
+export type ListDecimalFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Decimal[]'>
     
 
 /**
@@ -2388,6 +2564,8 @@ export type GlobalOmitConfig = {
   historia_caja?: Prisma.historia_cajaOmit
   proveedores?: Prisma.proveedoresOmit
   medio_pago?: Prisma.medio_pagoOmit
+  tipo_promocion?: Prisma.tipo_promocionOmit
+  promociones?: Prisma.promocionesOmit
   venta?: Prisma.ventaOmit
   detalle?: Prisma.detalleOmit
   pagos?: Prisma.pagosOmit
