@@ -47,7 +47,7 @@ function CreatePromotionForm() {
   useEffect(() => {
     const id = editId;
     const controller = new AbortController();
-    const headers = { Authorization: `Bearer ${localStorage.getItem("jwt")}` };
+    const headers = {};
     async function load() {
       const [productResponse, promotionResponse, promotionsResponse] = await Promise.all([
         fetch("/api/producto", { headers, cache: "no-store", signal: controller.signal }),
@@ -146,7 +146,7 @@ function CreatePromotionForm() {
     setSaving(true);
     try {
       const response = await fetch("/api/promociones", {
-        method: editId ? "PUT" : "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${localStorage.getItem("jwt")}` },
+        method: editId ? "PUT" : "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ ...(editId ? { id: editId } : {}), tipo: kind, nombre: name.trim(), descripcion: description.trim(), productos: selectedIds,
           ...(kind === "descuento" ? { descuento: Number(discount) } : {}),
           ...(kind === "yapa" ? { cantidadLlevar: Number(take), cantidadRegalo: Number(gift) } : {}),

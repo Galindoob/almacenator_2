@@ -1,4 +1,5 @@
 "use client";
+import { endSession, hasSessionHint } from "@/lib/client-session";
 
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -68,7 +69,7 @@ export default function TransaccionesPage() {
 
   useEffect(() => {
     let isActive = true;
-    const token = localStorage.getItem("jwt");
+    const token = hasSessionHint();
 
     if (!token) {
       router.replace("/login");
@@ -79,7 +80,7 @@ export default function TransaccionesPage() {
     const timeout = window.setTimeout(() => controller.abort(), 8000);
 
     fetch("/api/session", {
-      headers: { Authorization: `Bearer ${token}` },
+      headers: {},
       cache: "no-store",
       signal: controller.signal,
     })
@@ -89,7 +90,7 @@ export default function TransaccionesPage() {
           setIsSessionVerified(true);
           return;
         }
-        if (response.status === 401) localStorage.removeItem("jwt");
+        if (response.status === 401) void endSession();
         router.replace("/login");
       })
       .catch(() => {
@@ -108,10 +109,9 @@ export default function TransaccionesPage() {
     if (!isSessionVerified) return;
 
     const controller = new AbortController();
-    const token = localStorage.getItem("jwt");
 
     fetch("/api/medio-pago", {
-      headers: { Authorization: `Bearer ${token}` },
+      headers: {},
       cache: "no-store",
       signal: controller.signal,
     })
@@ -141,12 +141,12 @@ export default function TransaccionesPage() {
       try {
         const query = new URLSearchParams({ saleNumber, startDate, endDate, status, paymentMethod, page: String(page), pageSize: String(pageSize) });
         const response = await fetch(`/api/transacciones?${query}`, {
-          headers: { Authorization: `Bearer ${localStorage.getItem("jwt")}` },
+          headers: {},
           cache: "no-store", signal: controller.signal,
         });
         const data = await response.json();
         if (!response.ok) {
-          if (response.status === 401) { localStorage.removeItem("jwt"); router.replace("/login"); }
+          if (response.status === 401) { void endSession(); router.replace("/login"); }
           throw new Error(data.message ?? "No se pudieron cargar las transacciones.");
         }
         if (!controller.signal.aborted) setResults(data as TransactionResults);
@@ -201,7 +201,7 @@ export default function TransaccionesPage() {
   }
 
   function handleLogout() {
-    localStorage.removeItem("jwt");
+    void endSession();
     router.replace("/login");
   }
 

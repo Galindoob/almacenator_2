@@ -1,4 +1,5 @@
 "use client";
+import { endSession, hasSessionHint } from "@/lib/client-session";
 
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -35,7 +36,7 @@ export default function ConsultarPrecioPage() {
 
   useEffect(() => {
     let isActive = true;
-    const token = localStorage.getItem("jwt");
+    const token = hasSessionHint();
 
     if (!token) {
       router.replace("/login");
@@ -46,7 +47,7 @@ export default function ConsultarPrecioPage() {
     const timeout = window.setTimeout(() => controller.abort(), 8000);
 
     fetch("/api/session", {
-      headers: { Authorization: `Bearer ${token}` },
+      headers: {},
       cache: "no-store",
       signal: controller.signal,
     })
@@ -56,7 +57,7 @@ export default function ConsultarPrecioPage() {
           setIsSessionVerified(true);
           return;
         }
-        if (response.status === 401) localStorage.removeItem("jwt");
+        if (response.status === 401) void endSession();
         router.replace("/login");
       })
       .catch(() => {
@@ -80,7 +81,7 @@ export default function ConsultarPrecioPage() {
 
     const controller = new AbortController();
     const timeout = window.setTimeout(async () => {
-      const token = localStorage.getItem("jwt");
+      const token = hasSessionHint();
 
       if (!token) {
         router.replace("/login");
@@ -94,7 +95,7 @@ export default function ConsultarPrecioPage() {
         const response = await fetch(
           `/api/consultar-precio?q=${encodeURIComponent(normalizedQuery)}`,
           {
-            headers: { Authorization: `Bearer ${token}` },
+            headers: {},
             cache: "no-store",
             signal: controller.signal,
           },
@@ -107,7 +108,7 @@ export default function ConsultarPrecioPage() {
 
         if (!response.ok || data.status !== "ok") {
           if (response.status === 401) {
-            localStorage.removeItem("jwt");
+            void endSession();
             router.replace("/login");
             return;
           }
@@ -137,7 +138,7 @@ export default function ConsultarPrecioPage() {
   }, [query, router]);
 
   function handleLogout() {
-    localStorage.removeItem("jwt");
+    void endSession();
     router.replace("/login");
   }
 

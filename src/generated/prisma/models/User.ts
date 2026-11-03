@@ -194,6 +194,7 @@ export type UserWhereInput = {
   movimiento_de_stock?: Prisma.Movimiento_de_stockListRelationFilter
   ventas?: Prisma.VentaListRelationFilter
   configuracion?: Prisma.XOR<Prisma.ConfiguracionUsuarioNullableScalarRelationFilter, Prisma.ConfiguracionUsuarioWhereInput> | null
+  passwordResets?: Prisma.PasswordResetListRelationFilter
   role?: Prisma.XOR<Prisma.RoleScalarRelationFilter, Prisma.RoleWhereInput>
 }
 
@@ -208,6 +209,7 @@ export type UserOrderByWithRelationInput = {
   movimiento_de_stock?: Prisma.movimiento_de_stockOrderByRelationAggregateInput
   ventas?: Prisma.ventaOrderByRelationAggregateInput
   configuracion?: Prisma.ConfiguracionUsuarioOrderByWithRelationInput
+  passwordResets?: Prisma.PasswordResetOrderByRelationAggregateInput
   role?: Prisma.RoleOrderByWithRelationInput
 }
 
@@ -225,6 +227,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   movimiento_de_stock?: Prisma.Movimiento_de_stockListRelationFilter
   ventas?: Prisma.VentaListRelationFilter
   configuracion?: Prisma.XOR<Prisma.ConfiguracionUsuarioNullableScalarRelationFilter, Prisma.ConfiguracionUsuarioWhereInput> | null
+  passwordResets?: Prisma.PasswordResetListRelationFilter
   role?: Prisma.XOR<Prisma.RoleScalarRelationFilter, Prisma.RoleWhereInput>
 }, "id" | "correo">
 
@@ -262,6 +265,7 @@ export type UserCreateInput = {
   movimiento_de_stock?: Prisma.movimiento_de_stockCreateNestedManyWithoutUsersInput
   ventas?: Prisma.ventaCreateNestedManyWithoutVendedorInput
   configuracion?: Prisma.ConfiguracionUsuarioCreateNestedOneWithoutUsuarioInput
+  passwordResets?: Prisma.PasswordResetCreateNestedManyWithoutUserInput
   role?: Prisma.RoleCreateNestedOneWithoutUsersInput
 }
 
@@ -276,6 +280,7 @@ export type UserUncheckedCreateInput = {
   movimiento_de_stock?: Prisma.movimiento_de_stockUncheckedCreateNestedManyWithoutUsersInput
   ventas?: Prisma.ventaUncheckedCreateNestedManyWithoutVendedorInput
   configuracion?: Prisma.ConfiguracionUsuarioUncheckedCreateNestedOneWithoutUsuarioInput
+  passwordResets?: Prisma.PasswordResetUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserUpdateInput = {
@@ -288,6 +293,7 @@ export type UserUpdateInput = {
   movimiento_de_stock?: Prisma.movimiento_de_stockUpdateManyWithoutUsersNestedInput
   ventas?: Prisma.ventaUpdateManyWithoutVendedorNestedInput
   configuracion?: Prisma.ConfiguracionUsuarioUpdateOneWithoutUsuarioNestedInput
+  passwordResets?: Prisma.PasswordResetUpdateManyWithoutUserNestedInput
   role?: Prisma.RoleUpdateOneRequiredWithoutUsersNestedInput
 }
 
@@ -302,6 +308,7 @@ export type UserUncheckedUpdateInput = {
   movimiento_de_stock?: Prisma.movimiento_de_stockUncheckedUpdateManyWithoutUsersNestedInput
   ventas?: Prisma.ventaUncheckedUpdateManyWithoutVendedorNestedInput
   configuracion?: Prisma.ConfiguracionUsuarioUncheckedUpdateOneWithoutUsuarioNestedInput
+  passwordResets?: Prisma.PasswordResetUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateManyInput = {
@@ -357,6 +364,11 @@ export type UserMinOrderByAggregateInput = {
   correo?: Prisma.SortOrder
 }
 
+export type UserScalarRelationFilter = {
+  is?: Prisma.UserWhereInput
+  isNot?: Prisma.UserWhereInput
+}
+
 export type UserListRelationFilter = {
   every?: Prisma.UserWhereInput
   some?: Prisma.UserWhereInput
@@ -367,17 +379,26 @@ export type UserOrderByRelationAggregateInput = {
   _count?: Prisma.SortOrder
 }
 
-export type UserScalarRelationFilter = {
-  is?: Prisma.UserWhereInput
-  isNot?: Prisma.UserWhereInput
-}
-
 export type StringFieldUpdateOperationsInput = {
   set?: string
 }
 
 export type NullableStringFieldUpdateOperationsInput = {
   set?: string | null
+}
+
+export type UserCreateNestedOneWithoutPasswordResetsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutPasswordResetsInput, Prisma.UserUncheckedCreateWithoutPasswordResetsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutPasswordResetsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutPasswordResetsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutPasswordResetsInput, Prisma.UserUncheckedCreateWithoutPasswordResetsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutPasswordResetsInput
+  upsert?: Prisma.UserUpsertWithoutPasswordResetsInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutPasswordResetsInput, Prisma.UserUpdateWithoutPasswordResetsInput>, Prisma.UserUncheckedUpdateWithoutPasswordResetsInput>
 }
 
 export type UserCreateNestedManyWithoutRoleInput = {
@@ -478,6 +499,74 @@ export type UserUpdateOneRequiredWithoutConfiguracionNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutConfiguracionInput, Prisma.UserUpdateWithoutConfiguracionInput>, Prisma.UserUncheckedUpdateWithoutConfiguracionInput>
 }
 
+export type UserCreateWithoutPasswordResetsInput = {
+  id?: string
+  nombre: string
+  apellido: string
+  contrasena: string
+  correo?: string | null
+  apertura_caja?: Prisma.apertura_cajaCreateNestedManyWithoutUsersInput
+  movimiento_de_stock?: Prisma.movimiento_de_stockCreateNestedManyWithoutUsersInput
+  ventas?: Prisma.ventaCreateNestedManyWithoutVendedorInput
+  configuracion?: Prisma.ConfiguracionUsuarioCreateNestedOneWithoutUsuarioInput
+  role?: Prisma.RoleCreateNestedOneWithoutUsersInput
+}
+
+export type UserUncheckedCreateWithoutPasswordResetsInput = {
+  id?: string
+  nombre: string
+  apellido: string
+  contrasena: string
+  roleid?: string
+  correo?: string | null
+  apertura_caja?: Prisma.apertura_cajaUncheckedCreateNestedManyWithoutUsersInput
+  movimiento_de_stock?: Prisma.movimiento_de_stockUncheckedCreateNestedManyWithoutUsersInput
+  ventas?: Prisma.ventaUncheckedCreateNestedManyWithoutVendedorInput
+  configuracion?: Prisma.ConfiguracionUsuarioUncheckedCreateNestedOneWithoutUsuarioInput
+}
+
+export type UserCreateOrConnectWithoutPasswordResetsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutPasswordResetsInput, Prisma.UserUncheckedCreateWithoutPasswordResetsInput>
+}
+
+export type UserUpsertWithoutPasswordResetsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutPasswordResetsInput, Prisma.UserUncheckedUpdateWithoutPasswordResetsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutPasswordResetsInput, Prisma.UserUncheckedCreateWithoutPasswordResetsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutPasswordResetsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutPasswordResetsInput, Prisma.UserUncheckedUpdateWithoutPasswordResetsInput>
+}
+
+export type UserUpdateWithoutPasswordResetsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  nombre?: Prisma.StringFieldUpdateOperationsInput | string
+  apellido?: Prisma.StringFieldUpdateOperationsInput | string
+  contrasena?: Prisma.StringFieldUpdateOperationsInput | string
+  correo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  apertura_caja?: Prisma.apertura_cajaUpdateManyWithoutUsersNestedInput
+  movimiento_de_stock?: Prisma.movimiento_de_stockUpdateManyWithoutUsersNestedInput
+  ventas?: Prisma.ventaUpdateManyWithoutVendedorNestedInput
+  configuracion?: Prisma.ConfiguracionUsuarioUpdateOneWithoutUsuarioNestedInput
+  role?: Prisma.RoleUpdateOneRequiredWithoutUsersNestedInput
+}
+
+export type UserUncheckedUpdateWithoutPasswordResetsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  nombre?: Prisma.StringFieldUpdateOperationsInput | string
+  apellido?: Prisma.StringFieldUpdateOperationsInput | string
+  contrasena?: Prisma.StringFieldUpdateOperationsInput | string
+  roleid?: Prisma.StringFieldUpdateOperationsInput | string
+  correo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  apertura_caja?: Prisma.apertura_cajaUncheckedUpdateManyWithoutUsersNestedInput
+  movimiento_de_stock?: Prisma.movimiento_de_stockUncheckedUpdateManyWithoutUsersNestedInput
+  ventas?: Prisma.ventaUncheckedUpdateManyWithoutVendedorNestedInput
+  configuracion?: Prisma.ConfiguracionUsuarioUncheckedUpdateOneWithoutUsuarioNestedInput
+}
+
 export type UserCreateWithoutRoleInput = {
   id?: string
   nombre: string
@@ -488,6 +577,7 @@ export type UserCreateWithoutRoleInput = {
   movimiento_de_stock?: Prisma.movimiento_de_stockCreateNestedManyWithoutUsersInput
   ventas?: Prisma.ventaCreateNestedManyWithoutVendedorInput
   configuracion?: Prisma.ConfiguracionUsuarioCreateNestedOneWithoutUsuarioInput
+  passwordResets?: Prisma.PasswordResetCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutRoleInput = {
@@ -500,6 +590,7 @@ export type UserUncheckedCreateWithoutRoleInput = {
   movimiento_de_stock?: Prisma.movimiento_de_stockUncheckedCreateNestedManyWithoutUsersInput
   ventas?: Prisma.ventaUncheckedCreateNestedManyWithoutVendedorInput
   configuracion?: Prisma.ConfiguracionUsuarioUncheckedCreateNestedOneWithoutUsuarioInput
+  passwordResets?: Prisma.PasswordResetUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutRoleInput = {
@@ -549,6 +640,7 @@ export type UserCreateWithoutMovimiento_de_stockInput = {
   apertura_caja?: Prisma.apertura_cajaCreateNestedManyWithoutUsersInput
   ventas?: Prisma.ventaCreateNestedManyWithoutVendedorInput
   configuracion?: Prisma.ConfiguracionUsuarioCreateNestedOneWithoutUsuarioInput
+  passwordResets?: Prisma.PasswordResetCreateNestedManyWithoutUserInput
   role?: Prisma.RoleCreateNestedOneWithoutUsersInput
 }
 
@@ -562,6 +654,7 @@ export type UserUncheckedCreateWithoutMovimiento_de_stockInput = {
   apertura_caja?: Prisma.apertura_cajaUncheckedCreateNestedManyWithoutUsersInput
   ventas?: Prisma.ventaUncheckedCreateNestedManyWithoutVendedorInput
   configuracion?: Prisma.ConfiguracionUsuarioUncheckedCreateNestedOneWithoutUsuarioInput
+  passwordResets?: Prisma.PasswordResetUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutMovimiento_de_stockInput = {
@@ -589,6 +682,7 @@ export type UserUpdateWithoutMovimiento_de_stockInput = {
   apertura_caja?: Prisma.apertura_cajaUpdateManyWithoutUsersNestedInput
   ventas?: Prisma.ventaUpdateManyWithoutVendedorNestedInput
   configuracion?: Prisma.ConfiguracionUsuarioUpdateOneWithoutUsuarioNestedInput
+  passwordResets?: Prisma.PasswordResetUpdateManyWithoutUserNestedInput
   role?: Prisma.RoleUpdateOneRequiredWithoutUsersNestedInput
 }
 
@@ -602,6 +696,7 @@ export type UserUncheckedUpdateWithoutMovimiento_de_stockInput = {
   apertura_caja?: Prisma.apertura_cajaUncheckedUpdateManyWithoutUsersNestedInput
   ventas?: Prisma.ventaUncheckedUpdateManyWithoutVendedorNestedInput
   configuracion?: Prisma.ConfiguracionUsuarioUncheckedUpdateOneWithoutUsuarioNestedInput
+  passwordResets?: Prisma.PasswordResetUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutApertura_cajaInput = {
@@ -613,6 +708,7 @@ export type UserCreateWithoutApertura_cajaInput = {
   movimiento_de_stock?: Prisma.movimiento_de_stockCreateNestedManyWithoutUsersInput
   ventas?: Prisma.ventaCreateNestedManyWithoutVendedorInput
   configuracion?: Prisma.ConfiguracionUsuarioCreateNestedOneWithoutUsuarioInput
+  passwordResets?: Prisma.PasswordResetCreateNestedManyWithoutUserInput
   role?: Prisma.RoleCreateNestedOneWithoutUsersInput
 }
 
@@ -626,6 +722,7 @@ export type UserUncheckedCreateWithoutApertura_cajaInput = {
   movimiento_de_stock?: Prisma.movimiento_de_stockUncheckedCreateNestedManyWithoutUsersInput
   ventas?: Prisma.ventaUncheckedCreateNestedManyWithoutVendedorInput
   configuracion?: Prisma.ConfiguracionUsuarioUncheckedCreateNestedOneWithoutUsuarioInput
+  passwordResets?: Prisma.PasswordResetUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutApertura_cajaInput = {
@@ -653,6 +750,7 @@ export type UserUpdateWithoutApertura_cajaInput = {
   movimiento_de_stock?: Prisma.movimiento_de_stockUpdateManyWithoutUsersNestedInput
   ventas?: Prisma.ventaUpdateManyWithoutVendedorNestedInput
   configuracion?: Prisma.ConfiguracionUsuarioUpdateOneWithoutUsuarioNestedInput
+  passwordResets?: Prisma.PasswordResetUpdateManyWithoutUserNestedInput
   role?: Prisma.RoleUpdateOneRequiredWithoutUsersNestedInput
 }
 
@@ -666,6 +764,7 @@ export type UserUncheckedUpdateWithoutApertura_cajaInput = {
   movimiento_de_stock?: Prisma.movimiento_de_stockUncheckedUpdateManyWithoutUsersNestedInput
   ventas?: Prisma.ventaUncheckedUpdateManyWithoutVendedorNestedInput
   configuracion?: Prisma.ConfiguracionUsuarioUncheckedUpdateOneWithoutUsuarioNestedInput
+  passwordResets?: Prisma.PasswordResetUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutVentasInput = {
@@ -677,6 +776,7 @@ export type UserCreateWithoutVentasInput = {
   apertura_caja?: Prisma.apertura_cajaCreateNestedManyWithoutUsersInput
   movimiento_de_stock?: Prisma.movimiento_de_stockCreateNestedManyWithoutUsersInput
   configuracion?: Prisma.ConfiguracionUsuarioCreateNestedOneWithoutUsuarioInput
+  passwordResets?: Prisma.PasswordResetCreateNestedManyWithoutUserInput
   role?: Prisma.RoleCreateNestedOneWithoutUsersInput
 }
 
@@ -690,6 +790,7 @@ export type UserUncheckedCreateWithoutVentasInput = {
   apertura_caja?: Prisma.apertura_cajaUncheckedCreateNestedManyWithoutUsersInput
   movimiento_de_stock?: Prisma.movimiento_de_stockUncheckedCreateNestedManyWithoutUsersInput
   configuracion?: Prisma.ConfiguracionUsuarioUncheckedCreateNestedOneWithoutUsuarioInput
+  passwordResets?: Prisma.PasswordResetUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutVentasInput = {
@@ -717,6 +818,7 @@ export type UserUpdateWithoutVentasInput = {
   apertura_caja?: Prisma.apertura_cajaUpdateManyWithoutUsersNestedInput
   movimiento_de_stock?: Prisma.movimiento_de_stockUpdateManyWithoutUsersNestedInput
   configuracion?: Prisma.ConfiguracionUsuarioUpdateOneWithoutUsuarioNestedInput
+  passwordResets?: Prisma.PasswordResetUpdateManyWithoutUserNestedInput
   role?: Prisma.RoleUpdateOneRequiredWithoutUsersNestedInput
 }
 
@@ -730,6 +832,7 @@ export type UserUncheckedUpdateWithoutVentasInput = {
   apertura_caja?: Prisma.apertura_cajaUncheckedUpdateManyWithoutUsersNestedInput
   movimiento_de_stock?: Prisma.movimiento_de_stockUncheckedUpdateManyWithoutUsersNestedInput
   configuracion?: Prisma.ConfiguracionUsuarioUncheckedUpdateOneWithoutUsuarioNestedInput
+  passwordResets?: Prisma.PasswordResetUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutConfiguracionInput = {
@@ -741,6 +844,7 @@ export type UserCreateWithoutConfiguracionInput = {
   apertura_caja?: Prisma.apertura_cajaCreateNestedManyWithoutUsersInput
   movimiento_de_stock?: Prisma.movimiento_de_stockCreateNestedManyWithoutUsersInput
   ventas?: Prisma.ventaCreateNestedManyWithoutVendedorInput
+  passwordResets?: Prisma.PasswordResetCreateNestedManyWithoutUserInput
   role?: Prisma.RoleCreateNestedOneWithoutUsersInput
 }
 
@@ -754,6 +858,7 @@ export type UserUncheckedCreateWithoutConfiguracionInput = {
   apertura_caja?: Prisma.apertura_cajaUncheckedCreateNestedManyWithoutUsersInput
   movimiento_de_stock?: Prisma.movimiento_de_stockUncheckedCreateNestedManyWithoutUsersInput
   ventas?: Prisma.ventaUncheckedCreateNestedManyWithoutVendedorInput
+  passwordResets?: Prisma.PasswordResetUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutConfiguracionInput = {
@@ -781,6 +886,7 @@ export type UserUpdateWithoutConfiguracionInput = {
   apertura_caja?: Prisma.apertura_cajaUpdateManyWithoutUsersNestedInput
   movimiento_de_stock?: Prisma.movimiento_de_stockUpdateManyWithoutUsersNestedInput
   ventas?: Prisma.ventaUpdateManyWithoutVendedorNestedInput
+  passwordResets?: Prisma.PasswordResetUpdateManyWithoutUserNestedInput
   role?: Prisma.RoleUpdateOneRequiredWithoutUsersNestedInput
 }
 
@@ -794,6 +900,7 @@ export type UserUncheckedUpdateWithoutConfiguracionInput = {
   apertura_caja?: Prisma.apertura_cajaUncheckedUpdateManyWithoutUsersNestedInput
   movimiento_de_stock?: Prisma.movimiento_de_stockUncheckedUpdateManyWithoutUsersNestedInput
   ventas?: Prisma.ventaUncheckedUpdateManyWithoutVendedorNestedInput
+  passwordResets?: Prisma.PasswordResetUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateManyRoleInput = {
@@ -814,6 +921,7 @@ export type UserUpdateWithoutRoleInput = {
   movimiento_de_stock?: Prisma.movimiento_de_stockUpdateManyWithoutUsersNestedInput
   ventas?: Prisma.ventaUpdateManyWithoutVendedorNestedInput
   configuracion?: Prisma.ConfiguracionUsuarioUpdateOneWithoutUsuarioNestedInput
+  passwordResets?: Prisma.PasswordResetUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutRoleInput = {
@@ -826,6 +934,7 @@ export type UserUncheckedUpdateWithoutRoleInput = {
   movimiento_de_stock?: Prisma.movimiento_de_stockUncheckedUpdateManyWithoutUsersNestedInput
   ventas?: Prisma.ventaUncheckedUpdateManyWithoutVendedorNestedInput
   configuracion?: Prisma.ConfiguracionUsuarioUncheckedUpdateOneWithoutUsuarioNestedInput
+  passwordResets?: Prisma.PasswordResetUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateManyWithoutRoleInput = {
@@ -845,12 +954,14 @@ export type UserCountOutputType = {
   apertura_caja: number
   movimiento_de_stock: number
   ventas: number
+  passwordResets: number
 }
 
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   apertura_caja?: boolean | UserCountOutputTypeCountApertura_cajaArgs
   movimiento_de_stock?: boolean | UserCountOutputTypeCountMovimiento_de_stockArgs
   ventas?: boolean | UserCountOutputTypeCountVentasArgs
+  passwordResets?: boolean | UserCountOutputTypeCountPasswordResetsArgs
 }
 
 /**
@@ -884,6 +995,13 @@ export type UserCountOutputTypeCountVentasArgs<ExtArgs extends runtime.Types.Ext
   where?: Prisma.ventaWhereInput
 }
 
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountPasswordResetsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.PasswordResetWhereInput
+}
+
 
 export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -896,6 +1014,7 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   movimiento_de_stock?: boolean | Prisma.User$movimiento_de_stockArgs<ExtArgs>
   ventas?: boolean | Prisma.User$ventasArgs<ExtArgs>
   configuracion?: boolean | Prisma.User$configuracionArgs<ExtArgs>
+  passwordResets?: boolean | Prisma.User$passwordResetsArgs<ExtArgs>
   role?: boolean | Prisma.RoleDefaultArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
@@ -935,6 +1054,7 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   movimiento_de_stock?: boolean | Prisma.User$movimiento_de_stockArgs<ExtArgs>
   ventas?: boolean | Prisma.User$ventasArgs<ExtArgs>
   configuracion?: boolean | Prisma.User$configuracionArgs<ExtArgs>
+  passwordResets?: boolean | Prisma.User$passwordResetsArgs<ExtArgs>
   role?: boolean | Prisma.RoleDefaultArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
@@ -952,6 +1072,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     movimiento_de_stock: Prisma.$movimiento_de_stockPayload<ExtArgs>[]
     ventas: Prisma.$ventaPayload<ExtArgs>[]
     configuracion: Prisma.$ConfiguracionUsuarioPayload<ExtArgs> | null
+    passwordResets: Prisma.$PasswordResetPayload<ExtArgs>[]
     role: Prisma.$RolePayload<ExtArgs>
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
@@ -1359,6 +1480,7 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   movimiento_de_stock<T extends Prisma.User$movimiento_de_stockArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$movimiento_de_stockArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$movimiento_de_stockPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   ventas<T extends Prisma.User$ventasArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$ventasArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ventaPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   configuracion<T extends Prisma.User$configuracionArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$configuracionArgs<ExtArgs>>): Prisma.Prisma__ConfiguracionUsuarioClient<runtime.Types.Result.GetResult<Prisma.$ConfiguracionUsuarioPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  passwordResets<T extends Prisma.User$passwordResetsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$passwordResetsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PasswordResetPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   role<T extends Prisma.RoleDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.RoleDefaultArgs<ExtArgs>>): Prisma.Prisma__RoleClient<runtime.Types.Result.GetResult<Prisma.$RolePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -1884,6 +2006,30 @@ export type User$configuracionArgs<ExtArgs extends runtime.Types.Extensions.Inte
    */
   include?: Prisma.ConfiguracionUsuarioInclude<ExtArgs> | null
   where?: Prisma.ConfiguracionUsuarioWhereInput
+}
+
+/**
+ * User.passwordResets
+ */
+export type User$passwordResetsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the PasswordReset
+   */
+  select?: Prisma.PasswordResetSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the PasswordReset
+   */
+  omit?: Prisma.PasswordResetOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PasswordResetInclude<ExtArgs> | null
+  where?: Prisma.PasswordResetWhereInput
+  orderBy?: Prisma.PasswordResetOrderByWithRelationInput | Prisma.PasswordResetOrderByWithRelationInput[]
+  cursor?: Prisma.PasswordResetWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.PasswordResetScalarFieldEnum | Prisma.PasswordResetScalarFieldEnum[]
 }
 
 /**

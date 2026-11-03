@@ -1,4 +1,5 @@
 "use client";
+import { endSession, hasSessionHint } from "@/lib/client-session";
 
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -75,7 +76,7 @@ export default function ConfiguracionPage() {
 
   useEffect(() => {
     let isActive = true;
-    const token = localStorage.getItem("jwt");
+    const token = hasSessionHint();
 
     if (!token) {
       router.replace("/login");
@@ -86,7 +87,7 @@ export default function ConfiguracionPage() {
     const timeout = window.setTimeout(() => controller.abort(), 8000);
 
     fetch("/api/session", {
-      headers: { Authorization: `Bearer ${token}` },
+      headers: {},
       cache: "no-store",
       signal: controller.signal,
     })
@@ -96,7 +97,7 @@ export default function ConfiguracionPage() {
           setIsSessionVerified(true);
           return;
         }
-        if (response.status === 401) localStorage.removeItem("jwt");
+        if (response.status === 401) void endSession();
         router.replace("/login");
       })
       .catch(() => {
@@ -112,7 +113,7 @@ export default function ConfiguracionPage() {
   }, [router]);
 
   function handleLogout() {
-    localStorage.removeItem("jwt");
+    void endSession();
     router.replace("/login");
   }
 
@@ -198,10 +199,9 @@ function UsersSettings() {
 
   useEffect(() => {
     const controller = new AbortController();
-    const token = localStorage.getItem("jwt");
 
     fetch("/api/configuracion/usuarios", {
-      headers: { Authorization: `Bearer ${token}` },
+      headers: {},
       cache: "no-store",
       signal: controller.signal,
     })
@@ -286,7 +286,7 @@ function UsersSettings() {
     </>
   );
 }
-function CompanySettings({ onSaved }: { onSaved: (name: string, token: string) => void }) {
+function CompanySettings({ onSaved }: { onSaved: (name: string) => void }) {
   const [saved, setSaved] = useState<CompanyData | null>(null);
   const [draft, setDraft] = useState<CompanyData | null>(null);
   const [saving, setSaving] = useState(false);
@@ -295,10 +295,9 @@ function CompanySettings({ onSaved }: { onSaved: (name: string, token: string) =
 
   useEffect(() => {
     const controller = new AbortController();
-    const token = localStorage.getItem("jwt");
 
     fetch("/api/configuracion/empresa", {
-      headers: { Authorization: `Bearer ${token}` },
+      headers: {},
       cache: "no-store",
       signal: controller.signal,
     })
@@ -348,11 +347,9 @@ function CompanySettings({ onSaved }: { onSaved: (name: string, token: string) =
     setError("");
     setSuccess("");
     try {
-      const token = localStorage.getItem("jwt");
       const response = await fetch("/api/configuracion/empresa", {
         method: "PUT",
         headers: {
-          Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify(normalized),
@@ -363,7 +360,7 @@ function CompanySettings({ onSaved }: { onSaved: (name: string, token: string) =
       }
       setSaved(result.company);
       setDraft(result.company);
-      if (token) onSaved(result.company.nombreFantasia, token);
+      onSaved(result.company.nombreFantasia);
       setSuccess("Datos de empresa guardados.");
     } catch (saveError) {
       setError(saveError instanceof Error ? saveError.message : "No se pudieron guardar los datos.");

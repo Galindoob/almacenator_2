@@ -1,4 +1,5 @@
 "use client";
+import { hasSessionHint } from "@/lib/client-session";
 
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
@@ -43,7 +44,7 @@ export default function CierreCajaPage() {
 
   useEffect(() => {
     async function loadCashRegister() {
-      const token = localStorage.getItem("jwt");
+      const token = hasSessionHint();
 
       if (!token) {
         router.replace("/login");
@@ -53,7 +54,6 @@ export default function CierreCajaPage() {
       try {
         const response = await fetch("/api/caja", {
           headers: {
-            Authorization: `Bearer ${token}`,
           },
         });
         const data = (await response.json()) as {
@@ -102,7 +102,7 @@ export default function CierreCajaPage() {
   }
 
   async function closeCashRegister() {
-    const token = localStorage.getItem("jwt");
+    const token = hasSessionHint();
 
     if (!token) {
       router.replace("/login");
@@ -122,7 +122,6 @@ export default function CierreCajaPage() {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({ saldo_cierre: Number(cashOnHand) }),
       });

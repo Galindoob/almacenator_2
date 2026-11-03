@@ -1,4 +1,5 @@
 "use client";
+import { endSession, hasSessionHint } from "@/lib/client-session";
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -92,7 +93,7 @@ export default function ReportesPage() {
   const hasSales = (report?.periodSummary.sales ?? 0) > 0;
 
   useEffect(() => {
-    const token = localStorage.getItem("jwt");
+    const token = hasSessionHint();
     if (!token) {
       router.replace("/login");
       return;
@@ -103,7 +104,7 @@ export default function ReportesPage() {
     if (paymentMethod) params.set("paymentMethod", paymentMethod);
 
     fetch(`/api/reportes?${params}`, {
-      headers: { Authorization: `Bearer ${token}` },
+      headers: {},
       cache: "no-store",
       signal: controller.signal,
     })
@@ -111,7 +112,7 @@ export default function ReportesPage() {
         const data = await response.json() as ReportResponse;
         if (!response.ok) {
           if (response.status === 401) {
-            localStorage.removeItem("jwt");
+            void endSession();
             router.replace("/login");
           }
           throw new Error(data.message ?? "No se pudo cargar el reporte.");

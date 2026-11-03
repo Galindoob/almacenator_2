@@ -28,7 +28,7 @@ type AppearanceContextValue = AppearancePreferences & {
   clearAppearancePreview: () => void;
   savePreferences: (preferences: AppearancePreferences) => Promise<void>;
   setStoreName: (name: string) => Promise<void>;
-  syncSavedStoreName: (name: string, token: string) => void;
+  syncSavedStoreName: (name: string) => void;
   resetThemeForLogout: () => void;
 };
 
@@ -46,7 +46,7 @@ const AppearanceContext = createContext<AppearanceContextValue | null>(null);
 
 function subscribeToAppearance(onChange: () => void) {
   function handleStorage(event: StorageEvent) {
-    if (event.key === STORAGE_KEY || event.key === "jwt" || event.key === null) onChange();
+    if (event.key === STORAGE_KEY || event.key === null) onChange();
   }
 
   window.addEventListener("storage", handleStorage);
@@ -61,7 +61,7 @@ function subscribeToAppearance(onChange: () => void) {
 }
 
 function getAppearanceSnapshot() {
-  return localStorage.getItem("jwt") ? localStorage.getItem(STORAGE_KEY) : null;
+  return localStorage.getItem(STORAGE_KEY);
 }
 
 function writePreferences(preferences: AppearancePreferences) {
@@ -123,21 +123,18 @@ export function AppearanceProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     async function loadPreferences() {
-      const token = localStorage.getItem("jwt");
-      if (!token) {
-        if (localStorage.getItem(STORAGE_KEY)) clearCachedPreferences();
-        return;
-      }
-
       try {
         const response = await fetch("/api/configuracion", {
-          headers: { Authorization: `Bearer ${token}` },
+          headers: {},
           cache: "no-store",
         });
-        if (!response.ok) return;
+        if (!response.ok) {
+          if (response.status === 401) clearCachedPreferences();
+          return;
+        }
 
         const result = (await response.json()) as { preferences: AppearancePreferences };
-        if (localStorage.getItem("jwt") === token) writePreferences(result.preferences);
+        writePreferences(result.preferences);
       } catch {
         // Keep the current user's cached preferences while the API is unreachable.
       }
@@ -149,14 +146,9 @@ export function AppearanceProvider({ children }: { children: ReactNode }) {
       clearCachedPreferences();
       void loadPreferences();
     }
-    function handleStorageAuthChange(event: StorageEvent) {
-      if (event.key === "jwt") handleAuthChange();
-    }
     window.addEventListener("mini-gest-auth-change", handleAuthChange);
-    window.addEventListener("storage", handleStorageAuthChange);
     return () => {
       window.removeEventListener("mini-gest-auth-change", handleAuthChange);
-      window.removeEventListener("storage", handleStorageAuthChange);
     };
   }, []);
 
@@ -170,13 +162,9 @@ export function AppearanceProvider({ children }: { children: ReactNode }) {
   }, [preferences, preview]);
 
   async function savePreferences(nextPreferences: AppearancePreferences) {
-    const token = localStorage.getItem("jwt");
-    if (!token) throw new Error("Inicia sesión para guardar tus preferencias.");
-
     const response = await fetch("/api/configuracion", {
       method: "PUT",
       headers: {
-        Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify(nextPreferences),
@@ -189,10 +177,8 @@ export function AppearanceProvider({ children }: { children: ReactNode }) {
       throw new Error(result.message ?? "No se pudieron guardar las preferencias.");
     }
 
-    if (localStorage.getItem("jwt") === token) {
-      setPreview(null);
-      writePreferences(result.preferences);
-    }
+    setPreview(null);
+    writePreferences(result.preferences);
   }
 
   const value: AppearanceContextValue = {
@@ -206,10 +192,8 @@ export function AppearanceProvider({ children }: { children: ReactNode }) {
     clearAppearancePreview,
     savePreferences,
     setStoreName: (storeName) => savePreferences({ ...preferences, storeName }),
-    syncSavedStoreName: (storeName, token) => {
-      if (localStorage.getItem("jwt") === token) {
-        writePreferences({ ...parsePreferences(localStorage.getItem(STORAGE_KEY)), storeName });
-      }
+    syncSavedStoreName: (storeName) => {
+      writePreferences({ ...parsePreferences(localStorage.getItem(STORAGE_KEY)), storeName });
     },
     resetThemeForLogout: () => {
       setPreview(null);

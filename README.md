@@ -2,6 +2,17 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 
 ## Getting Started
 
+### Recuperación de contraseña
+
+Configura estas variables en `.env` para enviar los códigos por [Resend](https://resend.com/features/email-api):
+
+```env
+RESEND_API_KEY=...
+RESEND_FROM="Mini Gest <seguridad@tu-dominio-verificado.cl>"
+```
+
+El remitente debe pertenecer a un dominio verificado en Resend. Sin estas variables, la app no afirmará que se envió un código y mostrará un error de configuración. Los códigos vencen en 10 minutos y admiten hasta cinco intentos.
+
 First, run the development server:
 
 ```bash

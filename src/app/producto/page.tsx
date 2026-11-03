@@ -1,4 +1,5 @@
 "use client";
+import { endSession, hasSessionHint } from "@/lib/client-session";
 
 import { useRouter } from "next/navigation";
 import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
@@ -413,7 +414,7 @@ export default function ProductoPage() {
   }, [loadChileDate]);
 
   const loadExpiringProducts = useCallback(async () => {
-    const token = localStorage.getItem("jwt");
+    const token = hasSessionHint();
 
     if (!token) {
       router.replace("/login");
@@ -426,7 +427,6 @@ export default function ProductoPage() {
     try {
       const response = await fetch("/api/producto-vencimiento", {
         headers: {
-          Authorization: `Bearer ${token}`,
         },
       });
       const data = (await response.json()) as {
@@ -437,7 +437,7 @@ export default function ProductoPage() {
 
       if (!response.ok || data.status !== "ok") {
         if (response.status === 401) {
-          localStorage.removeItem("jwt");
+          void endSession();
           router.replace("/login");
           return;
         }
@@ -458,7 +458,7 @@ export default function ProductoPage() {
 
   useEffect(() => {
     async function loadProductos() {
-      const token = localStorage.getItem("jwt");
+      const token = hasSessionHint();
 
       if (!token) {
         router.replace("/login");
@@ -468,7 +468,6 @@ export default function ProductoPage() {
       try {
         const response = await fetch("/api/producto", {
           headers: {
-            Authorization: `Bearer ${token}`,
           },
         });
         const data = (await response.json()) as {
@@ -480,7 +479,7 @@ export default function ProductoPage() {
 
         if (!response.ok || data.status !== "ok") {
           if (response.status === 401) {
-            localStorage.removeItem("jwt");
+            void endSession();
             router.replace("/login");
             return;
           }
@@ -506,7 +505,7 @@ export default function ProductoPage() {
   }, [loadExpiringProducts, router]);
 
   function handleLogout() {
-    localStorage.removeItem("jwt");
+    void endSession();
     router.replace("/login");
   }
 
@@ -724,7 +723,7 @@ export default function ProductoPage() {
       return;
     }
 
-    const token = localStorage.getItem("jwt");
+    const token = hasSessionHint();
 
     if (!token) {
       router.replace("/login");
@@ -739,7 +738,6 @@ export default function ProductoPage() {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
           ...selectedProduct,
@@ -755,7 +753,7 @@ export default function ProductoPage() {
 
       if (!response.ok || data.status !== "ok" || !data.producto) {
         if (response.status === 401) {
-          localStorage.removeItem("jwt");
+          void endSession();
           router.replace("/login");
           return;
         }
@@ -847,7 +845,7 @@ export default function ProductoPage() {
       return;
     }
 
-    const token = localStorage.getItem("jwt");
+    const token = hasSessionHint();
 
     if (!token) {
       router.replace("/login");
@@ -893,7 +891,6 @@ export default function ProductoPage() {
       const response = await fetch("/api/producto", {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${token}`,
         },
         body: formData,
       });
@@ -905,7 +902,7 @@ export default function ProductoPage() {
 
       if (!response.ok || data.status !== "ok" || !data.producto) {
         if (response.status === 401) {
-          localStorage.removeItem("jwt");
+          void endSession();
           router.replace("/login");
           return;
         }
@@ -1011,7 +1008,7 @@ export default function ProductoPage() {
       return;
     }
 
-    const token = localStorage.getItem("jwt");
+    const token = hasSessionHint();
 
     if (!token) {
       router.replace("/login");
@@ -1046,7 +1043,6 @@ export default function ProductoPage() {
       const response = await fetch("/api/producto", {
         method: "PUT",
         headers: {
-          Authorization: `Bearer ${token}`,
         },
         body: formData,
       });
@@ -1058,7 +1054,7 @@ export default function ProductoPage() {
 
       if (!response.ok || data.status !== "ok" || !data.producto) {
         if (response.status === 401) {
-          localStorage.removeItem("jwt");
+          void endSession();
           router.replace("/login");
           return;
         }
@@ -1091,7 +1087,7 @@ export default function ProductoPage() {
       return;
     }
 
-    const token = localStorage.getItem("jwt");
+    const token = hasSessionHint();
     const quantity = Number(stockQuantity);
     const nextStock = selectedProduct.stock + quantity;
 
@@ -1108,7 +1104,6 @@ export default function ProductoPage() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
           producto: selectedProduct.id,
@@ -1130,7 +1125,7 @@ export default function ProductoPage() {
 
       if (!response.ok || data.status !== "ok" || !data.producto) {
         if (response.status === 401) {
-          localStorage.removeItem("jwt");
+          void endSession();
           router.replace("/login");
           return;
         }
@@ -1161,7 +1156,7 @@ export default function ProductoPage() {
       return;
     }
 
-    const token = localStorage.getItem("jwt");
+    const token = hasSessionHint();
     const quantity = Number(stockQuantity);
     const nextStock = selectedProduct.stock - quantity;
 
@@ -1182,7 +1177,6 @@ export default function ProductoPage() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
           producto: selectedProduct.id,
@@ -1202,7 +1196,7 @@ export default function ProductoPage() {
 
       if (!response.ok || data.status !== "ok" || !data.producto) {
         if (response.status === 401) {
-          localStorage.removeItem("jwt");
+          void endSession();
           router.replace("/login");
           return;
         }
@@ -1232,7 +1226,7 @@ export default function ProductoPage() {
       return;
     }
 
-    const token = localStorage.getItem("jwt");
+    const token = hasSessionHint();
 
     if (!token) {
       router.replace("/login");
@@ -1247,7 +1241,6 @@ export default function ProductoPage() {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
           productoId: pendingLotDeletion.productId,
@@ -1263,7 +1256,7 @@ export default function ProductoPage() {
 
       if (!response.ok || data.status !== "ok" || !data.producto) {
         if (response.status === 401) {
-          localStorage.removeItem("jwt");
+          void endSession();
           router.replace("/login");
           return;
         }
@@ -1289,7 +1282,7 @@ export default function ProductoPage() {
   }
 
   async function loadMovements(productId: string) {
-    const token = localStorage.getItem("jwt");
+    const token = hasSessionHint();
 
     if (!token) {
       router.replace("/login");
@@ -1302,7 +1295,6 @@ export default function ProductoPage() {
     try {
       const response = await fetch(`/api/movimiento-stock?producto=${productId}`, {
         headers: {
-          Authorization: `Bearer ${token}`,
         },
       });
       const data = (await response.json()) as {
@@ -1313,7 +1305,7 @@ export default function ProductoPage() {
 
       if (!response.ok || data.status !== "ok") {
         if (response.status === 401) {
-          localStorage.removeItem("jwt");
+          void endSession();
           router.replace("/login");
           return;
         }
@@ -2002,6 +1994,7 @@ function ProductCreatePanel({
       return !isPositiveIntegerText(form[field]);
     }
 
+
     return !form[field].trim();
   };
 
@@ -2224,6 +2217,7 @@ function ProductCreatePanel({
           </label>
         </div>
 
+
         {message ? (
           <p className={`product-create-message is-${messageType}`}>{message}</p>
         ) : null}
@@ -2298,6 +2292,7 @@ function ProductEditModal({
     if (field === "unidadMedidaId") {
       return needsMeasure && !form.unidadMedidaId;
     }
+
 
     return !form[field].trim();
   };
@@ -2479,6 +2474,7 @@ function ProductEditModal({
               </label>
             </>
           ) : null}
+
 
           {message ? <p className="product-create-message is-error">{message}</p> : null}
 

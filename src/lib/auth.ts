@@ -28,10 +28,7 @@ export function withAuth(
   handler: (request: AuthenticatedRequest) => Promise<Response> | Response,
 ) {
   return (request: NextRequest) => {
-    const authorization = request.headers.get("authorization") ?? "";
-    const token = authorization.startsWith("Bearer ")
-      ? authorization.slice(7)
-      : request.headers.get("token");
+    const token = request.cookies.get("minigest_login")?.value;
 
     if (!token) {
       return NextResponse.json(

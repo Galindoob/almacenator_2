@@ -1,4 +1,5 @@
 "use client";
+import { endSession, hasSessionHint } from "@/lib/client-session";
 
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -27,18 +28,6 @@ const homeActions: HomeAction[] = [
   { label: "Registrar egreso", tone: "expense", icon: "down", action: "expense" },
   { label: "Cerrar caja", tone: "cash", icon: "register", action: "close" },
 ];
-
-function decodeJwtPayload(token: string): TokenPayload | null {
-  try {
-    const payload = token.split(".")[1];
-    const normalizedPayload = payload.replace(/-/g, "+").replace(/_/g, "/");
-    const decoded = atob(normalizedPayload);
-
-    return JSON.parse(decoded) as TokenPayload;
-  } catch {
-    return null;
-  }
-}
 
 function StoreHeroIcon() {
   return (
@@ -103,27 +92,23 @@ export default function HomePage() {
   const [isSavingCashRegister, setIsSavingCashRegister] = useState(false);
 
   useEffect(() => {
-    const token = localStorage.getItem("jwt");
-
-    if (!token) {
-      router.replace("/login");
-      return;
-    }
-
-    const decodedPayload = decodeJwtPayload(token);
-
-    if (!decodedPayload) {
-      localStorage.removeItem("jwt");
-      router.replace("/login");
-      return;
-    }
-
-    queueMicrotask(() => setPayload(decodedPayload));
+    const controller = new AbortController();
+    fetch("/api/session", { cache: "no-store", signal: controller.signal })
+      .then(async (response) => {
+        if (!response.ok) {
+          if (response.status === 401) void endSession();
+          return;
+        }
+        const data = await response.json() as { user: TokenPayload };
+        setPayload(data.user);
+      })
+      .catch(() => {});
+    return () => controller.abort();
   }, [router]);
 
   useEffect(() => {
     async function loadCashRegisterState() {
-      const token = localStorage.getItem("jwt");
+      const token = hasSessionHint();
 
       if (!token) {
         return;
@@ -132,7 +117,6 @@ export default function HomePage() {
       try {
         const response = await fetch("/api/caja", {
           headers: {
-            Authorization: `Bearer ${token}`,
           },
         });
         const data = (await response.json()) as {
@@ -157,7 +141,7 @@ export default function HomePage() {
   }, [payload]);
 
   function handleLogout() {
-    localStorage.removeItem("jwt");
+    void endSession();
     router.replace("/login");
   }
 
@@ -181,7 +165,7 @@ export default function HomePage() {
 
   async function openCashRegister() {
     const amount = Number(openingAmount);
-    const token = localStorage.getItem("jwt");
+    const token = hasSessionHint();
 
     if (!token) {
       router.replace("/login");
@@ -200,7 +184,6 @@ export default function HomePage() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({ monto: amount }),
       });

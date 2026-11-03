@@ -1,4 +1,5 @@
 "use client";
+import { endSession, hasSessionHint } from "@/lib/client-session";
 
 import { useRouter } from "next/navigation";
 import { useEffect, useState, type ReactNode } from "react";
@@ -10,16 +11,16 @@ export default function PromotionsLayout({ children }: { children: ReactNode }) 
   const [verificationError, setVerificationError] = useState(false);
 
   useEffect(() => {
-    const token = localStorage.getItem("jwt");
+    const token = hasSessionHint();
     if (!token) { router.replace("/login"); return; }
     const controller = new AbortController();
     let active = true;
-    fetch("/api/session", { headers: { Authorization: `Bearer ${token}` }, cache: "no-store", signal: controller.signal })
+    fetch("/api/session", { headers: {}, cache: "no-store", signal: controller.signal })
       .then((response) => {
         if (!active) return;
         if (response.ok) setVerified(true);
         else if (response.status === 401) {
-          localStorage.removeItem("jwt");
+          void endSession();
           router.replace("/login");
         } else setVerificationError(true);
       })
@@ -30,7 +31,7 @@ export default function PromotionsLayout({ children }: { children: ReactNode }) 
   }, [router]);
 
   function logout() {
-    localStorage.removeItem("jwt");
+    void endSession();
     router.replace("/login");
   }
 

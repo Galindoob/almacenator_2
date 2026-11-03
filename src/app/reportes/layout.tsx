@@ -1,4 +1,5 @@
 "use client";
+import { endSession, hasSessionHint } from "@/lib/client-session";
 
 import { useRouter } from "next/navigation";
 import { useEffect, useState, type ReactNode } from "react";
@@ -10,7 +11,7 @@ export default function ReportesLayout({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     let isActive = true;
-    const token = localStorage.getItem("jwt");
+    const token = hasSessionHint();
 
     if (!token) {
       router.replace("/login");
@@ -21,7 +22,7 @@ export default function ReportesLayout({ children }: { children: ReactNode }) {
     const timeout = window.setTimeout(() => controller.abort(), 8000);
 
     fetch("/api/session", {
-      headers: { Authorization: `Bearer ${token}` },
+      headers: {},
       cache: "no-store",
       signal: controller.signal,
     })
@@ -31,7 +32,7 @@ export default function ReportesLayout({ children }: { children: ReactNode }) {
           setIsSessionVerified(true);
           return;
         }
-        if (response.status === 401) localStorage.removeItem("jwt");
+        if (response.status === 401) void endSession();
         router.replace("/login");
       })
       .catch(() => {
@@ -47,7 +48,7 @@ export default function ReportesLayout({ children }: { children: ReactNode }) {
   }, [router]);
 
   function handleLogout() {
-    localStorage.removeItem("jwt");
+    void endSession();
     router.replace("/login");
   }
 

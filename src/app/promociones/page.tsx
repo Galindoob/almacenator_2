@@ -29,7 +29,7 @@ export default function PromotionsPage() {
 
   useEffect(() => {
     const controller = new AbortController();
-    fetch("/api/promociones", { headers: { Authorization: `Bearer ${localStorage.getItem("jwt")}` }, cache: "no-store", signal: controller.signal })
+    fetch("/api/promociones", { headers: {}, cache: "no-store", signal: controller.signal })
       .then(async (response) => {
         const data = await response.json();
         if (!response.ok) throw new Error(data.message ?? "No se pudieron cargar las promociones.");
@@ -67,7 +67,7 @@ export default function PromotionsPage() {
   async function deletePromotion(promo: Promo) {
     if (!window.confirm(`¿Eliminar la promoción "${promo.nombre_promocion}" para ${promo.producto.nombre}?`)) return;
     const response = await fetch("/api/promociones", {
-      method: "DELETE", headers: { "Content-Type": "application/json", Authorization: `Bearer ${localStorage.getItem("jwt")}` },
+      method: "DELETE", headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ id: promo.id_promocion }),
     });
     const data = await response.json();

@@ -100,11 +100,24 @@ export async function POST(request: NextRequest) {
       { expiresIn: "8h" },
     );
 
-    return NextResponse.json({
+    const response = NextResponse.json({
       status: "ok",
       message: "Login correcto.",
-      token,
     });
+    response.cookies.set("minigest_login", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      path: "/",
+      maxAge: 60 * 60 * 8,
+    });
+    response.cookies.set("minigest_session_hint", "1", {
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      path: "/",
+      maxAge: 60 * 60 * 8,
+    });
+    return response;
   } catch (error) {
     console.error("Error al iniciar sesión:", error);
     return NextResponse.json(

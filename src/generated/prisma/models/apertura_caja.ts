@@ -795,10 +795,6 @@ export type apertura_cajaUncheckedUpdateManyWithoutUsersNestedInput = {
   deleteMany?: Prisma.apertura_cajaScalarWhereInput | Prisma.apertura_cajaScalarWhereInput[]
 }
 
-export type NullableDateTimeFieldUpdateOperationsInput = {
-  set?: Date | string | null
-}
-
 export type apertura_cajaCreateWithoutUsersInput = {
   id_apertura?: string
   horario_apertura?: Date | string

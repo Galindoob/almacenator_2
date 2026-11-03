@@ -1,4 +1,5 @@
 "use client";
+import { endSession, hasSessionHint } from "@/lib/client-session";
 
 import { Fragment, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -126,7 +127,7 @@ export default function ProvidersPage() {
 
   useEffect(() => {
     async function loadProviders() {
-      const token = localStorage.getItem("jwt");
+      const token = hasSessionHint();
 
       if (!token) {
         router.replace("/login");
@@ -135,7 +136,7 @@ export default function ProvidersPage() {
 
       try {
         const response = await fetch("/api/proveedores", {
-          headers: { Authorization: `Bearer ${token}` },
+          headers: {},
         });
         const data = (await response.json()) as {
           status?: "ok" | "error";
@@ -146,7 +147,7 @@ export default function ProvidersPage() {
 
         if (!response.ok || data.status !== "ok") {
           if (response.status === 401) {
-            localStorage.removeItem("jwt");
+            void endSession();
             router.replace("/login");
             return;
           }
@@ -219,7 +220,7 @@ export default function ProvidersPage() {
   }, [providerImagePreview]);
 
   function handleLogout() {
-    localStorage.removeItem("jwt");
+    void endSession();
     router.replace("/login");
   }
 
@@ -285,7 +286,7 @@ export default function ProvidersPage() {
       return;
     }
 
-    const token = localStorage.getItem("jwt");
+    const token = hasSessionHint();
 
     if (!token) {
       router.replace("/login");
@@ -307,7 +308,7 @@ export default function ProvidersPage() {
 
       const response = await fetch("/api/proveedores", {
         method: "POST",
-        headers: { Authorization: `Bearer ${token}` },
+        headers: {},
         body: formData,
       });
       const data = (await response.json()) as {
@@ -318,7 +319,7 @@ export default function ProvidersPage() {
 
       if (!response.ok || data.status !== "ok" || !data.proveedor) {
         if (response.status === 401) {
-          localStorage.removeItem("jwt");
+          void endSession();
           router.replace("/login");
           return;
         }
@@ -370,7 +371,7 @@ export default function ProvidersPage() {
       return;
     }
 
-    const token = localStorage.getItem("jwt");
+    const token = hasSessionHint();
 
     if (!token) {
       router.replace("/login");
@@ -390,7 +391,7 @@ export default function ProvidersPage() {
 
       const response = await fetch("/api/proveedores/imagen", {
         method: "PUT",
-        headers: { Authorization: `Bearer ${token}` },
+        headers: {},
         body: formData,
       });
       const data = (await response.json()) as {
@@ -401,7 +402,7 @@ export default function ProvidersPage() {
 
       if (!response.ok || data.status !== "ok") {
         if (response.status === 401) {
-          localStorage.removeItem("jwt");
+          void endSession();
           router.replace("/login");
           return;
         }
@@ -466,7 +467,7 @@ export default function ProvidersPage() {
       return;
     }
 
-    const token = localStorage.getItem("jwt");
+    const token = hasSessionHint();
 
     if (!token) {
       router.replace("/login");
@@ -481,7 +482,6 @@ export default function ProvidersPage() {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
           id_proveedor: selectedProvider.id_proveedor,
@@ -495,7 +495,7 @@ export default function ProvidersPage() {
 
       if (!response.ok || data.status !== "ok") {
         if (response.status === 401) {
-          localStorage.removeItem("jwt");
+          void endSession();
           router.replace("/login");
           return;
         }
@@ -573,7 +573,7 @@ export default function ProvidersPage() {
       return;
     }
 
-    const token = localStorage.getItem("jwt");
+    const token = hasSessionHint();
 
     if (!token) {
       router.replace("/login");
@@ -588,7 +588,6 @@ export default function ProvidersPage() {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
           id_proveedor: selectedProvider.id_proveedor,
@@ -603,7 +602,7 @@ export default function ProvidersPage() {
 
       if (!response.ok || data.status !== "ok" || !data.proveedor) {
         if (response.status === 401) {
-          localStorage.removeItem("jwt");
+          void endSession();
           router.replace("/login");
           return;
         }

@@ -244,6 +244,27 @@ body {
   transform: translateY(-1px);
 }
 
+.auth-form button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+  transform: none;
+}
+
+.auth-forgot-link {
+  display: block;
+  margin: 14px auto 0;
+  border: 0;
+  background: transparent;
+  color: var(--accent-color);
+  cursor: pointer;
+  font: inherit;
+  font-weight: 700;
+  text-decoration: underline;
+}
+
+.auth-forgot-link:disabled { cursor: wait; opacity: 0.65; }
+.auth-reset-intro { line-height: 1.5; margin: 0 0 20px; color: var(--light-dark-color); }
+
 .auth-switch {
   color: var(--light-dark-color);
   font-size: 0.9375rem;
@@ -428,7 +449,6 @@ body {
   gap: 8px;
   justify-content: center;
 }
-
 .navbar-spacer {
   min-width: 0;
 }
@@ -2757,6 +2777,79 @@ body {
   margin: 8px 0 0;
 }
 
+.product-report-heading { align-items: end; display: flex; gap: 20px; justify-content: space-between; }
+.product-report-heading > div > p:last-child { color: var(--light-dark-color); margin: 7px 0 0; }
+.product-report-eyebrow { color: var(--accent-color); font-size: .8rem; font-weight: 800; letter-spacing: .08em; margin: 0 0 5px; text-transform: uppercase; }
+.product-report-month { color: var(--light-dark-color); display: grid; flex: 0 0 190px; font-size: .82rem; font-weight: 700; gap: 6px; }
+.product-report-month input, .product-report-sidebar > input { background: var(--background); border: 1px solid var(--grey-color); border-radius: 9px; color: var(--foreground); font: inherit; min-height: 44px; padding: 8px 11px; width: 100%; }
+.product-report-month input:focus, .product-report-sidebar > input:focus { outline: 2px solid var(--accent-color); outline-offset: 1px; }
+.product-report-layout { align-items: start; display: grid; gap: 18px; grid-template-columns: minmax(230px, 270px) minmax(0, 1fr); }
+.product-report-sidebar, .product-report-panel, .product-report-selected, .product-report-kpis > div { background: var(--background); border: 1px solid var(--grey-color); border-radius: 13px; box-shadow: 0 4px 16px #0000000a; }
+.product-report-sidebar { display: grid; gap: 13px; padding: 16px; position: sticky; top: 90px; }
+.product-report-sidebar-head { align-items: center; display: flex; justify-content: space-between; }
+.product-report-sidebar-head h2 { font-size: 1rem; margin: 0; }
+.product-report-sidebar-head span { background: var(--accent-soft-color); border-radius: 20px; color: var(--accent-dark); font-size: .8rem; font-weight: 800; padding: 3px 9px; }
+.product-report-product-list { display: grid; gap: 5px; max-height: min(650px, calc(100dvh - 260px)); overflow-y: auto; }
+.product-report-product-list button { background: transparent; border: 1px solid transparent; border-radius: 8px; color: var(--foreground); cursor: pointer; display: grid; font: inherit; gap: 3px; padding: 10px; text-align: left; }
+.product-report-product-list button:hover, .product-report-product-list button.is-selected { background: var(--accent-soft-color); border-color: var(--accent-color); }
+.product-report-product-list strong { font-size: .9rem; overflow-wrap: anywhere; }
+.product-report-product-list small, .product-report-product-list p { color: var(--light-dark-color); line-height: 1.35; }
+.product-report-main { display: grid; gap: 16px; min-width: 0; }
+.product-report-selected { align-items: center; display: flex; gap: 16px; justify-content: space-between; padding: 16px 20px; }
+.product-report-selected span:first-child { color: var(--accent-color); font-size: .75rem; font-weight: 800; text-transform: uppercase; }
+.product-report-selected h2 { font-size: 1.4rem; margin: 2px 0; }
+.product-report-selected p { color: var(--light-dark-color); font-size: .87rem; margin: 0; }
+.product-report-period { background: var(--accent-soft-color); border-radius: 20px; color: var(--accent-dark); font-size: .85rem; font-weight: 800; padding: 7px 11px; text-transform: capitalize; white-space: nowrap; }
+.product-report-kpis { display: grid; gap: 12px; grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.product-report-kpis > div { border-top: 4px solid var(--accent-color); display: grid; gap: 6px; min-width: 0; padding: 15px; }
+.product-report-kpis span { color: var(--light-dark-color); font-size: .8rem; font-weight: 700; }
+.product-report-kpis strong { font-size: clamp(1.1rem, 1.8vw, 1.55rem); overflow-wrap: anywhere; }
+.product-report-kpis strong.is-negative { color: var(--danger-color); }
+.product-report-kpis small { color: var(--light-dark-color); }
+.product-report-charts { display: grid; gap: 16px; grid-template-columns: minmax(0, 1.55fr) minmax(250px, .9fr); }
+.product-report-panel { min-width: 0; padding: 19px; }
+.product-report-panel header h3 { font-size: 1.05rem; margin: 0; }
+.product-report-panel header p, .product-report-share > p, .product-report-no-data { color: var(--light-dark-color); font-size: .85rem; line-height: 1.4; margin: 5px 0 0; }
+.product-report-daily header { align-items: start; display: flex; gap: 10px; justify-content: space-between; }
+.product-report-daily header b { color: var(--accent-color); white-space: nowrap; }
+.product-report-daily-scroll { overflow-x: auto; padding-top: 18px; }
+.product-report-daily-plot { align-items: end; border-bottom: 1px solid var(--grey-color); display: grid; gap: 3px; grid-template-columns: repeat(31, minmax(20px, 1fr)); height: 225px; min-width: 670px; }
+.product-report-day { align-items: center; display: flex; flex-direction: column; height: 100%; justify-content: end; }
+.product-report-day-space { align-items: end; display: flex; flex: 1; justify-content: center; width: 100%; }
+.product-report-day-space i { background: var(--accent-color); border-radius: 4px 4px 0 0; display: block; max-width: 15px; width: 70%; }
+.product-report-day small { color: var(--light-dark-color); font-size: .7rem; padding: 6px 0; }
+.product-report-share { display: grid; justify-items: center; text-align: center; }
+.product-report-share header { justify-self: stretch; text-align: left; }
+.product-report-donut { align-items: center; border-radius: 50%; display: flex; height: 155px; justify-content: center; margin: 14px auto; width: 155px; }
+.product-report-donut > span { align-items: center; background: var(--background); border-radius: 50%; display: flex; flex-direction: column; height: 112px; justify-content: center; width: 112px; }
+.product-report-donut strong { font-size: 1.7rem; }
+.product-report-donut small { color: var(--light-dark-color); }
+.product-report-trend, .product-report-ranking { min-height: 285px; }
+.product-report-legend { color: var(--light-dark-color); display: flex; font-size: .8rem; gap: 16px; justify-content: flex-end; margin-top: 10px; }
+.product-report-legend span { align-items: center; display: flex; gap: 5px; }
+.product-report-legend i { background: var(--accent-color); border-radius: 2px; height: 9px; width: 9px; }
+.product-report-legend span:last-child i, .product-report-month-bars i:last-child { background: var(--accent-soft-color); border: 1px solid var(--accent-color); }
+.product-report-monthly { align-items: end; display: grid; gap: 10px; grid-template-columns: repeat(6, minmax(0, 1fr)); height: 170px; margin-top: 12px; }
+.product-report-monthly > div { align-items: center; display: flex; flex-direction: column; height: 100%; justify-content: end; }
+.product-report-month-bars { align-items: end; display: flex; flex: 1; gap: 3px; justify-content: center; width: 100%; }
+.product-report-month-bars i { background: var(--accent-color); border-radius: 4px 4px 0 0; display: block; max-width: 19px; width: 35%; }
+.product-report-month-bars i.is-negative { background: var(--danger-color); border-color: var(--danger-color); }
+.product-report-monthly small { color: var(--light-dark-color); padding-top: 6px; text-transform: capitalize; }
+.product-report-rank-tabs { display: flex; gap: 6px; margin-top: 12px; }
+.product-report-rank-tabs button { background: var(--light-primary-color); border: 1px solid var(--grey-color); border-radius: 20px; color: var(--foreground); cursor: pointer; font: inherit; font-size: .75rem; font-weight: 700; padding: 5px 10px; }
+.product-report-rank-tabs button.is-selected { background: var(--accent-color); border-color: var(--accent-color); color: #fff; }
+.product-report-rank-list { display: grid; gap: 10px; margin-top: 16px; }
+.product-report-rank-list button { background: transparent; border: 0; color: var(--foreground); cursor: pointer; display: grid; font: inherit; gap: 5px; grid-template-columns: minmax(0, 1fr) auto; padding: 0; text-align: left; }
+.product-report-rank-list button[aria-pressed="true"] > span { color: var(--accent-color); font-weight: 800; }
+.product-report-rank-list button > span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.product-report-rank-list button > strong { font-size: .85rem; }
+.product-report-rank-list button > i { background: var(--light-primary-color); border-radius: 20px; grid-column: 1 / -1; height: 7px; overflow: hidden; }
+.product-report-rank-list button > i > span { background: var(--accent-color); display: block; height: 100%; }
+.product-report-note { color: var(--light-dark-color); font-size: .8rem; line-height: 1.4; margin: 0 3px; }
+.product-report-wait { color: var(--light-dark-color); padding: 60px 20px; text-align: center; }
+@media (max-width: 1150px) { .product-report-kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); } .product-report-charts { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 700px) { .product-report-heading { align-items: stretch; flex-direction: column; } .product-report-month { flex-basis: auto; } .product-report-layout { grid-template-columns: minmax(0, 1fr); } .product-report-sidebar { position: static; } .product-report-product-list { max-height: 220px; } .product-report-selected { align-items: start; flex-direction: column; } }
+
 @media (max-width: 960px) {
   .reports-body {
     grid-template-columns: minmax(0, 1fr);
@@ -4785,6 +4878,7 @@ html[data-high-contrast="true"] .transaction-payment-badge { border: 1px solid c
     justify-content: flex-start;
     overflow-x: auto;
   }
+
 
   .product-view-shell {
     padding: 136px 12px 24px;

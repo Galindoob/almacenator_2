@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { FormEvent, useEffect, useMemo, useState } from "react";
+import { FormEvent, useMemo, useState } from "react";
 import { isSafeAppInput } from "@/lib/input-validation";
 import {
   authEmailSchema,
@@ -28,7 +28,7 @@ export function AuthForm({ mode }: AuthFormProps) {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [submitted, setSubmitted] = useState(false);
-  const [isCheckingSession, setIsCheckingSession] = useState(true);
+  const [requestingReset, setRequestingReset] = useState(false);
   const [status, setStatus] = useState<{
     type: "success" | "error";
     message: string;
@@ -41,51 +41,6 @@ export function AuthForm({ mode }: AuthFormProps) {
     confirmPassword: false,
   });
 
-  useEffect(() => {
-    let isActive = true;
-    const token = localStorage.getItem("jwt");
-
-    if (!token) {
-      window.dispatchEvent(new Event("mini-gest-auth-change"));
-      queueMicrotask(() => {
-        if (isActive) setIsCheckingSession(false);
-      });
-      return () => {
-        isActive = false;
-      };
-    }
-
-    const controller = new AbortController();
-    const timeout = window.setTimeout(() => controller.abort(), 5000);
-
-    fetch("/api/session", {
-      headers: { Authorization: `Bearer ${token}` },
-      cache: "no-store",
-      signal: controller.signal,
-    })
-      .then((response) => {
-        if (!isActive) return;
-        if (response.ok) {
-          router.replace("/home");
-          return;
-        }
-        if (response.status === 401) {
-          localStorage.removeItem("jwt");
-          window.dispatchEvent(new Event("mini-gest-auth-change"));
-        }
-        setIsCheckingSession(false);
-      })
-      .catch(() => {
-        if (isActive) setIsCheckingSession(false);
-      })
-      .finally(() => window.clearTimeout(timeout));
-
-    return () => {
-      isActive = false;
-      controller.abort();
-      window.clearTimeout(timeout);
-    };
-  }, [router]);
 
   const errors = useMemo(() => {
     const validatedEmail = authEmailSchema.safeParse(email);
@@ -163,10 +118,9 @@ export function AuthForm({ mode }: AuthFormProps) {
         const data = (await response.json()) as {
           status?: "ok" | "error";
           message?: string;
-          token?: string;
         };
 
-        if (!response.ok || data.status !== "ok" || !data.token) {
+        if (!response.ok || data.status !== "ok") {
           setStatus({
             type: "error",
             message: data.message ?? "Usuario y/o contraseña incorrecta.",
@@ -175,9 +129,9 @@ export function AuthForm({ mode }: AuthFormProps) {
         }
 
         localStorage.removeItem("jwt");
-        localStorage.setItem("jwt", data.token);
         window.dispatchEvent(new Event("mini-gest-auth-change"));
-        router.push("/home");
+        router.replace("/home");
+        router.refresh();
       } catch {
         setStatus({
           type: "error",
@@ -222,14 +176,31 @@ export function AuthForm({ mode }: AuthFormProps) {
     }
   }
 
-  if (isCheckingSession) {
-    return (
-      <section className="auth-shell">
-        <div className="auth-panel" role="status" aria-live="polite">
-          Verificando sesión...
-        </div>
-      </section>
-    );
+  async function requestPasswordReset() {
+    const validated = authEmailSchema.safeParse(email);
+    if (!validated.success) {
+      setStatus({ type: "error", message: "Ingresa un correo válido para recuperar tu contraseña." });
+      return;
+    }
+    setRequestingReset(true);
+    setStatus(null);
+    try {
+      const response = await fetch("/api/password-reset", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "start", email: validated.data }),
+      });
+      if (!response.ok) {
+        const result = await response.json() as { message?: string };
+        setStatus({ type: "error", message: result.message ?? "No se pudo iniciar la recuperación." });
+        return;
+      }
+      router.push("/reestablecer_contrasena");
+    } catch {
+      setStatus({ type: "error", message: "No se pudo conectar con el servicio de recuperación." });
+    } finally {
+      setRequestingReset(false);
+    }
   }
 
   return (
@@ -351,6 +322,12 @@ export function AuthForm({ mode }: AuthFormProps) {
 
           <button type="submit">{isRegister ? "Registrar" : "Ingresar"}</button>
         </form>
+
+        {!isRegister && submitted && (status?.type === "error" || Object.values(errors).some(Boolean)) ? (
+          <button className="auth-forgot-link" type="button" onClick={requestPasswordReset} disabled={requestingReset}>
+            {requestingReset ? "Enviando código..." : "¿Olvidaste tu contraseña?"}
+          </button>
+        ) : null}
 
         {status ? (
           <p className={`auth-status auth-status-${status.type}`}>

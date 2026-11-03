@@ -1,4 +1,5 @@
 "use client";
+import { endSession, hasSessionHint } from "@/lib/client-session";
 
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
@@ -8,11 +9,11 @@ export function PlaceholderModulePage({ title }: { title: string }) {
   const router = useRouter();
 
   useEffect(() => {
-    if (!localStorage.getItem("jwt")) router.replace("/login");
+    if (!hasSessionHint()) router.replace("/login");
   }, [router]);
 
   function handleLogout() {
-    localStorage.removeItem("jwt");
+    void endSession();
     router.replace("/login");
   }
 

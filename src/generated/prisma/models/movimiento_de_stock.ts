@@ -581,10 +581,6 @@ export type movimiento_de_stockUncheckedUpdateManyWithoutProductosNestedInput = 
   deleteMany?: Prisma.movimiento_de_stockScalarWhereInput | Prisma.movimiento_de_stockScalarWhereInput[]
 }
 
-export type DateTimeFieldUpdateOperationsInput = {
-  set?: Date | string
-}
-
 export type movimiento_de_stockCreateWithoutUsersInput = {
   id?: string
   fecha?: Date | string

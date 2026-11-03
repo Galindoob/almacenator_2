@@ -1,4 +1,5 @@
 "use client";
+import { endSession, hasSessionHint } from "@/lib/client-session";
 
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -249,7 +250,7 @@ export default function SalesPage() {
 
   useEffect(() => {
     async function loadProductos() {
-      const token = localStorage.getItem("jwt");
+      const token = hasSessionHint();
 
       if (!token) {
         router.replace("/login");
@@ -259,7 +260,6 @@ export default function SalesPage() {
       try {
         const response = await fetch("/api/producto", {
           headers: {
-            Authorization: `Bearer ${token}`,
           },
         });
         const data = (await response.json()) as {
@@ -270,7 +270,7 @@ export default function SalesPage() {
 
         if (!response.ok || data.status !== "ok") {
           if (response.status === 401) {
-            localStorage.removeItem("jwt");
+            void endSession();
             router.replace("/login");
             return;
           }
@@ -280,7 +280,7 @@ export default function SalesPage() {
         }
 
         setProductos(data.productos ?? []);
-        const salesResponse = await fetch("/api/ventas", { headers: { Authorization: `Bearer ${token}` }, cache: "no-store" });
+        const salesResponse = await fetch("/api/ventas", { headers: {}, cache: "no-store" });
         if (!salesResponse.ok) throw new Error("No se pudieron cargar las ventas.");
         const saved = await salesResponse.json() as { ventas: Sale[] };
         setSales(saved.ventas);
@@ -301,12 +301,12 @@ export default function SalesPage() {
   useEffect(() => {
     if (rightPanel !== "payment") return;
 
-    const token = localStorage.getItem("jwt");
+    const token = hasSessionHint();
     if (!token) return;
 
     const controller = new AbortController();
     fetch("/api/medio-pago", {
-      headers: { Authorization: `Bearer ${token}` },
+      headers: {},
       cache: "no-store",
       signal: controller.signal,
     })
@@ -381,7 +381,7 @@ export default function SalesPage() {
   }
 
   async function refreshInventory() {
-    const response = await fetch("/api/producto", { headers: { Authorization: `Bearer ${localStorage.getItem("jwt")}` }, cache: "no-store" });
+    const response = await fetch("/api/producto", { headers: {}, cache: "no-store" });
     if (response.ok) {
       const data = await response.json();
       setProductos(data.productos ?? []);
@@ -395,14 +395,14 @@ export default function SalesPage() {
     setOperationError("");
     try {
       const response = await fetch("/api/ventas", {
-        method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${localStorage.getItem("jwt")}` },
+        method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify(command),
       });
       const data = await response.json() as { venta: Sale | null; message?: string; receiptWarning?: string };
       if (!response.ok) {
         if (response.status === 401) router.replace("/login");
         if (response.status === 409) {
-          const updated = await fetch("/api/ventas", { headers: { Authorization: `Bearer ${localStorage.getItem("jwt")}` }, cache: "no-store" });
+          const updated = await fetch("/api/ventas", { headers: {}, cache: "no-store" });
           if (updated.ok) {
             const { ventas } = await updated.json() as { ventas: Sale[] };
             setSales(ventas);

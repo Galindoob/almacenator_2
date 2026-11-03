@@ -18,9 +18,25 @@ model User {
   movimiento_de_stock movimiento_de_stock[]
   ventas              venta[]
   configuracion       ConfiguracionUsuario?
+  passwordResets      PasswordReset[]
   role                Role                  @relation(fields: [roleid], references: [id], map: "fk_users_role")
 
   @@map("users")
+}
+
+model PasswordReset {
+  id         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId     String    @map("user_id") @db.Uuid
+  codeHash   String    @map("code_hash") @db.VarChar(64)
+  createdAt  DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  expiresAt  DateTime  @map("expires_at") @db.Timestamptz(6)
+  attempts   Int       @default(0)
+  verifiedAt DateTime? @map("verified_at") @db.Timestamptz(6)
+  usedAt     DateTime? @map("used_at") @db.Timestamptz(6)
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+  @@map("password_reset")
 }
 
 model Empresa {
