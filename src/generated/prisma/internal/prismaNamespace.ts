@@ -2189,6 +2189,7 @@ export const ProductoScalarFieldEnum = {
   unidadId: 'unidadId',
   precioVenta: 'precioVenta',
   stock: 'stock',
+  stockMinimo: 'stockMinimo',
   controlaStock: 'controlaStock',
   urlImagen: 'urlImagen',
   costo: 'costo',

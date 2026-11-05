@@ -5,8 +5,9 @@ import { Suspense, useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { X, Search, Check } from "lucide-react";
 import { isSafeAppInput, isSafeDescriptionInput } from "@/lib/input-validation";
+import { useBarcodeScanner } from "../components/useBarcodeScanner";
 
-type Product = { id: string; nombre: string; precioVenta: number; costo: number; stock: number; urlImagen: string | null; categoriaId: string; marca: { nombre: string }; categoria: { nombreCategoria: string } };
+type Product = { id: string; nombre: string; codigoBarra: string | null; precioVenta: number; costo: number; stock: number; urlImagen: string | null; categoriaId: string; marca: { nombre: string }; categoria: { nombreCategoria: string } };
 type PromoKind = "descuento" | "yapa" | "combo";
 type EditablePromotion = {
   id_promocion: string;
@@ -91,7 +92,7 @@ function CreatePromotionForm() {
     .sort((a, b) => a[1].localeCompare(b[1], "es-CL")), [products]);
   const visibleProducts = useMemo(() => products.filter((product) =>
     (!categoryId || product.categoriaId === categoryId) &&
-    `${product.nombre} ${product.marca.nombre} ${product.categoria.nombreCategoria}`
+    `${product.nombre} ${product.marca.nombre} ${product.categoria.nombreCategoria} ${product.codigoBarra ?? ""}`
       .toLocaleLowerCase("es-CL").includes(search.toLocaleLowerCase("es-CL"))), [products, search, categoryId]);
   const count = Number(kind === "combo" ? comboCount : take);
   const guidePrice = kind === "combo" && selectedProducts.length === 1 && Number.isInteger(count) && count > 0
@@ -110,6 +111,21 @@ function CreatePromotionForm() {
     }
     setSelectedIds((current) => current.includes(id) ? current.filter((item) => item !== id) : [...current, id]);
   }
+
+  const { onSearchKeyDown } = useBarcodeScanner((code) => {
+    const normalized = code.trim();
+    if (!normalized || !isSafeAppInput(normalized)) return;
+    setSearch(normalized);
+    setCategoryId("");
+    const product = products.find((item) => item.codigoBarra?.trim() === normalized);
+    if (!product || productPromotions.some((promotion) => promotion.id_productos === product.id && promotion.id_promocion !== editId)) return;
+    if (kind === "combo" || editId) {
+      setSelectedIds([product.id]);
+      setComboPrice("");
+    } else {
+      setSelectedIds((current) => current.includes(product.id) ? current : [...current, product.id]);
+    }
+  }, modalOpen && !loading && !saving);
 
   function selectKind(value: PromoKind) {
     setKind(value);
@@ -186,7 +202,7 @@ function CreatePromotionForm() {
               <h2 id="promotion-products-title">{kind === "combo" || editId ? "Seleccionar un producto" : "Seleccionar productos"}</h2>
               <button type="button" aria-label="Cerrar" onClick={() => setModalOpen(false)}><X/></button>
             </header>
-            <label className="promotions-search"><Search/><input placeholder="Buscar producto o categoría" value={search} onChange={(event) => setSearch(event.target.value)}/></label>
+            <label className="promotions-search"><Search/><input placeholder="Buscar producto, categoría o código de barras" value={search} onKeyDown={onSearchKeyDown} onChange={(event) => setSearch(event.target.value)}/></label>
             <label className="promotion-category-filter">
               <span>Categoría</span>
               <select value={categoryId} onChange={(event) => setCategoryId(event.target.value)}>

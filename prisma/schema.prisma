@@ -97,6 +97,7 @@ model Producto {
   unidadId                                             String                @map("id_unidad") @db.Uuid
   precioVenta                                          Int                   @map("precio_venta")
   stock                                                Int                   @default(0)
+  stockMinimo                                          Int                   @default(10) @map("stock_minimo")
   controlaStock                                        Boolean               @default(true) @map("controla_stock")
   urlImagen                                            String?               @map("url_imagen") @db.VarChar(500)
   costo                                                Int                   @default(0)

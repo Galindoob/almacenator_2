@@ -29,6 +29,7 @@ export type AggregateProducto = {
 export type ProductoAvgAggregateOutputType = {
   precioVenta: number | null
   stock: number | null
+  stockMinimo: number | null
   costo: number | null
   contenido: number | null
 }
@@ -36,6 +37,7 @@ export type ProductoAvgAggregateOutputType = {
 export type ProductoSumAggregateOutputType = {
   precioVenta: number | null
   stock: number | null
+  stockMinimo: number | null
   costo: number | null
   contenido: number | null
 }
@@ -50,6 +52,7 @@ export type ProductoMinAggregateOutputType = {
   unidadId: string | null
   precioVenta: number | null
   stock: number | null
+  stockMinimo: number | null
   controlaStock: boolean | null
   urlImagen: string | null
   costo: number | null
@@ -69,6 +72,7 @@ export type ProductoMaxAggregateOutputType = {
   unidadId: string | null
   precioVenta: number | null
   stock: number | null
+  stockMinimo: number | null
   controlaStock: boolean | null
   urlImagen: string | null
   costo: number | null
@@ -88,6 +92,7 @@ export type ProductoCountAggregateOutputType = {
   unidadId: number
   precioVenta: number
   stock: number
+  stockMinimo: number
   controlaStock: number
   urlImagen: number
   costo: number
@@ -102,6 +107,7 @@ export type ProductoCountAggregateOutputType = {
 export type ProductoAvgAggregateInputType = {
   precioVenta?: true
   stock?: true
+  stockMinimo?: true
   costo?: true
   contenido?: true
 }
@@ -109,6 +115,7 @@ export type ProductoAvgAggregateInputType = {
 export type ProductoSumAggregateInputType = {
   precioVenta?: true
   stock?: true
+  stockMinimo?: true
   costo?: true
   contenido?: true
 }
@@ -123,6 +130,7 @@ export type ProductoMinAggregateInputType = {
   unidadId?: true
   precioVenta?: true
   stock?: true
+  stockMinimo?: true
   controlaStock?: true
   urlImagen?: true
   costo?: true
@@ -142,6 +150,7 @@ export type ProductoMaxAggregateInputType = {
   unidadId?: true
   precioVenta?: true
   stock?: true
+  stockMinimo?: true
   controlaStock?: true
   urlImagen?: true
   costo?: true
@@ -161,6 +170,7 @@ export type ProductoCountAggregateInputType = {
   unidadId?: true
   precioVenta?: true
   stock?: true
+  stockMinimo?: true
   controlaStock?: true
   urlImagen?: true
   costo?: true
@@ -267,6 +277,7 @@ export type ProductoGroupByOutputType = {
   unidadId: string
   precioVenta: number
   stock: number
+  stockMinimo: number
   controlaStock: boolean
   urlImagen: string | null
   costo: number
@@ -309,6 +320,7 @@ export type ProductoWhereInput = {
   unidadId?: Prisma.UuidFilter<"Producto"> | string
   precioVenta?: Prisma.IntFilter<"Producto"> | number
   stock?: Prisma.IntFilter<"Producto"> | number
+  stockMinimo?: Prisma.IntFilter<"Producto"> | number
   controlaStock?: Prisma.BoolFilter<"Producto"> | boolean
   urlImagen?: Prisma.StringNullableFilter<"Producto"> | string | null
   costo?: Prisma.IntFilter<"Producto"> | number
@@ -338,6 +350,7 @@ export type ProductoOrderByWithRelationInput = {
   unidadId?: Prisma.SortOrder
   precioVenta?: Prisma.SortOrder
   stock?: Prisma.SortOrder
+  stockMinimo?: Prisma.SortOrder
   controlaStock?: Prisma.SortOrder
   urlImagen?: Prisma.SortOrderInput | Prisma.SortOrder
   costo?: Prisma.SortOrder
@@ -370,6 +383,7 @@ export type ProductoWhereUniqueInput = Prisma.AtLeast<{
   unidadId?: Prisma.UuidFilter<"Producto"> | string
   precioVenta?: Prisma.IntFilter<"Producto"> | number
   stock?: Prisma.IntFilter<"Producto"> | number
+  stockMinimo?: Prisma.IntFilter<"Producto"> | number
   controlaStock?: Prisma.BoolFilter<"Producto"> | boolean
   urlImagen?: Prisma.StringNullableFilter<"Producto"> | string | null
   costo?: Prisma.IntFilter<"Producto"> | number
@@ -399,6 +413,7 @@ export type ProductoOrderByWithAggregationInput = {
   unidadId?: Prisma.SortOrder
   precioVenta?: Prisma.SortOrder
   stock?: Prisma.SortOrder
+  stockMinimo?: Prisma.SortOrder
   controlaStock?: Prisma.SortOrder
   urlImagen?: Prisma.SortOrderInput | Prisma.SortOrder
   costo?: Prisma.SortOrder
@@ -426,6 +441,7 @@ export type ProductoScalarWhereWithAggregatesInput = {
   unidadId?: Prisma.UuidWithAggregatesFilter<"Producto"> | string
   precioVenta?: Prisma.IntWithAggregatesFilter<"Producto"> | number
   stock?: Prisma.IntWithAggregatesFilter<"Producto"> | number
+  stockMinimo?: Prisma.IntWithAggregatesFilter<"Producto"> | number
   controlaStock?: Prisma.BoolWithAggregatesFilter<"Producto"> | boolean
   urlImagen?: Prisma.StringNullableWithAggregatesFilter<"Producto"> | string | null
   costo?: Prisma.IntWithAggregatesFilter<"Producto"> | number
@@ -442,6 +458,7 @@ export type ProductoCreateInput = {
   codigoBarra?: string | null
   precioVenta: number
   stock?: number
+  stockMinimo?: number
   controlaStock?: boolean
   urlImagen?: string | null
   costo?: number
@@ -468,6 +485,7 @@ export type ProductoUncheckedCreateInput = {
   unidadId: string
   precioVenta: number
   stock?: number
+  stockMinimo?: number
   controlaStock?: boolean
   urlImagen?: string | null
   costo?: number
@@ -488,6 +506,7 @@ export type ProductoUpdateInput = {
   codigoBarra?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   precioVenta?: Prisma.IntFieldUpdateOperationsInput | number
   stock?: Prisma.IntFieldUpdateOperationsInput | number
+  stockMinimo?: Prisma.IntFieldUpdateOperationsInput | number
   controlaStock?: Prisma.BoolFieldUpdateOperationsInput | boolean
   urlImagen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   costo?: Prisma.IntFieldUpdateOperationsInput | number
@@ -514,6 +533,7 @@ export type ProductoUncheckedUpdateInput = {
   unidadId?: Prisma.StringFieldUpdateOperationsInput | string
   precioVenta?: Prisma.IntFieldUpdateOperationsInput | number
   stock?: Prisma.IntFieldUpdateOperationsInput | number
+  stockMinimo?: Prisma.IntFieldUpdateOperationsInput | number
   controlaStock?: Prisma.BoolFieldUpdateOperationsInput | boolean
   urlImagen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   costo?: Prisma.IntFieldUpdateOperationsInput | number
@@ -537,6 +557,7 @@ export type ProductoCreateManyInput = {
   unidadId: string
   precioVenta: number
   stock?: number
+  stockMinimo?: number
   controlaStock?: boolean
   urlImagen?: string | null
   costo?: number
@@ -553,6 +574,7 @@ export type ProductoUpdateManyMutationInput = {
   codigoBarra?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   precioVenta?: Prisma.IntFieldUpdateOperationsInput | number
   stock?: Prisma.IntFieldUpdateOperationsInput | number
+  stockMinimo?: Prisma.IntFieldUpdateOperationsInput | number
   controlaStock?: Prisma.BoolFieldUpdateOperationsInput | boolean
   urlImagen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   costo?: Prisma.IntFieldUpdateOperationsInput | number
@@ -569,6 +591,7 @@ export type ProductoUncheckedUpdateManyInput = {
   unidadId?: Prisma.StringFieldUpdateOperationsInput | string
   precioVenta?: Prisma.IntFieldUpdateOperationsInput | number
   stock?: Prisma.IntFieldUpdateOperationsInput | number
+  stockMinimo?: Prisma.IntFieldUpdateOperationsInput | number
   controlaStock?: Prisma.BoolFieldUpdateOperationsInput | boolean
   urlImagen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   costo?: Prisma.IntFieldUpdateOperationsInput | number
@@ -598,6 +621,7 @@ export type ProductoCountOrderByAggregateInput = {
   unidadId?: Prisma.SortOrder
   precioVenta?: Prisma.SortOrder
   stock?: Prisma.SortOrder
+  stockMinimo?: Prisma.SortOrder
   controlaStock?: Prisma.SortOrder
   urlImagen?: Prisma.SortOrder
   costo?: Prisma.SortOrder
@@ -610,6 +634,7 @@ export type ProductoCountOrderByAggregateInput = {
 export type ProductoAvgOrderByAggregateInput = {
   precioVenta?: Prisma.SortOrder
   stock?: Prisma.SortOrder
+  stockMinimo?: Prisma.SortOrder
   costo?: Prisma.SortOrder
   contenido?: Prisma.SortOrder
 }
@@ -624,6 +649,7 @@ export type ProductoMaxOrderByAggregateInput = {
   unidadId?: Prisma.SortOrder
   precioVenta?: Prisma.SortOrder
   stock?: Prisma.SortOrder
+  stockMinimo?: Prisma.SortOrder
   controlaStock?: Prisma.SortOrder
   urlImagen?: Prisma.SortOrder
   costo?: Prisma.SortOrder
@@ -643,6 +669,7 @@ export type ProductoMinOrderByAggregateInput = {
   unidadId?: Prisma.SortOrder
   precioVenta?: Prisma.SortOrder
   stock?: Prisma.SortOrder
+  stockMinimo?: Prisma.SortOrder
   controlaStock?: Prisma.SortOrder
   urlImagen?: Prisma.SortOrder
   costo?: Prisma.SortOrder
@@ -655,6 +682,7 @@ export type ProductoMinOrderByAggregateInput = {
 export type ProductoSumOrderByAggregateInput = {
   precioVenta?: Prisma.SortOrder
   stock?: Prisma.SortOrder
+  stockMinimo?: Prisma.SortOrder
   costo?: Prisma.SortOrder
   contenido?: Prisma.SortOrder
 }
@@ -991,6 +1019,7 @@ export type ProductoCreateWithoutMarcaInput = {
   codigoBarra?: string | null
   precioVenta: number
   stock?: number
+  stockMinimo?: number
   controlaStock?: boolean
   urlImagen?: string | null
   costo?: number
@@ -1015,6 +1044,7 @@ export type ProductoUncheckedCreateWithoutMarcaInput = {
   unidadId: string
   precioVenta: number
   stock?: number
+  stockMinimo?: number
   controlaStock?: boolean
   urlImagen?: string | null
   costo?: number
@@ -1067,6 +1097,7 @@ export type ProductoScalarWhereInput = {
   unidadId?: Prisma.UuidFilter<"Producto"> | string
   precioVenta?: Prisma.IntFilter<"Producto"> | number
   stock?: Prisma.IntFilter<"Producto"> | number
+  stockMinimo?: Prisma.IntFilter<"Producto"> | number
   controlaStock?: Prisma.BoolFilter<"Producto"> | boolean
   urlImagen?: Prisma.StringNullableFilter<"Producto"> | string | null
   costo?: Prisma.IntFilter<"Producto"> | number
@@ -1083,6 +1114,7 @@ export type ProductoCreateWithoutCategoriaInput = {
   codigoBarra?: string | null
   precioVenta: number
   stock?: number
+  stockMinimo?: number
   controlaStock?: boolean
   urlImagen?: string | null
   costo?: number
@@ -1107,6 +1139,7 @@ export type ProductoUncheckedCreateWithoutCategoriaInput = {
   unidadId: string
   precioVenta: number
   stock?: number
+  stockMinimo?: number
   controlaStock?: boolean
   urlImagen?: string | null
   costo?: number
@@ -1153,6 +1186,7 @@ export type ProductoCreateWithoutUnidadInput = {
   codigoBarra?: string | null
   precioVenta: number
   stock?: number
+  stockMinimo?: number
   controlaStock?: boolean
   urlImagen?: string | null
   costo?: number
@@ -1177,6 +1211,7 @@ export type ProductoUncheckedCreateWithoutUnidadInput = {
   categoriaId: string
   precioVenta: number
   stock?: number
+  stockMinimo?: number
   controlaStock?: boolean
   urlImagen?: string | null
   costo?: number
@@ -1223,6 +1258,7 @@ export type ProductoCreateWithoutMovimiento_de_stockInput = {
   codigoBarra?: string | null
   precioVenta: number
   stock?: number
+  stockMinimo?: number
   controlaStock?: boolean
   urlImagen?: string | null
   costo?: number
@@ -1248,6 +1284,7 @@ export type ProductoUncheckedCreateWithoutMovimiento_de_stockInput = {
   unidadId: string
   precioVenta: number
   stock?: number
+  stockMinimo?: number
   controlaStock?: boolean
   urlImagen?: string | null
   costo?: number
@@ -1283,6 +1320,7 @@ export type ProductoUpdateWithoutMovimiento_de_stockInput = {
   codigoBarra?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   precioVenta?: Prisma.IntFieldUpdateOperationsInput | number
   stock?: Prisma.IntFieldUpdateOperationsInput | number
+  stockMinimo?: Prisma.IntFieldUpdateOperationsInput | number
   controlaStock?: Prisma.BoolFieldUpdateOperationsInput | boolean
   urlImagen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   costo?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1308,6 +1346,7 @@ export type ProductoUncheckedUpdateWithoutMovimiento_de_stockInput = {
   unidadId?: Prisma.StringFieldUpdateOperationsInput | string
   precioVenta?: Prisma.IntFieldUpdateOperationsInput | number
   stock?: Prisma.IntFieldUpdateOperationsInput | number
+  stockMinimo?: Prisma.IntFieldUpdateOperationsInput | number
   controlaStock?: Prisma.BoolFieldUpdateOperationsInput | boolean
   urlImagen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   costo?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1327,6 +1366,7 @@ export type ProductoCreateWithoutUnidad_medida_productos_unidad_medidaTounidad_m
   codigoBarra?: string | null
   precioVenta: number
   stock?: number
+  stockMinimo?: number
   controlaStock?: boolean
   urlImagen?: string | null
   costo?: number
@@ -1352,6 +1392,7 @@ export type ProductoUncheckedCreateWithoutUnidad_medida_productos_unidad_medidaT
   unidadId: string
   precioVenta: number
   stock?: number
+  stockMinimo?: number
   controlaStock?: boolean
   urlImagen?: string | null
   costo?: number
@@ -1397,6 +1438,7 @@ export type ProductoCreateWithoutInstancia_productoInput = {
   codigoBarra?: string | null
   precioVenta: number
   stock?: number
+  stockMinimo?: number
   controlaStock?: boolean
   urlImagen?: string | null
   costo?: number
@@ -1422,6 +1464,7 @@ export type ProductoUncheckedCreateWithoutInstancia_productoInput = {
   unidadId: string
   precioVenta: number
   stock?: number
+  stockMinimo?: number
   controlaStock?: boolean
   urlImagen?: string | null
   costo?: number
@@ -1457,6 +1500,7 @@ export type ProductoUpdateWithoutInstancia_productoInput = {
   codigoBarra?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   precioVenta?: Prisma.IntFieldUpdateOperationsInput | number
   stock?: Prisma.IntFieldUpdateOperationsInput | number
+  stockMinimo?: Prisma.IntFieldUpdateOperationsInput | number
   controlaStock?: Prisma.BoolFieldUpdateOperationsInput | boolean
   urlImagen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   costo?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1482,6 +1526,7 @@ export type ProductoUncheckedUpdateWithoutInstancia_productoInput = {
   unidadId?: Prisma.StringFieldUpdateOperationsInput | string
   precioVenta?: Prisma.IntFieldUpdateOperationsInput | number
   stock?: Prisma.IntFieldUpdateOperationsInput | number
+  stockMinimo?: Prisma.IntFieldUpdateOperationsInput | number
   controlaStock?: Prisma.BoolFieldUpdateOperationsInput | boolean
   urlImagen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   costo?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1501,6 +1546,7 @@ export type ProductoCreateWithoutEmpaque_productos_empaqueToempaqueInput = {
   codigoBarra?: string | null
   precioVenta: number
   stock?: number
+  stockMinimo?: number
   controlaStock?: boolean
   urlImagen?: string | null
   costo?: number
@@ -1526,6 +1572,7 @@ export type ProductoUncheckedCreateWithoutEmpaque_productos_empaqueToempaqueInpu
   unidadId: string
   precioVenta: number
   stock?: number
+  stockMinimo?: number
   controlaStock?: boolean
   urlImagen?: string | null
   costo?: number
@@ -1571,6 +1618,7 @@ export type ProductoCreateWithoutProveedoresInput = {
   codigoBarra?: string | null
   precioVenta: number
   stock?: number
+  stockMinimo?: number
   controlaStock?: boolean
   urlImagen?: string | null
   costo?: number
@@ -1596,6 +1644,7 @@ export type ProductoUncheckedCreateWithoutProveedoresInput = {
   unidadId: string
   precioVenta: number
   stock?: number
+  stockMinimo?: number
   controlaStock?: boolean
   urlImagen?: string | null
   costo?: number
@@ -1641,6 +1690,7 @@ export type ProductoCreateWithoutPromocionesInput = {
   codigoBarra?: string | null
   precioVenta: number
   stock?: number
+  stockMinimo?: number
   controlaStock?: boolean
   urlImagen?: string | null
   costo?: number
@@ -1666,6 +1716,7 @@ export type ProductoUncheckedCreateWithoutPromocionesInput = {
   unidadId: string
   precioVenta: number
   stock?: number
+  stockMinimo?: number
   controlaStock?: boolean
   urlImagen?: string | null
   costo?: number
@@ -1701,6 +1752,7 @@ export type ProductoUpdateWithoutPromocionesInput = {
   codigoBarra?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   precioVenta?: Prisma.IntFieldUpdateOperationsInput | number
   stock?: Prisma.IntFieldUpdateOperationsInput | number
+  stockMinimo?: Prisma.IntFieldUpdateOperationsInput | number
   controlaStock?: Prisma.BoolFieldUpdateOperationsInput | boolean
   urlImagen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   costo?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1726,6 +1778,7 @@ export type ProductoUncheckedUpdateWithoutPromocionesInput = {
   unidadId?: Prisma.StringFieldUpdateOperationsInput | string
   precioVenta?: Prisma.IntFieldUpdateOperationsInput | number
   stock?: Prisma.IntFieldUpdateOperationsInput | number
+  stockMinimo?: Prisma.IntFieldUpdateOperationsInput | number
   controlaStock?: Prisma.BoolFieldUpdateOperationsInput | boolean
   urlImagen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   costo?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1745,6 +1798,7 @@ export type ProductoCreateWithoutDetallesInput = {
   codigoBarra?: string | null
   precioVenta: number
   stock?: number
+  stockMinimo?: number
   controlaStock?: boolean
   urlImagen?: string | null
   costo?: number
@@ -1770,6 +1824,7 @@ export type ProductoUncheckedCreateWithoutDetallesInput = {
   unidadId: string
   precioVenta: number
   stock?: number
+  stockMinimo?: number
   controlaStock?: boolean
   urlImagen?: string | null
   costo?: number
@@ -1805,6 +1860,7 @@ export type ProductoUpdateWithoutDetallesInput = {
   codigoBarra?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   precioVenta?: Prisma.IntFieldUpdateOperationsInput | number
   stock?: Prisma.IntFieldUpdateOperationsInput | number
+  stockMinimo?: Prisma.IntFieldUpdateOperationsInput | number
   controlaStock?: Prisma.BoolFieldUpdateOperationsInput | boolean
   urlImagen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   costo?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1830,6 +1886,7 @@ export type ProductoUncheckedUpdateWithoutDetallesInput = {
   unidadId?: Prisma.StringFieldUpdateOperationsInput | string
   precioVenta?: Prisma.IntFieldUpdateOperationsInput | number
   stock?: Prisma.IntFieldUpdateOperationsInput | number
+  stockMinimo?: Prisma.IntFieldUpdateOperationsInput | number
   controlaStock?: Prisma.BoolFieldUpdateOperationsInput | boolean
   urlImagen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   costo?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1851,6 +1908,7 @@ export type ProductoCreateManyMarcaInput = {
   unidadId: string
   precioVenta: number
   stock?: number
+  stockMinimo?: number
   controlaStock?: boolean
   urlImagen?: string | null
   costo?: number
@@ -1867,6 +1925,7 @@ export type ProductoUpdateWithoutMarcaInput = {
   codigoBarra?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   precioVenta?: Prisma.IntFieldUpdateOperationsInput | number
   stock?: Prisma.IntFieldUpdateOperationsInput | number
+  stockMinimo?: Prisma.IntFieldUpdateOperationsInput | number
   controlaStock?: Prisma.BoolFieldUpdateOperationsInput | boolean
   urlImagen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   costo?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1891,6 +1950,7 @@ export type ProductoUncheckedUpdateWithoutMarcaInput = {
   unidadId?: Prisma.StringFieldUpdateOperationsInput | string
   precioVenta?: Prisma.IntFieldUpdateOperationsInput | number
   stock?: Prisma.IntFieldUpdateOperationsInput | number
+  stockMinimo?: Prisma.IntFieldUpdateOperationsInput | number
   controlaStock?: Prisma.BoolFieldUpdateOperationsInput | boolean
   urlImagen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   costo?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1913,6 +1973,7 @@ export type ProductoUncheckedUpdateManyWithoutMarcaInput = {
   unidadId?: Prisma.StringFieldUpdateOperationsInput | string
   precioVenta?: Prisma.IntFieldUpdateOperationsInput | number
   stock?: Prisma.IntFieldUpdateOperationsInput | number
+  stockMinimo?: Prisma.IntFieldUpdateOperationsInput | number
   controlaStock?: Prisma.BoolFieldUpdateOperationsInput | boolean
   urlImagen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   costo?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1931,6 +1992,7 @@ export type ProductoCreateManyCategoriaInput = {
   unidadId: string
   precioVenta: number
   stock?: number
+  stockMinimo?: number
   controlaStock?: boolean
   urlImagen?: string | null
   costo?: number
@@ -1947,6 +2009,7 @@ export type ProductoUpdateWithoutCategoriaInput = {
   codigoBarra?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   precioVenta?: Prisma.IntFieldUpdateOperationsInput | number
   stock?: Prisma.IntFieldUpdateOperationsInput | number
+  stockMinimo?: Prisma.IntFieldUpdateOperationsInput | number
   controlaStock?: Prisma.BoolFieldUpdateOperationsInput | boolean
   urlImagen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   costo?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1971,6 +2034,7 @@ export type ProductoUncheckedUpdateWithoutCategoriaInput = {
   unidadId?: Prisma.StringFieldUpdateOperationsInput | string
   precioVenta?: Prisma.IntFieldUpdateOperationsInput | number
   stock?: Prisma.IntFieldUpdateOperationsInput | number
+  stockMinimo?: Prisma.IntFieldUpdateOperationsInput | number
   controlaStock?: Prisma.BoolFieldUpdateOperationsInput | boolean
   urlImagen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   costo?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1993,6 +2057,7 @@ export type ProductoUncheckedUpdateManyWithoutCategoriaInput = {
   unidadId?: Prisma.StringFieldUpdateOperationsInput | string
   precioVenta?: Prisma.IntFieldUpdateOperationsInput | number
   stock?: Prisma.IntFieldUpdateOperationsInput | number
+  stockMinimo?: Prisma.IntFieldUpdateOperationsInput | number
   controlaStock?: Prisma.BoolFieldUpdateOperationsInput | boolean
   urlImagen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   costo?: Prisma.IntFieldUpdateOperationsInput | number
@@ -2011,6 +2076,7 @@ export type ProductoCreateManyUnidadInput = {
   categoriaId: string
   precioVenta: number
   stock?: number
+  stockMinimo?: number
   controlaStock?: boolean
   urlImagen?: string | null
   costo?: number
@@ -2027,6 +2093,7 @@ export type ProductoUpdateWithoutUnidadInput = {
   codigoBarra?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   precioVenta?: Prisma.IntFieldUpdateOperationsInput | number
   stock?: Prisma.IntFieldUpdateOperationsInput | number
+  stockMinimo?: Prisma.IntFieldUpdateOperationsInput | number
   controlaStock?: Prisma.BoolFieldUpdateOperationsInput | boolean
   urlImagen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   costo?: Prisma.IntFieldUpdateOperationsInput | number
@@ -2051,6 +2118,7 @@ export type ProductoUncheckedUpdateWithoutUnidadInput = {
   categoriaId?: Prisma.StringFieldUpdateOperationsInput | string
   precioVenta?: Prisma.IntFieldUpdateOperationsInput | number
   stock?: Prisma.IntFieldUpdateOperationsInput | number
+  stockMinimo?: Prisma.IntFieldUpdateOperationsInput | number
   controlaStock?: Prisma.BoolFieldUpdateOperationsInput | boolean
   urlImagen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   costo?: Prisma.IntFieldUpdateOperationsInput | number
@@ -2073,6 +2141,7 @@ export type ProductoUncheckedUpdateManyWithoutUnidadInput = {
   categoriaId?: Prisma.StringFieldUpdateOperationsInput | string
   precioVenta?: Prisma.IntFieldUpdateOperationsInput | number
   stock?: Prisma.IntFieldUpdateOperationsInput | number
+  stockMinimo?: Prisma.IntFieldUpdateOperationsInput | number
   controlaStock?: Prisma.BoolFieldUpdateOperationsInput | boolean
   urlImagen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   costo?: Prisma.IntFieldUpdateOperationsInput | number
@@ -2092,6 +2161,7 @@ export type ProductoCreateManyUnidad_medida_productos_unidad_medidaTounidad_medi
   unidadId: string
   precioVenta: number
   stock?: number
+  stockMinimo?: number
   controlaStock?: boolean
   urlImagen?: string | null
   costo?: number
@@ -2107,6 +2177,7 @@ export type ProductoUpdateWithoutUnidad_medida_productos_unidad_medidaTounidad_m
   codigoBarra?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   precioVenta?: Prisma.IntFieldUpdateOperationsInput | number
   stock?: Prisma.IntFieldUpdateOperationsInput | number
+  stockMinimo?: Prisma.IntFieldUpdateOperationsInput | number
   controlaStock?: Prisma.BoolFieldUpdateOperationsInput | boolean
   urlImagen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   costo?: Prisma.IntFieldUpdateOperationsInput | number
@@ -2132,6 +2203,7 @@ export type ProductoUncheckedUpdateWithoutUnidad_medida_productos_unidad_medidaT
   unidadId?: Prisma.StringFieldUpdateOperationsInput | string
   precioVenta?: Prisma.IntFieldUpdateOperationsInput | number
   stock?: Prisma.IntFieldUpdateOperationsInput | number
+  stockMinimo?: Prisma.IntFieldUpdateOperationsInput | number
   controlaStock?: Prisma.BoolFieldUpdateOperationsInput | boolean
   urlImagen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   costo?: Prisma.IntFieldUpdateOperationsInput | number
@@ -2154,6 +2226,7 @@ export type ProductoUncheckedUpdateManyWithoutUnidad_medida_productos_unidad_med
   unidadId?: Prisma.StringFieldUpdateOperationsInput | string
   precioVenta?: Prisma.IntFieldUpdateOperationsInput | number
   stock?: Prisma.IntFieldUpdateOperationsInput | number
+  stockMinimo?: Prisma.IntFieldUpdateOperationsInput | number
   controlaStock?: Prisma.BoolFieldUpdateOperationsInput | boolean
   urlImagen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   costo?: Prisma.IntFieldUpdateOperationsInput | number
@@ -2172,6 +2245,7 @@ export type ProductoCreateManyEmpaque_productos_empaqueToempaqueInput = {
   unidadId: string
   precioVenta: number
   stock?: number
+  stockMinimo?: number
   controlaStock?: boolean
   urlImagen?: string | null
   costo?: number
@@ -2187,6 +2261,7 @@ export type ProductoUpdateWithoutEmpaque_productos_empaqueToempaqueInput = {
   codigoBarra?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   precioVenta?: Prisma.IntFieldUpdateOperationsInput | number
   stock?: Prisma.IntFieldUpdateOperationsInput | number
+  stockMinimo?: Prisma.IntFieldUpdateOperationsInput | number
   controlaStock?: Prisma.BoolFieldUpdateOperationsInput | boolean
   urlImagen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   costo?: Prisma.IntFieldUpdateOperationsInput | number
@@ -2212,6 +2287,7 @@ export type ProductoUncheckedUpdateWithoutEmpaque_productos_empaqueToempaqueInpu
   unidadId?: Prisma.StringFieldUpdateOperationsInput | string
   precioVenta?: Prisma.IntFieldUpdateOperationsInput | number
   stock?: Prisma.IntFieldUpdateOperationsInput | number
+  stockMinimo?: Prisma.IntFieldUpdateOperationsInput | number
   controlaStock?: Prisma.BoolFieldUpdateOperationsInput | boolean
   urlImagen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   costo?: Prisma.IntFieldUpdateOperationsInput | number
@@ -2234,6 +2310,7 @@ export type ProductoUncheckedUpdateManyWithoutEmpaque_productos_empaqueToempaque
   unidadId?: Prisma.StringFieldUpdateOperationsInput | string
   precioVenta?: Prisma.IntFieldUpdateOperationsInput | number
   stock?: Prisma.IntFieldUpdateOperationsInput | number
+  stockMinimo?: Prisma.IntFieldUpdateOperationsInput | number
   controlaStock?: Prisma.BoolFieldUpdateOperationsInput | boolean
   urlImagen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   costo?: Prisma.IntFieldUpdateOperationsInput | number
@@ -2252,6 +2329,7 @@ export type ProductoCreateManyProveedoresInput = {
   unidadId: string
   precioVenta: number
   stock?: number
+  stockMinimo?: number
   controlaStock?: boolean
   urlImagen?: string | null
   costo?: number
@@ -2267,6 +2345,7 @@ export type ProductoUpdateWithoutProveedoresInput = {
   codigoBarra?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   precioVenta?: Prisma.IntFieldUpdateOperationsInput | number
   stock?: Prisma.IntFieldUpdateOperationsInput | number
+  stockMinimo?: Prisma.IntFieldUpdateOperationsInput | number
   controlaStock?: Prisma.BoolFieldUpdateOperationsInput | boolean
   urlImagen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   costo?: Prisma.IntFieldUpdateOperationsInput | number
@@ -2292,6 +2371,7 @@ export type ProductoUncheckedUpdateWithoutProveedoresInput = {
   unidadId?: Prisma.StringFieldUpdateOperationsInput | string
   precioVenta?: Prisma.IntFieldUpdateOperationsInput | number
   stock?: Prisma.IntFieldUpdateOperationsInput | number
+  stockMinimo?: Prisma.IntFieldUpdateOperationsInput | number
   controlaStock?: Prisma.BoolFieldUpdateOperationsInput | boolean
   urlImagen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   costo?: Prisma.IntFieldUpdateOperationsInput | number
@@ -2314,6 +2394,7 @@ export type ProductoUncheckedUpdateManyWithoutProveedoresInput = {
   unidadId?: Prisma.StringFieldUpdateOperationsInput | string
   precioVenta?: Prisma.IntFieldUpdateOperationsInput | number
   stock?: Prisma.IntFieldUpdateOperationsInput | number
+  stockMinimo?: Prisma.IntFieldUpdateOperationsInput | number
   controlaStock?: Prisma.BoolFieldUpdateOperationsInput | boolean
   urlImagen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   costo?: Prisma.IntFieldUpdateOperationsInput | number
@@ -2390,6 +2471,7 @@ export type ProductoSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs
   unidadId?: boolean
   precioVenta?: boolean
   stock?: boolean
+  stockMinimo?: boolean
   controlaStock?: boolean
   urlImagen?: boolean
   costo?: boolean
@@ -2420,6 +2502,7 @@ export type ProductoSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exte
   unidadId?: boolean
   precioVenta?: boolean
   stock?: boolean
+  stockMinimo?: boolean
   controlaStock?: boolean
   urlImagen?: boolean
   costo?: boolean
@@ -2445,6 +2528,7 @@ export type ProductoSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exte
   unidadId?: boolean
   precioVenta?: boolean
   stock?: boolean
+  stockMinimo?: boolean
   controlaStock?: boolean
   urlImagen?: boolean
   costo?: boolean
@@ -2470,6 +2554,7 @@ export type ProductoSelectScalar = {
   unidadId?: boolean
   precioVenta?: boolean
   stock?: boolean
+  stockMinimo?: boolean
   controlaStock?: boolean
   urlImagen?: boolean
   costo?: boolean
@@ -2479,7 +2564,7 @@ export type ProductoSelectScalar = {
   id_proveedor?: boolean
 }
 
-export type ProductoOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "nombre" | "descripcion" | "marcaId" | "codigoBarra" | "categoriaId" | "unidadId" | "precioVenta" | "stock" | "controlaStock" | "urlImagen" | "costo" | "contenido" | "unidad_medida" | "empaque" | "id_proveedor", ExtArgs["result"]["producto"]>
+export type ProductoOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "nombre" | "descripcion" | "marcaId" | "codigoBarra" | "categoriaId" | "unidadId" | "precioVenta" | "stock" | "stockMinimo" | "controlaStock" | "urlImagen" | "costo" | "contenido" | "unidad_medida" | "empaque" | "id_proveedor", ExtArgs["result"]["producto"]>
 export type ProductoInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   promociones?: boolean | Prisma.Producto$promocionesArgs<ExtArgs>
   instancia_producto?: boolean | Prisma.Producto$instancia_productoArgs<ExtArgs>
@@ -2534,6 +2619,7 @@ export type $ProductoPayload<ExtArgs extends runtime.Types.Extensions.InternalAr
     unidadId: string
     precioVenta: number
     stock: number
+    stockMinimo: number
     controlaStock: boolean
     urlImagen: string | null
     costo: number
@@ -2983,6 +3069,7 @@ export interface ProductoFieldRefs {
   readonly unidadId: Prisma.FieldRef<"Producto", 'String'>
   readonly precioVenta: Prisma.FieldRef<"Producto", 'Int'>
   readonly stock: Prisma.FieldRef<"Producto", 'Int'>
+  readonly stockMinimo: Prisma.FieldRef<"Producto", 'Int'>
   readonly controlaStock: Prisma.FieldRef<"Producto", 'Boolean'>
   readonly urlImagen: Prisma.FieldRef<"Producto", 'String'>
   readonly costo: Prisma.FieldRef<"Producto", 'Int'>

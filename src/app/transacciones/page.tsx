@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Eye, RefreshCw, X } from "lucide-react";
 import { Navbar } from "../components/Navbar";
+import { CartLoader } from "../components/CartLoader";
 
 const columns = [
   "N° de venta",
@@ -311,7 +312,7 @@ export default function TransaccionesPage() {
               </thead>
               <tbody>
                 {tableUnavailable ? <tr><td colSpan={columns.length} className="transactions-empty">
-                  <span role={error ? "alert" : "status"}>{invalidDateRange ? "Revisa el rango de fechas." : error || "Cargando transacciones..."}</span>
+                  {loading && !invalidDateRange && !error ? <CartLoader compact label="Cargando transacciones..." /> : <span role={error ? "alert" : "status"}>{invalidDateRange ? "Revisa el rango de fechas." : error}</span>}
                 </td></tr> : results.transactions.length ? results.transactions.map((transaction) => (
                   <tr key={transaction.id_venta}>
                     <td>{transaction.num_venta}</td>

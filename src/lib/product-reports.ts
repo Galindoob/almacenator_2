@@ -45,7 +45,7 @@ export async function getProductReport(
   const products = await tx.producto.findMany({
       orderBy: { nombre: "asc" },
       select: {
-        id: true, nombre: true, contenido: true,
+        id: true, nombre: true, codigoBarra: true, contenido: true,
         marca: { select: { nombre: true } },
         categoria: { select: { nombreCategoria: true } },
         unidad: { select: { unidad: true } },

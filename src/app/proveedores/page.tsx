@@ -4,6 +4,7 @@ import { endSession, hasSessionHint } from "@/lib/client-session";
 import { Fragment, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Navbar } from "../components/Navbar";
+import { CartLoader } from "../components/CartLoader";
 import { isSafeAppInput } from "@/lib/input-validation";
 
 type ProviderProduct = {
@@ -682,7 +683,7 @@ export default function ProvidersPage() {
             }}
           />
 
-          {isLoading ? <p className="product-empty">Cargando proveedores...</p> : null}
+          {isLoading ? <CartLoader label="Cargando proveedores..." /> : null}
           {error ? <p className="product-error">{error}</p> : null}
 
           {!isLoading && !error ? (

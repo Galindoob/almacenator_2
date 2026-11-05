@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect, useId, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { useAppearance } from "./AppearanceProvider";
 
 type NavbarProps = {
@@ -11,6 +11,8 @@ type NavbarProps = {
   activeProductTab?: "productos" | "promociones" | "vencimiento";
   onProductTabChange?: (tab: "productos" | "promociones" | "vencimiento") => void;
   showExpiringAlert?: boolean;
+  lowStockProducts?: { id: string; nombre: string; stock: number; stockMinimo: number }[];
+  onLowStockProductSelect?: (id: string) => void;
   showLogout?: boolean;
 };
 
@@ -43,16 +45,39 @@ export function Navbar({
   activeProductTab = "productos",
   onProductTabChange,
   showExpiringAlert = false,
+  lowStockProducts = [],
+  onLowStockProductSelect,
   showLogout = true,
 }: NavbarProps) {
   const router = useRouter();
   const menuId = useId();
   const productsSubmenuId = useId();
   const reportsSubmenuId = useId();
+  const lowStockPanelId = useId();
+  const lowStockRef = useRef<HTMLDivElement>(null);
   const { storeName, resetThemeForLogout } = useAppearance();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isProductsOpen, setIsProductsOpen] = useState(false);
   const [isReportsOpen, setIsReportsOpen] = useState(false);
+  const [isLowStockOpen, setIsLowStockOpen] = useState(false);
+
+  useEffect(() => {
+    if (!isLowStockOpen) return;
+    const closeOnOutsideClick = (event: PointerEvent) => {
+      if (lowStockRef.current && !lowStockRef.current.contains(event.target as Node)) {
+        setIsLowStockOpen(false);
+      }
+    };
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setIsLowStockOpen(false);
+    };
+    document.addEventListener("pointerdown", closeOnOutsideClick);
+    document.addEventListener("keydown", closeOnEscape);
+    return () => {
+      document.removeEventListener("pointerdown", closeOnOutsideClick);
+      document.removeEventListener("keydown", closeOnEscape);
+    };
+  }, [isLowStockOpen]);
 
   useEffect(() => {
     function handleEscape(event: KeyboardEvent) {
@@ -195,6 +220,49 @@ export function Navbar({
         ) : (
           <div className="navbar-spacer" />
         )}
+
+        {showProductTabs ? (
+          <div className="navbar-low-stock" ref={lowStockRef}>
+            <button
+              type="button"
+              className={`navbar-low-stock-trigger${lowStockProducts.length ? " has-alerts" : ""}`}
+              aria-label={`Productos con stock bajo: ${lowStockProducts.length}`}
+              aria-expanded={isLowStockOpen}
+              aria-controls={lowStockPanelId}
+              title="Productos con stock bajo"
+              onClick={() => setIsLowStockOpen((open) => !open)}
+            >
+              <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M12 3 2 21h20L12 3Z" />
+                <path d="M12 9v5" />
+                <circle cx="12" cy="18" r=".8" fill="currentColor" stroke="none" />
+              </svg>
+              {lowStockProducts.length > 0 ? <span className="navbar-low-stock-count">{lowStockProducts.length}</span> : null}
+            </button>
+            {isLowStockOpen ? (
+              <section id={lowStockPanelId} className="navbar-low-stock-panel" aria-label="Productos con stock bajo">
+                <div className="navbar-low-stock-heading">
+                  <strong>Stock bajo</strong>
+                  <button type="button" aria-label="Cerrar lista" onClick={() => setIsLowStockOpen(false)}>×</button>
+                </div>
+                <p className="navbar-low-stock-hint">Stock igual o inferior al mínimo configurado.</p>
+                {lowStockProducts.length > 0 ? (
+                  <div className="navbar-low-stock-list">
+                    {lowStockProducts.map((product) => (
+                      <button key={product.id} type="button" onClick={() => {
+                        setIsLowStockOpen(false);
+                        onLowStockProductSelect?.(product.id);
+                      }}>
+                        <span className="navbar-low-stock-name">{product.nombre}</span>
+                        <span className="navbar-low-stock-level">Stock: {product.stock} · Mínimo: {product.stockMinimo}</span>
+                      </button>
+                    ))}
+                  </div>
+                ) : <p className="navbar-low-stock-empty">No hay productos con stock bajo.</p>}
+              </section>
+            ) : null}
+          </div>
+        ) : null}
 
         {showLogout && onLogout ? (
           <button type="button" className="navbar-logout" onClick={handleLogout}>

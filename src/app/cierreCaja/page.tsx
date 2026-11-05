@@ -4,6 +4,7 @@ import { hasSessionHint } from "@/lib/client-session";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { isSafeAppInput } from "@/lib/input-validation";
+import { CartLoader } from "../components/CartLoader";
 
 type CashRegister = {
   id_apertura: string;
@@ -146,7 +147,7 @@ export default function CierreCajaPage() {
   if (isLoading) {
     return (
       <main className="cash-close-shell">
-        <p className="cash-close-status">Cargando cierre de caja...</p>
+        <CartLoader screen label="Cargando cierre de caja..." />
       </main>
     );
   }

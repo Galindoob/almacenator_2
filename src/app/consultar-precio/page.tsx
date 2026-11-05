@@ -4,6 +4,7 @@ import { endSession, hasSessionHint } from "@/lib/client-session";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Navbar } from "../components/Navbar";
+import { useBarcodeScanner } from "../components/useBarcodeScanner";
 import { isSafeAppInput } from "@/lib/input-validation";
 
 type PriceProduct = {
@@ -33,6 +34,17 @@ export default function ConsultarPrecioPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [isSessionVerified, setIsSessionVerified] = useState(false);
   const [error, setError] = useState("");
+  const { onSearchKeyDown } = useBarcodeScanner((code) => {
+    const nextQuery = code.trim();
+    if (!nextQuery || !isSafeAppInput(nextQuery)) return;
+    setSearchText(nextQuery);
+    if (nextQuery === query) return;
+    setProducts([]);
+    setSelectedProductId(null);
+    setError("");
+    setIsLoading(true);
+    setQuery(nextQuery);
+  }, isSessionVerified);
 
   useEffect(() => {
     let isActive = true;
@@ -191,6 +203,7 @@ export default function ConsultarPrecioPage() {
             autoFocus
             type="search"
             value={searchText}
+            onKeyDown={onSearchKeyDown}
             onChange={(event) => {
               if (isSafeAppInput(event.target.value)) setSearchText(event.target.value);
             }}

@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const MIN_PASSWORD_LENGTH = 15;
+export const MIN_PASSWORD_LENGTH = 12;
 export const MAX_PASSWORD_BYTES = 72;
 
 export function passwordCharacterCount(value: string) {

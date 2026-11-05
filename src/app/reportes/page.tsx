@@ -3,6 +3,7 @@ import { endSession, hasSessionHint } from "@/lib/client-session";
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+import { CartLoader } from "../components/CartLoader";
 
 type Summary = { sales: number; total: number; margin: number };
 type DailyReport = Summary & { date: string };
@@ -189,7 +190,7 @@ export default function ReportesPage() {
               aria-label={hasSales ? `Ventas por día en ${monthLabel}` : `Sin ventas para graficar en ${monthLabel}`}
             >
               {!loading && !hasSales ? <div className="reports-chart-empty">Aún no hay ventas para graficar</div> : null}
-              {loading ? <div className="reports-chart-empty">Cargando reporte...</div> : null}
+              {loading ? <div className="reports-chart-empty"><CartLoader label="Cargando reporte..." /></div> : null}
               <div
                 className="reports-chart-days"
                 style={{ gridTemplateColumns: `repeat(${dayCount}, minmax(25px, 1fr))` }}

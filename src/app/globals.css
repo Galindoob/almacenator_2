@@ -123,6 +123,43 @@ body {
   box-sizing: border-box;
 }
 
+.cart-loader {
+  align-items: center;
+  animation: cart-loader-reveal 1ms 600ms forwards;
+  color: var(--accent-color);
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  justify-content: center;
+  min-height: 108px;
+  opacity: 0;
+  padding: 12px;
+  visibility: hidden;
+}
+
+.cart-loader.is-compact { min-height: 72px; padding: 8px; }
+.cart-loader.is-screen {
+  background: color-mix(in srgb, var(--background) 90%, transparent);
+  inset: 0;
+  min-height: var(--app-dynamic-viewport-height);
+  position: fixed;
+  z-index: 100;
+}
+.cart-loader-motion { align-items: center; display: flex; height: 42px; justify-content: center; position: relative; width: 64px; }
+.cart-loader-motion svg { animation: cart-loader-drive 1.2s ease-in-out infinite alternate; height: 38px; position: relative; width: 38px; }
+.cart-loader-trail { background: currentColor; border-radius: 999px; height: 2px; left: 1px; opacity: .35; position: absolute; top: 20px; width: 11px; }
+.cart-loader-label { color: var(--foreground); font-size: .78rem; font-weight: 700; text-align: center; }
+.cart-loader-dots { display: flex; gap: 5px; }
+.cart-loader-dots i { animation: cart-loader-pulse .9s ease-in-out infinite alternate; background: currentColor; border-radius: 50%; height: 5px; width: 5px; }
+.cart-loader-dots i:nth-child(2) { animation-delay: .2s; }
+.cart-loader-dots i:nth-child(3) { animation-delay: .4s; }
+@keyframes cart-loader-reveal { to { opacity: 1; visibility: visible; } }
+@keyframes cart-loader-drive { from { transform: translateX(-7px); } to { transform: translateX(7px); } }
+@keyframes cart-loader-pulse { to { opacity: .25; transform: translateY(-3px); } }
+@media (prefers-reduced-motion: reduce) {
+  .cart-loader-motion svg, .cart-loader-dots i { animation: none; }
+}
+
 .auth-shell {
   align-items: center;
   background:
@@ -449,6 +486,50 @@ body {
   gap: 8px;
   justify-content: center;
 }
+
+.navbar-low-stock { justify-self: end; position: relative; }
+.navbar-low-stock-trigger {
+  align-items: center;
+  background: #fff;
+  border: 1px solid var(--grey-color);
+  border-radius: 8px;
+  color: var(--foreground);
+  cursor: pointer;
+  display: inline-flex;
+  gap: 6px;
+  height: 42px;
+  justify-content: center;
+  min-width: 42px;
+  padding: 0 9px;
+}
+.navbar-low-stock-trigger svg { height: 22px; width: 22px; }
+.navbar-low-stock-trigger.has-alerts { background: var(--accent-soft-color); border-color: var(--accent-color); color: var(--accent-dark); }
+.navbar-low-stock-trigger:hover, .navbar-low-stock-trigger[aria-expanded="true"] { outline: 2px solid var(--accent-color); outline-offset: 1px; }
+.navbar-low-stock-count { background: var(--accent-color); border-radius: 999px; color: #fff; font-size: .75rem; font-weight: 800; min-width: 22px; padding: 3px 5px; text-align: center; }
+.navbar-low-stock-panel {
+  background: var(--background);
+  border: 1px solid var(--grey-color);
+  border-radius: 12px;
+  box-shadow: 0 14px 36px rgba(0, 0, 0, .18);
+  color: var(--foreground);
+  padding: 16px;
+  position: absolute;
+  right: 0;
+  top: calc(100% + 9px);
+  width: min(360px, calc(var(--app-viewport-width) - 32px));
+  z-index: 25;
+}
+.navbar-low-stock-heading { align-items: center; display: flex; justify-content: space-between; }
+.navbar-low-stock-heading strong { font-size: 1rem; }
+.navbar-low-stock-heading button { background: transparent; border: 0; color: inherit; cursor: pointer; font-size: 1.5rem; line-height: 1; }
+.navbar-low-stock-hint, .navbar-low-stock-empty { color: var(--light-dark-color); font-size: .8125rem; line-height: 1.4; margin: 8px 0 12px; }
+.navbar-low-stock-list { display: grid; gap: 6px; max-height: min(360px, 52vh); overflow-y: auto; overscroll-behavior: contain; }
+.navbar-low-stock-list button { background: var(--light-primary-color); border: 1px solid transparent; border-radius: 8px; color: var(--foreground); cursor: pointer; display: grid; gap: 3px; padding: 9px 10px; text-align: left; }
+.navbar-low-stock-list button:hover, .navbar-low-stock-list button:focus-visible { border-color: var(--accent-color); }
+.navbar-low-stock-name { font-weight: 800; }
+.navbar-low-stock-level { color: var(--light-dark-color); font-size: .8125rem; }
+html[data-appearance-mode="dark"] .navbar-low-stock-trigger { background: var(--background); }
+html[data-appearance-mode="dark"] .navbar-low-stock-trigger.has-alerts { background: var(--accent-soft-color); color: var(--foreground); }
 .navbar-spacer {
   min-width: 0;
 }
@@ -2001,7 +2082,8 @@ body {
   background: rgba(220, 53, 69, 0.1);
 }
 
-.stock-modal label {
+.stock-modal label,
+.stock-modal-field {
   color: var(--foreground);
   display: grid;
   font-size: 0.8125rem;
@@ -2022,34 +2104,43 @@ body {
   width: 100%;
 }
 
-.date-input-wrap {
-  display: grid;
+.expiration-date-input {
+  align-items: center;
+  background: #ffffff;
+  border: 1px solid var(--grey-color);
+  border-radius: 8px;
+  color: #222222;
+  display: flex;
+  gap: 2px;
+  min-height: 42px;
+  padding: 4px 8px;
   position: relative;
 }
 
-.date-placeholder {
-  color: #9d9d9d;
-  font-weight: 700;
-  left: 12px;
-  pointer-events: none;
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  z-index: 1;
+.expiration-date-input:focus-within {
+  border-color: var(--accent-color);
+  box-shadow: 0 0 0 3px rgba(var(--accent-rgb), .14);
 }
 
-.date-input-wrap:focus-within .date-placeholder {
-  display: none;
+.stock-modal .expiration-date-input input.expiration-part {
+  background: transparent;
+  border: 0;
+  border-radius: 3px;
+  color: inherit;
+  font-size: .875rem;
+  min-height: 30px;
+  padding: 2px 3px;
+  text-align: center;
+  width: 31px;
 }
 
-.date-input-wrap input {
-  color: transparent;
-}
-
-.date-input-wrap input:focus,
-.date-input-wrap.has-value input {
-  color: var(--foreground);
-}
+.stock-modal .expiration-date-input input.expiration-part.is-year { width: 51px; }
+.stock-modal .expiration-date-input input.expiration-part::placeholder { color: #929b9b; opacity: 1; }
+.stock-modal .expiration-date-input input.expiration-part:focus { outline: 2px solid var(--accent-color); outline-offset: 1px; }
+.expiration-calendar-button { background: transparent; border: 0; color: inherit; cursor: pointer; display: grid; margin-left: auto; padding: 3px; place-items: center; }
+.expiration-calendar-button svg { height: 19px; width: 19px; }
+.expiration-calendar-button:disabled { cursor: not-allowed; opacity: .5; }
+.stock-modal .expiration-date-input input.expiration-calendar-native { height: 1px; min-height: 0; opacity: 0; padding: 0; pointer-events: none; position: absolute; right: 18px; top: 50%; width: 1px; }
 
 .date-error {
   color: var(--danger-color);
@@ -3263,6 +3354,45 @@ html[data-high-contrast="true"] .transaction-payment-badge { border: 1px solid c
   color: var(--light-dark-color);
   margin: 6px 0 0;
 }
+
+.settings-account-section {
+  align-items: center;
+  border: 1px solid var(--grey-color);
+  border-radius: 10px;
+  display: flex;
+  gap: 20px;
+  justify-content: space-between;
+  padding: 18px;
+}
+.settings-account-section h2 { align-items: center; color: var(--foreground); display: flex; font-size: 1.1rem; gap: 9px; margin: 0; }
+.settings-account-section h2 svg { color: var(--accent-color); height: 21px; width: 21px; }
+.settings-account-section p { color: var(--light-dark-color); margin: 6px 0 0; }
+.settings-account-section > button,
+.settings-account-modal footer button { border: 1px solid var(--accent-color); border-radius: 8px; cursor: pointer; font: inherit; font-weight: 800; padding: 10px 16px; }
+.settings-account-section > button { background: var(--accent-color); color: #ffffff; white-space: nowrap; }
+.settings-account-section > button:disabled,
+.settings-account-modal button:disabled { cursor: not-allowed; opacity: .55; }
+.settings-account-overlay { align-items: center; background: rgba(0, 0, 0, .62); display: flex; inset: 0; justify-content: center; padding: 20px; position: fixed; z-index: 1200; }
+.settings-account-modal { background: #ffffff; border: 1px solid var(--grey-color); border-radius: 12px; box-shadow: 0 20px 60px rgba(0, 0, 0, .25); color: var(--foreground); max-height: 90dvh; max-width: 520px; overflow-y: auto; padding: 22px; width: 100%; }
+.settings-account-modal header { align-items: flex-start; display: flex; gap: 16px; justify-content: space-between; margin-bottom: 20px; }
+.settings-account-modal header h2 { font-size: 1.25rem; margin: 0; }
+.settings-account-modal header p { color: var(--light-dark-color); margin: 5px 0 0; }
+.settings-account-modal header button { align-items: center; background: transparent; border: 0; color: var(--foreground); cursor: pointer; display: flex; padding: 2px; }
+.settings-account-modal header button svg { height: 22px; width: 22px; }
+.settings-account-modal form { display: grid; gap: 14px; }
+.settings-account-modal label { color: var(--foreground); display: grid; font-weight: 700; gap: 6px; }
+.settings-account-modal label > span { color: var(--danger-color); }
+.settings-account-modal input { background: #ffffff; border: 1px solid var(--grey-color); border-radius: 8px; color: var(--foreground); font: inherit; min-height: 43px; padding: 9px 11px; width: 100%; }
+.settings-account-modal input:focus { border-color: var(--accent-color); outline: 2px solid color-mix(in srgb, var(--accent-color) 25%, transparent); }
+.settings-account-modal input[aria-invalid="true"] { border-color: var(--danger-color); }
+.settings-account-modal label small { color: var(--danger-color); font-weight: 600; }
+.settings-account-modal footer { display: flex; gap: 10px; justify-content: flex-end; margin-top: 4px; }
+.settings-account-modal footer button:first-child { background: transparent; color: var(--foreground); }
+.settings-account-modal footer button:last-child { background: var(--accent-color); color: #ffffff; }
+@media (max-width: 600px) { .settings-account-section { align-items: stretch; flex-direction: column; } .settings-account-modal footer { flex-direction: column-reverse; } }
+html[data-appearance-mode="dark"] .settings-account-modal { background: #192426; border-color: #526365; }
+html[data-appearance-mode="dark"] .settings-account-modal input { background: #101b1d; border-color: #526365; }
+html[data-appearance-mode="dark"][data-high-contrast="true"] .settings-account-modal { background: #080d0e; border-color: #d4e0de; }
 
 .settings-section {
   border-top: 1px solid #edf0f0;
@@ -4879,6 +5009,8 @@ html[data-high-contrast="true"] .transaction-payment-badge { border: 1px solid c
     overflow-x: auto;
   }
 
+  .navbar-low-stock { grid-column: 3; grid-row: 1; }
+
 
   .product-view-shell {
     padding: 136px 12px 24px;
@@ -5125,6 +5257,16 @@ html[data-appearance-mode="dark"] :is(.sales-view-price, .sales-view-line-total)
 .sales-view-weight-field:focus-within {
   border-color: var(--accent-color);
   box-shadow: 0 0 0 3px rgba(var(--accent-rgb), 0.14);
+}
+
+.sales-scan-message {
+  background: var(--background);
+  border: 1px solid var(--danger-color);
+  border-radius: 8px;
+  color: var(--danger-color);
+  font-size: .875rem;
+  margin: 8px 0 0;
+  padding: 9px 12px;
 }
 
 .sales-view-cart-scroll,
@@ -6064,7 +6206,6 @@ html[data-high-contrast="true"] :is(
   .home-subtitle,
   .home-action-arrow,
   .home-note,
-  .date-placeholder,
   .product-detail-empty svg
 ) {
   color: var(--light-dark-color);
@@ -6204,6 +6345,16 @@ html[data-appearance-mode="dark"] :is(
 }
 
 html[data-appearance-mode="dark"] :is(input, select, textarea)::placeholder {
+  color: #a4b3b2;
+}
+
+html[data-appearance-mode="dark"] .expiration-date-input {
+  background: #101b1d;
+  border-color: #526365;
+  color: var(--foreground);
+}
+
+html[data-appearance-mode="dark"] .stock-modal .expiration-date-input input.expiration-part::placeholder {
   color: #a4b3b2;
 }
 
@@ -6392,6 +6543,15 @@ html[data-appearance-mode="dark"][data-high-contrast="true"] :is(
 }
 
 html[data-appearance-mode="dark"][data-high-contrast="true"] :is(input, select, textarea)::placeholder {
+  color: #d4e0de;
+}
+
+html[data-appearance-mode="dark"][data-high-contrast="true"] .expiration-date-input {
+  background: #000000;
+  border-color: #d4e0de;
+}
+
+html[data-appearance-mode="dark"][data-high-contrast="true"] .stock-modal .expiration-date-input input.expiration-part::placeholder {
   color: #d4e0de;
 }
 

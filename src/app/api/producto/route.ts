@@ -30,6 +30,7 @@ type ProductPayload = {
   unidad_medida?: string | null;
   precioVenta?: number;
   stock?: number;
+  stockMinimo?: number;
   urlImagen?: string | null;
   costo?: number;
 };
@@ -46,6 +47,7 @@ const productSelect = {
   unidad_medida: true,
   precioVenta: true,
   stock: true,
+  stockMinimo: true,
   controlaStock: true,
   urlImagen: true,
   costo: true,
@@ -92,6 +94,7 @@ function buildProductCreateData(
         ? Math.round(product.precioVenta)
         : 0,
     stock: controlaStock && typeof product.stock === "number" ? Math.round(product.stock) : 0,
+    stockMinimo: product.stockMinimo ?? 10,
     controlaStock,
     urlImagen: product.urlImagen,
     costo: typeof product.costo === "number" ? Math.round(product.costo) : undefined,
@@ -119,6 +122,7 @@ function buildProductUpdateData(
         ? Math.round(product.precioVenta)
         : undefined,
     controlaStock,
+    stockMinimo: product.stockMinimo,
     urlImagen: product.urlImagen,
     costo: typeof product.costo === "number" ? Math.round(product.costo) : undefined,
   };
@@ -152,6 +156,17 @@ function getFormNumber(formData: FormData, key: string) {
   return Number.isFinite(numberValue) ? numberValue : undefined;
 }
 
+function getStockMinimum(formData: FormData) {
+  if (!formData.has("stockMinimo")) return undefined;
+  const value = getFormString(formData, "stockMinimo");
+  return value === "" ? NaN : Number(value);
+}
+
+function isInvalidStockMinimum(value: unknown) {
+  return value !== undefined &&
+    (!Number.isInteger(value) || Number(value) < 0 || Number(value) > 1_000_000);
+}
+
 function getOptionalFormString(formData: FormData, key: string) {
   const value = getFormString(formData, key)?.trim();
   return value ? value : null;
@@ -181,6 +196,7 @@ function parseProductFormData(formData: FormData): {
       precioVenta: getFormNumber(formData, "precioVenta"),
       costo: getFormNumber(formData, "costo"),
       stock: getFormNumber(formData, "stock"),
+      stockMinimo: getStockMinimum(formData),
     },
     imageFile: formData.get("imagen"),
     removeImage: getFormString(formData, "removeImage") === "true",
@@ -476,6 +492,12 @@ export const POST = withAuth(async (request) => {
       : { product: (await request.json()) as ProductPayload, imageFile: null };
     const product = parsed.product;
     assertSafePayloadText(product);
+    if (isInvalidStockMinimum(product.stockMinimo)) {
+      return NextResponse.json(
+        { status: "error", message: "El stock mínimo debe ser un entero entre 0 y 1.000.000." },
+        { status: 400 },
+      );
+    }
     const marcaNombre = product.marcaNombre?.trim();
     const categoriaNombre = product.categoriaNombre?.trim();
     const empaqueNombre = product.empaqueNombre?.trim();
@@ -642,6 +664,12 @@ export const PUT = withAuth(async (request) => {
       : { product: (await request.json()) as ProductPayload, imageFile: null, removeImage: false };
     const product = parsed.product;
     assertSafePayloadText(product);
+    if (isInvalidStockMinimum(product.stockMinimo)) {
+      return NextResponse.json(
+        { status: "error", message: "El stock mínimo debe ser un entero entre 0 y 1.000.000." },
+        { status: 400 },
+      );
+    }
 
     if (!product.id) {
       return NextResponse.json(

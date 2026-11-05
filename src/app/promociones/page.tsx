@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { Search, Trash2, Percent, Tag, Gift, Pencil } from "lucide-react";
+import { CartLoader } from "../components/CartLoader";
+import { useBarcodeScanner } from "../components/useBarcodeScanner";
 
 type Promo = {
   id_promocion: string;
@@ -14,7 +16,7 @@ type Promo = {
   combo: number | null;
   precio_combo: number | null;
   tipo_promocion: { tipo: string };
-  producto: { id: string; nombre: string; costo: number; precioVenta: number; urlImagen: string | null; marca: { nombre: string } };
+  producto: { id: string; nombre: string; codigoBarra: string | null; costo: number; precioVenta: number; urlImagen: string | null; marca: { nombre: string } };
 };
 
 function money(value: number) { return `$${Math.round(value).toLocaleString("es-CL")}`; }
@@ -26,6 +28,13 @@ export default function PromotionsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [includeVat, setIncludeVat] = useState(true);
+  const { onSearchKeyDown } = useBarcodeScanner((code) => {
+    const normalized = code.trim();
+    if (!normalized) return;
+    setSearch(normalized);
+    const promo = promotions.find((item) => item.producto.codigoBarra?.trim() === normalized);
+    if (promo) setSelectedId(promo.id_promocion);
+  }, !loading);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -50,7 +59,7 @@ export default function PromotionsPage() {
   }, []);
 
   const filtered = useMemo(() => promotions.filter((promo) =>
-    `${promo.nombre_promocion} ${promo.producto.nombre} ${promo.tipo_promocion.tipo}`.toLocaleLowerCase("es-CL").includes(search.toLocaleLowerCase("es-CL"))), [promotions, search]);
+    `${promo.nombre_promocion} ${promo.producto.nombre} ${promo.producto.codigoBarra ?? ""} ${promo.tipo_promocion.tipo}`.toLocaleLowerCase("es-CL").includes(search.toLocaleLowerCase("es-CL"))), [promotions, search]);
   const selected = promotions.find((promo) => promo.id_promocion === selectedId) ?? null;
   const priceMultiplier = includeVat ? 1 : 1 / 1.19;
   const costMultiplier = includeVat ? 1.19 : 1;
@@ -80,10 +89,10 @@ export default function PromotionsPage() {
       <header className="promotions-page-heading"><h1>Promociones</h1><Link href="/crear_promocion" className="promotions-create-button">Nueva promoción</Link></header>
       <div className="promotions-layout">
         <section className="promotions-list" aria-label="Promociones registradas">
-          <label className="promotions-search"><Search aria-hidden="true"/><input type="search" placeholder="Buscar promociones" value={search} onChange={(event) => setSearch(event.target.value)} /></label>
+          <label className="promotions-search"><Search aria-hidden="true"/><input type="search" placeholder="Buscar promoción, producto o código de barras" value={search} onKeyDown={onSearchKeyDown} onChange={(event) => setSearch(event.target.value)} /></label>
           <div className="promotions-table-heading"><span>Nombre</span><span>Precio</span><span aria-label="Acciones" /></div>
           <div className="promotions-rows">
-            {loading ? <p className="promotions-state">Cargando promociones...</p> : error ? <p className="promotions-state is-error">{error}</p> : filtered.length === 0 ? <p className="promotions-state">No hay promociones registradas.</p> : filtered.map((promo) => (
+            {loading ? <CartLoader label="Cargando promociones..." /> : error ? <p className="promotions-state is-error">{error}</p> : filtered.length === 0 ? <p className="promotions-state">No hay promociones registradas.</p> : filtered.map((promo) => (
               <article className={`promotions-row${selectedId === promo.id_promocion ? " is-selected" : ""}`} key={promo.id_promocion}>
                 <button type="button" className="promotions-row-select" onClick={() => setSelectedId(promo.id_promocion)}>
                   <strong>{promo.nombre_promocion}</strong><span>{promo.producto.nombre} · {promo.tipo_promocion.tipo}</span>

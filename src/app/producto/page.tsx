@@ -2,8 +2,11 @@
 import { endSession, hasSessionHint } from "@/lib/client-session";
 
 import { useRouter } from "next/navigation";
-import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
+import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { CalendarDays } from "lucide-react";
 import { Navbar } from "../components/Navbar";
+import { CartLoader } from "../components/CartLoader";
+import { useBarcodeScanner } from "../components/useBarcodeScanner";
 import { isSafeAppInput, isSafeDescriptionInput } from "@/lib/input-validation";
 
 type Producto = {
@@ -19,6 +22,7 @@ type Producto = {
   contenido: number | null;
   unidad_medida: string | null;
   stock: number;
+  stockMinimo: number;
   controlaStock: boolean;
   costo: number;
   precioVenta: number;
@@ -85,6 +89,7 @@ type CreateProductForm = {
   unidadMedidaId: string;
   precioVenta: string;
   costo: string;
+  stockMinimo: string;
 };
 
 type EditProductForm = {
@@ -98,6 +103,7 @@ type EditProductForm = {
   proveedorId: string;
   contenido: string;
   unidadMedidaId: string;
+  stockMinimo: string;
 };
 
 type PriceState = {
@@ -145,6 +151,10 @@ function isPositiveIntegerText(value: string) {
 
 function isUnsignedIntegerText(value: string) {
   return /^\d*$/.test(value);
+}
+
+function isValidStockMinimumText(value: string) {
+  return /^\d+$/.test(value) && Number(value) <= 1_000_000;
 }
 
 function getProductContentLabel(producto: Producto) {
@@ -293,6 +303,7 @@ function buildEditForm(producto: Producto): EditProductForm {
     proveedorId: producto.id_proveedor ?? "",
     contenido: producto.contenido ? String(producto.contenido) : "",
     unidadMedidaId: producto.unidad_medida ?? "",
+    stockMinimo: String(producto.stockMinimo),
   };
 }
 
@@ -312,6 +323,7 @@ const initialCreateForm: CreateProductForm = {
   unidadMedidaId: "",
   precioVenta: "",
   costo: "",
+  stockMinimo: "10",
 };
 
 function buildInitialPriceState(producto: Producto): PriceState {
@@ -375,6 +387,7 @@ export default function ProductoPage() {
   const [createForm, setCreateForm] =
     useState<CreateProductForm>(initialCreateForm);
   const [createImage, setCreateImage] = useState<File | null>(null);
+  const [createFormResetKey, setCreateFormResetKey] = useState(0);
   const [createMessage, setCreateMessage] = useState("");
   const [createMessageType, setCreateMessageType] = useState<"error" | "success">(
     "error",
@@ -532,7 +545,7 @@ export default function ProductoPage() {
     }
 
     return productos.filter((producto) =>
-      producto.nombre.toLowerCase().includes(query),
+      producto.nombre.toLowerCase().includes(query) || producto.codigoBarra?.toLowerCase().includes(query),
     );
   }, [productos, search]);
 
@@ -544,7 +557,7 @@ export default function ProductoPage() {
     }
 
     return expiringProducts.filter((producto) =>
-      producto.nombre.toLowerCase().includes(query),
+      producto.nombre.toLowerCase().includes(query) || producto.codigoBarra?.toLowerCase().includes(query),
     );
   }, [expiringProducts, search]);
 
@@ -559,6 +572,12 @@ export default function ProductoPage() {
       ),
     [expiringProducts, chileToday],
   );
+  const lowStockProducts = useMemo(
+    () => productos
+      .filter((producto) => producto.controlaStock && producto.stock <= producto.stockMinimo)
+      .sort((a, b) => a.stock - b.stock || a.nombre.localeCompare(b.nombre, "es")),
+    [productos],
+  );
 
   function selectProduct(producto: Producto) {
     setSelectedProductId(producto.id);
@@ -569,6 +588,25 @@ export default function ProductoPage() {
     setSaveMessage("");
     closeStockModal();
   }
+
+  const { onSearchKeyDown } = useBarcodeScanner((code) => {
+    const normalized = code.trim();
+    if (!normalized || !isSafeAppInput(normalized)) return;
+    const product = productos.find((item) => item.codigoBarra?.trim() === normalized);
+    if (activeProductTab === "vencimiento") {
+      const expiring = expiringProducts.find((item) => item.codigoBarra?.trim() === normalized);
+      if (expiring) {
+        setSearch(normalized);
+        setOpenExpiringProductId(expiring.id);
+        return;
+      }
+    }
+    setSearch(normalized);
+    if (product) {
+      if (activeProductTab !== "productos") changeProductTab("productos");
+      selectProduct(product);
+    }
+  }, panelMode !== "create" && !isEditModalOpen && !stockModal);
 
   function openCreateProductPanel() {
     setSelectedProductId(null);
@@ -818,6 +856,7 @@ export default function ProductoPage() {
       !createForm.unidadId ||
       !isPositiveIntegerText(createForm.precioVenta) ||
       !isPositiveIntegerText(createForm.costo) ||
+      !isValidStockMinimumText(createForm.stockMinimo) ||
       (needsMeasure &&
         (!isPositiveIntegerText(createForm.contenido) ||
           !createForm.unidadMedidaId))
@@ -884,6 +923,7 @@ export default function ProductoPage() {
       formData.append("precioVenta", createForm.precioVenta);
       formData.append("costo", createForm.costo);
       formData.append("stock", "0");
+      formData.append("stockMinimo", createForm.stockMinimo);
       if (createImage) {
         formData.append("imagen", createImage);
       }
@@ -963,6 +1003,7 @@ export default function ProductoPage() {
       }
       setCreateForm(initialCreateForm);
       setCreateImage(null);
+      setCreateFormResetKey((current) => current + 1);
       setCreateMessage("Producto creado correctamente.");
       setCreateMessageType("success");
       setCreateSubmitted(false);
@@ -1001,6 +1042,7 @@ export default function ProductoPage() {
       !editForm.categoriaId ||
       !editForm.empaqueId ||
       !editForm.unidadId ||
+      !isValidStockMinimumText(editForm.stockMinimo) ||
       (needsMeasure &&
         (!isPositiveIntegerText(editForm.contenido) || !editForm.unidadMedidaId))
     ) {
@@ -1029,6 +1071,7 @@ export default function ProductoPage() {
       formData.append("empaque", editForm.empaqueId);
       formData.append("unidadId", editForm.unidadId);
       formData.append("id_proveedor", editForm.proveedorId);
+      formData.append("stockMinimo", editForm.stockMinimo);
       if (needsMeasure) {
         formData.append("contenido", editForm.contenido);
         formData.append("unidad_medida", editForm.unidadMedidaId);
@@ -1351,6 +1394,14 @@ export default function ProductoPage() {
         activeProductTab={activeProductTab}
         onProductTabChange={changeProductTab}
         showExpiringAlert={hasCloseExpiringProduct}
+        lowStockProducts={lowStockProducts}
+        onLowStockProductSelect={(id) => {
+          const product = productos.find((item) => item.id === id);
+          if (!product) return;
+          changeProductTab("productos");
+          setSearch("");
+          selectProduct(product);
+        }}
         showLogout={false}
       />
 
@@ -1372,8 +1423,9 @@ export default function ProductoPage() {
             <input
               className="product-search"
               type="search"
-              placeholder="Buscar producto"
+              placeholder="Buscar producto o código de barras"
               value={search}
+              onKeyDown={onSearchKeyDown}
               onChange={(event) => {
                 if (isSafeAppInput(event.target.value)) {
                   setSearch(event.target.value);
@@ -1411,7 +1463,7 @@ export default function ProductoPage() {
           ) : null}
 
           {activeProductTab === "productos" && isLoading ? (
-            <p className="product-empty">Cargando productos...</p>
+            <CartLoader label="Cargando productos..." />
           ) : null}
           {activeProductTab === "productos" && error ? (
             <p className="product-error">{error}</p>
@@ -1476,6 +1528,7 @@ export default function ProductoPage() {
 
         {activeProductTab === "vencimiento" ? null : panelMode === "create" ? (
           <ProductCreatePanel
+            key={createFormResetKey}
             form={createForm}
             options={options}
             message={createMessage}
@@ -1610,7 +1663,7 @@ function ExpiringProductsTable({
   onRequestDeleteLot,
 }: ExpiringProductsTableProps) {
   if (isLoading) {
-    return <p className="product-empty">Cargando productos por vencer...</p>;
+    return <CartLoader label="Cargando productos por vencer..." />;
   }
 
   if (error) {
@@ -1994,6 +2047,10 @@ function ProductCreatePanel({
       return !isPositiveIntegerText(form[field]);
     }
 
+    if (field === "stockMinimo") {
+      return !isValidStockMinimumText(form.stockMinimo);
+    }
+
 
     return !form[field].trim();
   };
@@ -2217,6 +2274,18 @@ function ProductCreatePanel({
           </label>
         </div>
 
+        <label className={isMissing("stockMinimo") ? "is-invalid" : ""}>
+          Stock mínimo para alerta <span className="required-mark">*</span>
+          <input
+            type="text"
+            inputMode="numeric"
+            pattern="[0-9]*"
+            maxLength={7}
+            value={form.stockMinimo}
+            onChange={(event) => onChange("stockMinimo", event.target.value)}
+          />
+        </label>
+
 
         {message ? (
           <p className={`product-create-message is-${messageType}`}>{message}</p>
@@ -2291,6 +2360,10 @@ function ProductEditModal({
 
     if (field === "unidadMedidaId") {
       return needsMeasure && !form.unidadMedidaId;
+    }
+
+    if (field === "stockMinimo") {
+      return !isValidStockMinimumText(form.stockMinimo);
     }
 
 
@@ -2474,6 +2547,18 @@ function ProductEditModal({
               </label>
             </>
           ) : null}
+
+          <label className={isMissing("stockMinimo") ? "is-invalid" : ""}>
+            Stock mínimo para alerta <span className="required-mark">*</span>
+            <input
+              type="text"
+              inputMode="numeric"
+              pattern="[0-9]*"
+              maxLength={7}
+              value={form.stockMinimo}
+              onChange={(event) => onChange("stockMinimo", event.target.value)}
+            />
+          </label>
 
 
           {message ? <p className="product-create-message is-error">{message}</p> : null}
@@ -2788,6 +2873,77 @@ type StockModalViewProps = {
   onShowComment: (value: string | null) => void;
 };
 
+function toExpirationDate(day: string, month: string, year: string) {
+  if (day.length !== 2 || month.length !== 2 || year.length !== 4) return "";
+  const parsedDay = Number(day);
+  const parsedMonth = Number(month);
+  const parsedYear = Number(year);
+  const date = new Date(Date.UTC(parsedYear, parsedMonth - 1, parsedDay));
+  if (date.getUTCFullYear() !== parsedYear || date.getUTCMonth() + 1 !== parsedMonth || date.getUTCDate() !== parsedDay) return "";
+  return `${year}-${month}-${day}`;
+}
+
+function ExpirationDateInput({ value, min, disabled, onChange }: {
+  value: string;
+  min: string;
+  disabled: boolean;
+  onChange: (value: string) => void;
+}) {
+  const [day, setDay] = useState("");
+  const [month, setMonth] = useState("");
+  const [year, setYear] = useState("");
+  const dayRef = useRef<HTMLInputElement>(null);
+  const monthRef = useRef<HTMLInputElement>(null);
+  const yearRef = useRef<HTMLInputElement>(null);
+  const calendarRef = useRef<HTMLInputElement>(null);
+  const invalidDate = day.length === 2 && month.length === 2 && year.length === 4 && !toExpirationDate(day, month, year);
+
+  function updatePart(part: "day" | "month" | "year", raw: string) {
+    const digits = raw.replace(/\D/g, "").slice(0, part === "year" ? 4 : 2);
+    const nextDay = part === "day" ? digits : day;
+    const nextMonth = part === "month" ? digits : month;
+    const nextYear = part === "year" ? digits : year;
+    if (part === "day") setDay(digits);
+    if (part === "month") setMonth(digits);
+    if (part === "year") setYear(digits);
+    onChange(toExpirationDate(nextDay, nextMonth, nextYear));
+    if (part === "day" && digits.length === 2) monthRef.current?.focus();
+    if (part === "month" && digits.length === 2) yearRef.current?.focus();
+  }
+
+  return (
+    <>
+      <div className="expiration-date-input" role="group" aria-label="Fecha de vencimiento, día mes y año">
+        <input ref={dayRef} className="expiration-part is-day" type="text" inputMode="numeric" autoComplete="off" maxLength={2} placeholder="DD" aria-label="Día" disabled={disabled} value={day}
+          onChange={(event) => updatePart("day", event.target.value)} />
+        <span aria-hidden="true">-</span>
+        <input ref={monthRef} className="expiration-part is-month" type="text" inputMode="numeric" autoComplete="off" maxLength={2} placeholder="MM" aria-label="Mes" disabled={disabled} value={month}
+          onChange={(event) => updatePart("month", event.target.value)}
+          onKeyDown={(event) => { if (event.key === "Backspace" && !month) dayRef.current?.focus(); }} />
+        <span aria-hidden="true">-</span>
+        <input ref={yearRef} className="expiration-part is-year" type="text" inputMode="numeric" autoComplete="off" maxLength={4} placeholder="AAAA" aria-label="Año" disabled={disabled} value={year}
+          onChange={(event) => updatePart("year", event.target.value)}
+          onKeyDown={(event) => { if (event.key === "Backspace" && !year) monthRef.current?.focus(); }} />
+        <button type="button" className="expiration-calendar-button" aria-label="Elegir fecha en calendario" disabled={disabled}
+          onClick={() => { try { calendarRef.current?.showPicker(); } catch { calendarRef.current?.focus(); } }}>
+          <CalendarDays aria-hidden="true" />
+        </button>
+        <input ref={calendarRef} className="expiration-calendar-native" type="date" tabIndex={-1} aria-hidden="true" min={min} value={value} disabled={disabled}
+          onChange={(event) => {
+            const selected = event.target.value;
+            if (!selected) return;
+            const [selectedYear, selectedMonth, selectedDay] = selected.split("-");
+            setDay(selectedDay);
+            setMonth(selectedMonth);
+            setYear(selectedYear);
+            onChange(selected);
+          }} />
+      </div>
+      {invalidDate ? <span className="date-error">Ingresa una fecha válida (DD-MM-AAAA).</span> : null}
+    </>
+  );
+}
+
 function StockModalView({
   product,
   chileToday,
@@ -2865,29 +3021,16 @@ function StockModalView({
                 onChange={(event) => onQuantityChange(event.target.value)}
               />
             </label>
-            <label>
-              Fecha de vencimiento
-              <span
-                className={`date-input-wrap${expirationDate ? " has-value" : ""}`}
-              >
-                {!expirationDate ? (
-                  <span className="date-placeholder">Ej: 31-12-2026</span>
-                ) : null}
-                <input
-                  type="date"
-                  min={minExpirationDate}
-                  value={expirationDate}
-                  onChange={(event) => onExpirationDateChange(event.target.value)}
-                  disabled={!chileToday}
-                />
-              </span>
+            <div className="stock-modal-field">
+              <span>Fecha de vencimiento</span>
+              <ExpirationDateInput value={expirationDate} min={minExpirationDate} disabled={!chileToday} onChange={onExpirationDateChange} />
               {timeError ? <span className="date-error">{timeError}</span> : null}
               {hasInvalidExpirationDate ? (
                 <span className="date-error">
                   Debe ser una fecha posterior a hoy.
                 </span>
               ) : null}
-            </label>
+            </div>
             <p>Tu nuevo stock será: {addedStock}</p>
             {message ? <p className="stock-modal-message">{message}</p> : null}
             <div className="stock-modal-actions">

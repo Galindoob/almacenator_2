@@ -277,7 +277,7 @@ export function AuthForm({ mode }: AuthFormProps) {
               <input
                 type="password"
                 value={password}
-                placeholder={isRegister ? "Al menos 15 caracteres" : "Tu contraseña"}
+                placeholder={isRegister ? `Al menos ${MIN_PASSWORD_LENGTH} caracteres` : "Tu contraseña"}
                 maxLength={128}
                 autoComplete={isRegister ? "new-password" : "current-password"}
                 onBlur={() =>

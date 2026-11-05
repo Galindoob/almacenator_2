@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { FormEvent, useEffect, useState } from "react";
 import {
-  MIN_PASSWORD_LENGTH, MAX_PASSWORD_BYTES, passwordByteCount,
+  MIN_PASSWORD_LENGTH,
   passwordCharacterCount, registrationPasswordSchema,
 } from "@/lib/auth-validation";
 
@@ -80,7 +80,6 @@ export default function ResetPasswordPage() {
     { label: "Una mayúscula (opcional)", met: /\p{Lu}/u.test(password) },
     { label: "Un número (opcional)", met: /\p{N}/u.test(password) },
     { label: "Un símbolo (opcional)", met: /[^\p{L}\p{N}\s]/u.test(password) },
-    { label: `Máximo ${MAX_PASSWORD_BYTES} bytes`, met: passwordByteCount(password) <= MAX_PASSWORD_BYTES },
   ];
 
   return (

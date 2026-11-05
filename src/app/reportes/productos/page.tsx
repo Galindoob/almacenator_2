@@ -2,8 +2,10 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { endSession } from "@/lib/client-session";
+import { CartLoader } from "../../components/CartLoader";
+import { useBarcodeScanner } from "../../components/useBarcodeScanner";
 
-type Product = { id: string; nombre: string; contenido: number | null; marca: { nombre: string }; categoria: { nombreCategoria: string }; unidad: { unidad: string }; unidad_medida_productos_unidad_medidaTounidad_medida: { nombre: string } | null };
+type Product = { id: string; nombre: string; codigoBarra: string | null; contenido: number | null; marca: { nombre: string }; categoria: { nombreCategoria: string }; unidad: { unidad: string }; unidad_medida_productos_unidad_medidaTounidad_medida: { nombre: string } | null };
 type Totals = { id: string; quantity: number; revenue: number; cost: number; sales: number };
 type Period = { quantity: number; revenue: number; cost: number };
 type Report = { selectedId: string | null; products: Product[]; totals: Totals[]; daily: (Period & { date: string })[]; monthly: (Period & { month: string })[]; message?: string };
@@ -60,7 +62,7 @@ export default function ReporteProductosPage() {
   const allRevenue = (report?.totals ?? []).reduce((sum, row) => sum + row.revenue, 0);
   const share = allRevenue ? totals.revenue / allRevenue * 100 : 0;
   const productMap = useMemo(() => new Map((report?.products ?? []).map((product) => [product.id, product])), [report]);
-  const filtered = useMemo(() => (report?.products ?? []).filter((product) => `${product.nombre} ${product.marca.nombre} ${product.categoria.nombreCategoria}`.toLocaleLowerCase("es-CL").includes(search.trim().toLocaleLowerCase("es-CL"))), [report, search]);
+  const filtered = useMemo(() => (report?.products ?? []).filter((product) => `${product.nombre} ${product.marca.nombre} ${product.categoria.nombreCategoria} ${product.codigoBarra ?? ""}`.toLocaleLowerCase("es-CL").includes(search.trim().toLocaleLowerCase("es-CL"))), [report, search]);
   const dayCount = useMemo(() => { const [year, value] = month.split("-").map(Number); return new Date(Date.UTC(year, value, 0)).getUTCDate(); }, [month]);
   const dailyMap = new Map((report?.daily ?? []).map((row) => [row.date, row]));
   const days = Array.from({ length: dayCount }, (_, index) => ({ day: index + 1, value: dailyMap.get(`${month}-${String(index + 1).padStart(2, "0")}`) }));
@@ -73,6 +75,13 @@ export default function ReporteProductosPage() {
   const maxTop = Math.max(0, ...top.map(rankingValue));
   const unit = selected?.unidad.unidad.toLocaleLowerCase("es-CL").includes("peso") ? "kg" : "unidades";
   function chooseProduct(id: string) { if (id !== selectedId) { setProductId(id); setLoading(true); setError(""); } }
+  const { onSearchKeyDown } = useBarcodeScanner((code) => {
+    const normalized = code.trim();
+    if (!normalized) return;
+    setSearch(normalized);
+    const product = report?.products.find((item) => item.codigoBarra?.trim() === normalized);
+    if (product) chooseProduct(product.id);
+  }, Boolean(report));
 
   return (
     <section className="reports-content product-report" aria-labelledby="product-reports-title">
@@ -84,14 +93,14 @@ export default function ReporteProductosPage() {
       <div className="product-report-layout" aria-busy={loading}>
         <aside className="product-report-sidebar" aria-label="Seleccionar producto">
           <div className="product-report-sidebar-head"><h2>Productos</h2><span>{report?.products.length ?? 0}</span></div>
-          <input type="search" value={search} maxLength={100} placeholder="Buscar nombre, marca o categoría" aria-label="Buscar producto" onChange={(event) => setSearch(event.target.value)} />
+          <input type="search" value={search} maxLength={100} placeholder="Buscar nombre, marca, categoría o código" aria-label="Buscar producto" onKeyDown={onSearchKeyDown} onChange={(event) => setSearch(event.target.value)} />
           <div className="product-report-product-list">
             {filtered.map((product) => <button key={product.id} type="button" className={product.id === selectedId ? "is-selected" : ""} aria-pressed={product.id === selectedId} onClick={() => chooseProduct(product.id)}><strong>{product.nombre}</strong><small>{product.marca.nombre} · {product.categoria.nombreCategoria}</small></button>)}
             {!loading && !filtered.length ? <p>{report?.products.length ? "No hay productos que coincidan." : "Todavía no hay productos."}</p> : null}
           </div>
         </aside>
         <div className="product-report-main">
-          {loading && !report ? <div className="product-report-panel product-report-wait">Cargando datos de ventas...</div> : null}
+          {loading && !report ? <div className="product-report-panel product-report-wait"><CartLoader label="Cargando datos de ventas..." /></div> : null}
           {!loading && !selected ? <div className="product-report-panel product-report-wait">Agrega un producto para comenzar a analizar ventas.</div> : null}
           {selected ? <>
             <div className="product-report-selected"><div><span>Producto seleccionado</span><h2>{selected.nombre}</h2><p>{selected.marca.nombre} · {selected.categoria.nombreCategoria} · {selected.unidad.unidad}{selected.contenido && selected.unidad_medida_productos_unidad_medidaTounidad_medida ? ` · ${selected.contenido} ${selected.unidad_medida_productos_unidad_medidaTounidad_medida.nombre}` : ""}</p></div><span className="product-report-period">{monthName(month)} {month.slice(0, 4)}</span></div>

@@ -23,7 +23,7 @@ const schema = z.object({
 });
 
 const include = { producto: { select: {
-  id: true, nombre: true, costo: true, precioVenta: true, urlImagen: true,
+  id: true, nombre: true, codigoBarra: true, costo: true, precioVenta: true, urlImagen: true,
   marca: { select: { nombre: true } },
 } }, tipo_promocion: { select: { tipo: true } } };
 

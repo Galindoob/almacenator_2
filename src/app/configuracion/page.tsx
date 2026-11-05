@@ -2,8 +2,8 @@
 import { endSession, hasSessionHint } from "@/lib/client-session";
 
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
-import { Check, Maximize2, Minimize2, Moon, Sun } from "lucide-react";
+import { useCallback, useEffect, useState } from "react";
+import { Check, KeyRound, Maximize2, Minimize2, Moon, Sun, X } from "lucide-react";
 import { Navbar } from "../components/Navbar";
 import {
   useAppearance,
@@ -12,6 +12,8 @@ import {
 } from "../components/AppearanceProvider";
 import { isSafeAppInput } from "@/lib/input-validation";
 import { formatRut, rutSchema } from "@/lib/rut";
+import { accountChangeSchema } from "@/lib/account-validation";
+import { MIN_PASSWORD_LENGTH, passwordCharacterCount } from "@/lib/auth-validation";
 
 const themes: { id: ColorTheme; label: string; color: string }[] = [
   { id: "green", label: "Verde", color: "#008b76" },
@@ -177,6 +179,7 @@ export default function ConfiguracionPage() {
               <header className="settings-heading">
                 <h1>Preferencias</h1>
               </header>
+              <AccountSettings />
               <AppearanceSettings
                 key={`${colorTheme}-${fontScale}-${interfaceScale}-${highContrast}-${darkMode}`}
                 preferences={{ colorTheme, fontScale, interfaceScale, storeName, highContrast, darkMode }}
@@ -189,6 +192,158 @@ export default function ConfiguracionPage() {
         </div>
       </section>
     </main>
+  );
+}
+
+function AccountSettings() {
+  const [savedName, setSavedName] = useState("");
+  const [name, setName] = useState("");
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [repeatPassword, setRepeatPassword] = useState("");
+  const [modalOpen, setModalOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    const controller = new AbortController();
+    fetch("/api/configuracion/cuenta", { cache: "no-store", signal: controller.signal })
+      .then(async (response) => {
+        const data = await response.json() as { user?: { nombre: string }; message?: string };
+        if (!response.ok || !data.user) throw new Error(data.message ?? "No se pudo cargar tu cuenta.");
+        setSavedName(data.user.nombre);
+        setName(data.user.nombre);
+      })
+      .catch((reason: unknown) => {
+        if (!controller.signal.aborted) setError(reason instanceof Error ? reason.message : "No se pudo cargar tu cuenta.");
+      })
+      .finally(() => { if (!controller.signal.aborted) setLoading(false); });
+    return () => controller.abort();
+  }, []);
+
+  const closeModal = useCallback(() => {
+    if (saving) return;
+    setModalOpen(false);
+    setName(savedName);
+    setCurrentPassword("");
+    setNewPassword("");
+    setRepeatPassword("");
+    setFieldErrors({});
+    setError("");
+  }, [savedName, saving]);
+
+  useEffect(() => {
+    if (!modalOpen) return;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    function onEscape(event: KeyboardEvent) {
+      if (event.key === "Escape") closeModal();
+    }
+    window.addEventListener("keydown", onEscape);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener("keydown", onEscape);
+    };
+  }, [modalOpen, closeModal]);
+
+  async function saveAccount(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const parsed = accountChangeSchema.safeParse({
+      nombre: name,
+      contrasenaActual: currentPassword,
+      nuevaContrasena: newPassword,
+      repetirContrasena: repeatPassword,
+    });
+    if (!parsed.success) {
+      const errors: Record<string, string> = {};
+      for (const issue of parsed.error.issues) {
+        const field = String(issue.path[0] ?? "");
+        if (!errors[field]) errors[field] = issue.message;
+      }
+      setFieldErrors(errors);
+      return;
+    }
+    if (parsed.data.nombre === savedName && !parsed.data.nuevaContrasena) {
+      setError("Cambia el nombre o ingresa una nueva contraseña.");
+      return;
+    }
+    setSaving(true);
+    setError("");
+    setFieldErrors({});
+    try {
+      const response = await fetch("/api/configuracion/cuenta", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(parsed.data),
+      });
+      const data = await response.json() as { message?: string; user?: { nombre: string } };
+      if (!response.ok || !data.user) throw new Error(data.message ?? "No se pudo actualizar la cuenta.");
+      setSavedName(data.user.nombre);
+      setName(data.user.nombre);
+      setCurrentPassword("");
+      setNewPassword("");
+      setRepeatPassword("");
+      setModalOpen(false);
+      setSuccess("Nombre o contraseña actualizados correctamente.");
+    } catch (reason) {
+      setError(reason instanceof Error ? reason.message : "No se pudo actualizar la cuenta.");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  const passwordChecks = [
+    { label: `${MIN_PASSWORD_LENGTH} caracteres como mínimo (obligatorio)`, met: passwordCharacterCount(newPassword) >= MIN_PASSWORD_LENGTH },
+    { label: "Una mayúscula (opcional)", met: /\p{Lu}/u.test(newPassword) },
+    { label: "Un número (opcional)", met: /\p{N}/u.test(newPassword) },
+    { label: "Un símbolo (opcional)", met: /[^\p{L}\p{N}\s]/u.test(newPassword) },
+  ];
+
+  return (
+    <>
+      <section className="settings-account-section" aria-labelledby="account-settings-title">
+        <div>
+          <h2 id="account-settings-title"><KeyRound aria-hidden="true" /> Nombre y contraseña</h2>
+          <p>{loading ? "Cargando cuenta..." : savedName ? `Cuenta de ${savedName}` : "Administra los datos de tu cuenta."}</p>
+        </div>
+        <button type="button" onClick={() => { setSuccess(""); setError(""); setModalOpen(true); }} disabled={loading || !savedName}>Cambiar datos</button>
+      </section>
+      {!modalOpen && error ? <p className="settings-save-error" role="alert">{error}</p> : null}
+      {success ? <p className="settings-save-success" role="status">{success}</p> : null}
+      {modalOpen ? (
+        <div className="settings-account-overlay" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) closeModal(); }}>
+          <section className="settings-account-modal" role="dialog" aria-modal="true" aria-labelledby="account-modal-title">
+            <header><div><h2 id="account-modal-title">Cambiar nombre o contraseña</h2><p>Confirma tu contraseña actual para guardar los cambios.</p></div><button type="button" aria-label="Cerrar" onClick={closeModal} disabled={saving}><X aria-hidden="true" /></button></header>
+            <form onSubmit={(event) => void saveAccount(event)} noValidate>
+              <label>Nombre
+                <input autoFocus type="text" autoComplete="given-name" maxLength={25} value={name} aria-invalid={Boolean(fieldErrors.nombre)} onChange={(event) => { if (isSafeAppInput(event.target.value)) setName(event.target.value); setFieldErrors((current) => ({ ...current, nombre: "" })); }} />
+                {fieldErrors.nombre ? <small role="alert">{fieldErrors.nombre}</small> : null}
+              </label>
+              <label>Contraseña actual <span aria-hidden="true">*</span>
+                <input type="password" autoComplete="current-password" value={currentPassword} aria-invalid={Boolean(fieldErrors.contrasenaActual)} onChange={(event) => { setCurrentPassword(event.target.value); setFieldErrors((current) => ({ ...current, contrasenaActual: "" })); }} />
+                {fieldErrors.contrasenaActual ? <small role="alert">{fieldErrors.contrasenaActual}</small> : null}
+              </label>
+              <label>Nueva contraseña
+                <input type="password" autoComplete="new-password" value={newPassword} aria-invalid={Boolean(fieldErrors.nuevaContrasena)} onChange={(event) => { setNewPassword(event.target.value); setFieldErrors((current) => ({ ...current, nuevaContrasena: "" })); }} placeholder="Déjala vacía si solo cambiarás el nombre" />
+                {fieldErrors.nuevaContrasena ? <small role="alert">{fieldErrors.nuevaContrasena}</small> : null}
+              </label>
+              <ul className="auth-password-rules" aria-label="Condiciones de la nueva contraseña">
+                {passwordChecks.map((check) => <li className={check.met ? "is-met" : ""} key={check.label}>{check.met ? "✓" : "○"} {check.label}</li>)}
+              </ul>
+              <label>Repetir nueva contraseña
+                <input type="password" autoComplete="new-password" value={repeatPassword} aria-invalid={Boolean(fieldErrors.repetirContrasena)} onChange={(event) => { setRepeatPassword(event.target.value); setFieldErrors((current) => ({ ...current, repetirContrasena: "" })); }} />
+                {fieldErrors.repetirContrasena ? <small role="alert">{fieldErrors.repetirContrasena}</small> : null}
+              </label>
+              {error ? <p className="settings-save-error" role="alert">{error}</p> : null}
+              <footer><button type="button" onClick={closeModal} disabled={saving}>Cancelar</button><button type="submit" disabled={saving}>{saving ? "Guardando..." : "Guardar cambios"}</button></footer>
+            </form>
+          </section>
+        </div>
+      ) : null}
+    </>
   );
 }
 

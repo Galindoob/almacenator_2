@@ -2,10 +2,11 @@
 import { endSession, hasSessionHint } from "@/lib/client-session";
 
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type KeyboardEvent as ReactKeyboardEvent } from "react";
 import { ArrowLeft, ArrowLeftRight, Banknote, CreditCard, Wallet, Plus, Trash2, ShoppingBasket, CheckCircle, Printer, ReceiptText } from "lucide-react";
 import type { SaleCommand } from "@/lib/sales";
 import { Navbar } from "../components/Navbar";
+import { CartLoader } from "../components/CartLoader";
 import { useAppearance } from "../components/AppearanceProvider";
 import { isSafeAppInput } from "@/lib/input-validation";
 import { roundCashAmount } from "@/lib/cash-rounding";
@@ -15,6 +16,7 @@ import { calculatePromotion, promotionCondition, type PromotionRule } from "@/li
 type Producto = {
   id: string;
   nombre: string;
+  codigoBarra: string | null;
   descripcion: string | null;
   contenido: number | null;
   stock: number;
@@ -239,6 +241,13 @@ export default function SalesPage() {
   const [cashAmount, setCashAmount] = useState("");
   const [completedSale, setCompletedSale] = useState<Sale | null>(null);
   const [search, setSearch] = useState("");
+  const [scanMessage, setScanMessage] = useState("");
+  const searchInputRef = useRef<HTMLInputElement>(null);
+  const scannerBuffer = useRef({ value: "", lastKeyAt: 0, fastKeys: 0 });
+  const searchScannerBuffer = useRef({ value: "", lastKeyAt: 0, fastKeys: 0 });
+  const scannerTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const searchScannerTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const pendingBarcodes = useRef<string[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
   const [rightPanel, setRightPanel] = useState<"catalog" | "payment" | "complete">("catalog");
@@ -339,7 +348,8 @@ export default function SalesPage() {
         (!product.controlaStock || product.stock >= 1) &&
         (!normalizedSearch ||
           product.nombre.toLowerCase().includes(normalizedSearch) ||
-          product.marca.nombre.toLowerCase().includes(normalizedSearch)),
+          product.marca.nombre.toLowerCase().includes(normalizedSearch) ||
+          product.codigoBarra?.toLowerCase().includes(normalizedSearch)),
     );
   }, [productos, search]);
 
@@ -532,6 +542,14 @@ export default function SalesPage() {
     }
   }
 
+  function updateUnitQuantity(productId: string, delta: number) {
+    const item = cart.find((entry) => entry.product.id === productId);
+    if (item?.kind === "unit" && item.quantity + delta <= 0 && cartTotal - getLineTotal(item) <= 0) {
+      setRightPanel("catalog");
+    }
+    if (item?.kind === "unit") saveQuantity(productId, Math.max(0, item.quantity + delta));
+  }
+
   function addToCart(product: Producto) {
     if (locked || busyRef.current) return;
     if (cartTotal <= 0) setRightPanel("catalog");
@@ -550,12 +568,132 @@ export default function SalesPage() {
     updateUnitQuantity(product.id, 1);
   }
 
-  function updateUnitQuantity(productId: string, delta: number) {
-    const item = cart.find((entry) => entry.product.id === productId);
-    if (item?.kind === "unit" && item.quantity + delta <= 0 && cartTotal - getLineTotal(item) <= 0) {
-      setRightPanel("catalog");
+  function addBarcodeToCart(code: string) {
+    const normalizedCode = code.trim();
+    if (!normalizedCode || rightPanel !== "catalog") return;
+    if (isLoading || busyRef.current) {
+      pendingBarcodes.current.push(normalizedCode);
+      return;
     }
-    if (item?.kind === "unit") saveQuantity(productId, Math.max(0, item.quantity + delta));
+    const product = productos.find((item) => item.codigoBarra?.trim() === normalizedCode);
+    if (!product) {
+      setScanMessage(`No se encontró un producto con el código ${normalizedCode}.`);
+      return;
+    }
+    if (completedSale || locked) {
+      setScanMessage("Esta venta no permite agregar más productos.");
+      return;
+    }
+    if (!activeSale && sales.length >= 5) {
+      setScanMessage("Ya hay cinco ventas pendientes. Finaliza una para continuar.");
+      return;
+    }
+    if (product.controlaStock && product.stock < 1) {
+      setScanMessage(`${product.nombre} no tiene stock disponible.`);
+      return;
+    }
+    setScanMessage("");
+    setSearch("");
+    addToCart(product);
+  }
+
+  useEffect(() => {
+    if (rightPanel !== "catalog") {
+      pendingBarcodes.current = [];
+      return;
+    }
+    if (isLoading || busy || pendingBarcodes.current.length === 0) return;
+    const timer = window.setTimeout(() => {
+      if (busyRef.current) return;
+      const next = pendingBarcodes.current.shift();
+      if (next) addBarcodeToCart(next);
+    }, 0);
+    return () => window.clearTimeout(timer);
+  });
+
+  useEffect(() => {
+    function onScannerKeyDown(event: KeyboardEvent) {
+      const target = event.target;
+      if (
+        event.ctrlKey || event.altKey || event.metaKey || event.isComposing ||
+        (target instanceof HTMLElement && (
+          target.isContentEditable || target.closest("input, textarea, select, [contenteditable='true']")
+        ))
+      ) {
+        scannerBuffer.current = { value: "", lastKeyAt: 0, fastKeys: 0 };
+        return;
+      }
+
+      if (event.key === "Enter" || event.key === "Tab") {
+        const scanned = scannerBuffer.current;
+        const code = scanned.value;
+        scannerBuffer.current = { value: "", lastKeyAt: 0, fastKeys: 0 };
+        if (scannerTimer.current) clearTimeout(scannerTimer.current);
+        if (code.length >= 4 && (scanned.fastKeys >= 4 || productos.some((product) => product.codigoBarra?.trim() === code))) {
+          event.preventDefault();
+          addBarcodeToCart(code);
+        }
+        return;
+      }
+
+      if (event.key.length !== 1 || !isSafeAppInput(event.key) || rightPanel !== "catalog") return;
+      const now = performance.now();
+      const previous = scannerBuffer.current;
+      const fast = now - previous.lastKeyAt < 90;
+      const value = now - previous.lastKeyAt < 250 ? previous.value + event.key : event.key;
+      scannerBuffer.current = {
+        value: value.slice(-60),
+        lastKeyAt: now,
+        fastKeys: fast ? previous.fastKeys + 1 : 1,
+      };
+      if (scannerTimer.current) clearTimeout(scannerTimer.current);
+      scannerTimer.current = setTimeout(() => {
+        const scanned = scannerBuffer.current;
+        scannerBuffer.current = { value: "", lastKeyAt: 0, fastKeys: 0 };
+        if ((scanned.value.length >= 4 && productos.some((product) => product.codigoBarra?.trim() === scanned.value)) || scanned.fastKeys >= 6) {
+          addBarcodeToCart(scanned.value);
+        }
+      }, 300);
+    }
+    window.addEventListener("keydown", onScannerKeyDown);
+    return () => window.removeEventListener("keydown", onScannerKeyDown);
+  });
+
+  useEffect(() => () => {
+    if (scannerTimer.current) clearTimeout(scannerTimer.current);
+    if (searchScannerTimer.current) clearTimeout(searchScannerTimer.current);
+  }, []);
+
+  function onSearchScannerKeyDown(event: ReactKeyboardEvent<HTMLInputElement>) {
+    if (event.key === "Enter" || event.key === "Tab") {
+      const code = event.currentTarget.value.trim();
+      const isBarcode = productos.some((product) => product.codigoBarra?.trim() === code);
+      if (isBarcode && (event.key === "Enter" || searchScannerBuffer.current.fastKeys >= 4)) {
+        event.preventDefault();
+        if (searchScannerTimer.current) clearTimeout(searchScannerTimer.current);
+        searchScannerBuffer.current = { value: "", lastKeyAt: 0, fastKeys: 0 };
+        addBarcodeToCart(code);
+      }
+      return;
+    }
+    if (event.key.length !== 1 || event.ctrlKey || event.altKey || event.metaKey) return;
+    const now = performance.now();
+    const previous = searchScannerBuffer.current;
+    const fast = now - previous.lastKeyAt < 90;
+    searchScannerBuffer.current = {
+      value: fast ? previous.value + event.key : event.key,
+      lastKeyAt: now,
+      fastKeys: fast ? previous.fastKeys + 1 : 1,
+    };
+    if (searchScannerTimer.current) clearTimeout(searchScannerTimer.current);
+    searchScannerTimer.current = setTimeout(() => {
+      const scanned = searchScannerBuffer.current;
+      searchScannerBuffer.current = { value: "", lastKeyAt: 0, fastKeys: 0 };
+      const code = searchInputRef.current?.value.trim();
+      if (scanned.fastKeys >= 6 && code === scanned.value && productos.some((product) => product.codigoBarra?.trim() === code)) {
+        addBarcodeToCart(code);
+      }
+    }, 160);
   }
 
   function removeFromCart(productId: string) {
@@ -639,6 +777,7 @@ export default function SalesPage() {
   return (
     <main className="sales-view-shell">
       <Navbar compact showLogout={false} />
+      {busy && <CartLoader screen label="Procesando venta..." />}
       {operationError && <p className="sales-operation-error" role="alert">{operationError}</p>}
       <section className="sales-view-layout sales-with-tabs" aria-busy={busy}>
         <nav className="sales-tabs" aria-label="Ventas pendientes">
@@ -822,17 +961,21 @@ export default function SalesPage() {
           ) : (
           <>
           <input
+            ref={searchInputRef}
             className="sales-view-search"
             type="search"
-            placeholder="Buscar producto por nombre o marca"
+            placeholder="Buscar producto por nombre, marca o código de barras"
             value={search}
+            onKeyDown={onSearchScannerKeyDown}
             onChange={(event) => {
               if (isSafeAppInput(event.target.value)) {
                 setSearch(event.target.value);
+                setScanMessage("");
               }
             }}
             aria-label="Buscar producto"
           />
+          {scanMessage && <p className="sales-scan-message" role="alert">{scanMessage}</p>}
 
           <div className="sales-view-catalog-heading">
             <h2>Productos disponibles</h2>
@@ -841,7 +984,7 @@ export default function SalesPage() {
 
           <div className="sales-view-catalog-scroll">
             {isLoading ? (
-              <p className="sales-view-status">Cargando productos...</p>
+              <CartLoader label="Cargando productos..." />
             ) : error ? (
               <p className="sales-view-status is-error">{error}</p>
             ) : availableProducts.length === 0 ? (
