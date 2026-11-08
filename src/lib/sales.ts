@@ -124,18 +124,22 @@ async function setItem(tx: Tx, saleId: string, productId: string, amount: number
 // The user lock serializes creation/counting and payment retries across browser tabs.
 // Product locks are also used by inventory endpoints to protect reserved lots.
 export async function executeSaleCommand(tx: Tx, userId: string, command: SaleCommand) {
+  await tx.$queryRaw`SELECT pg_advisory_xact_lock(79104001)::text AS locked`;
   await tx.$queryRaw`SELECT id FROM users WHERE id = ${userId}::uuid FOR UPDATE`;
+  const openCashRegister = await tx.apertura_caja.findFirst({ where: { horario_cierre: null }, select: { id_apertura: true } });
+  if (!openCashRegister) throw new SaleError("Abre la caja antes de registrar ventas.");
   if (command.action === "create") {
     const replay = await tx.venta.findUnique({ where: { clave_cliente: command.key } });
     if (replay) {
       if (replay.id_vendedor !== userId) throw new SaleError("Operacion no disponible.");
       return readSale(tx, replay.id_venta);
     }
-    if (await tx.venta.count({ where: { id_vendedor: userId, estado: "pendiente" } }) >= 5) {
+    if (await tx.venta.count({ where: { id_vendedor: userId, id_apertura_caja: openCashRegister.id_apertura, estado: "pendiente" } }) >= 5) {
       throw new SaleError("Solo puedes mantener cinco ventas pendientes al mismo tiempo.");
     }
     const sale = await tx.venta.create({ data: {
-      id_vendedor: userId, clave_cliente: command.key, estado: "pendiente", valor_total: 0,
+      id_vendedor: userId, id_apertura_caja: openCashRegister.id_apertura,
+      clave_cliente: command.key, estado: "pendiente", valor_total: 0,
     } });
     await setItem(tx, sale.id_venta, command.productId, command.quantity);
     return readSale(tx, sale.id_venta);
@@ -143,6 +147,7 @@ export async function executeSaleCommand(tx: Tx, userId: string, command: SaleCo
 
   const sale = await tx.venta.findFirst({ where: { id_venta: command.saleId, id_vendedor: userId }, include: { pagos: { include: { medio_pago: true } }, detalles: true } });
   if (!sale) throw new SaleError("Venta no encontrada.", 404);
+  if (sale.id_apertura_caja !== openCashRegister.id_apertura) throw new SaleError("Esta venta no pertenece a la caja abierta.");
   if (command.action === "pay") {
     const replay = await tx.pagos.findUnique({ where: { clave_operacion: command.key } });
     if (replay) {
@@ -180,6 +185,23 @@ export async function executeSaleCommand(tx: Tx, userId: string, command: SaleCo
   const { completed, change, adjustment } = calculatePayment(total, paid, validMoney(amount), cash,
     sale.pagos.every((p) => p.medio_pago.medio_de_pago.toLowerCase().trim() === "efectivo"));
   await tx.pagos.create({ data: { id_venta: sale.id_venta, id_medio_pago: method.id_medio, pago: amount, clave_operacion: command.key } });
+  const methodName = method.medio_de_pago.toLowerCase().trim();
+  const netAmount = validMoney(amount - change);
+  const firstPaymentWithMethod = !sale.pagos.some((payment) => payment.id_medio_pago === method.id_medio);
+  if (!["efectivo", "debito", "débito", "credito", "crédito", "transferencia"].includes(methodName)) {
+    throw new SaleError("Este método de pago aún no está configurado para el cierre de caja.", 400);
+  }
+  const paymentFields = methodName === "efectivo"
+    ? { total_efectivo: { increment: netAmount }, venta_efectivo: { increment: firstPaymentWithMethod ? 1 : 0 }, saldo_esperado: { increment: netAmount }, valor_real: { increment: netAmount } }
+    : methodName === "debito" || methodName === "débito"
+      ? { total_debito: { increment: netAmount }, venta_debito: { increment: firstPaymentWithMethod ? 1 : 0 } }
+      : methodName === "credito" || methodName === "crédito"
+        ? { total_credito: { increment: netAmount }, venta_credito: { increment: firstPaymentWithMethod ? 1 : 0 } }
+        : { total_transferencia: { increment: netAmount }, venta_transferencia: { increment: firstPaymentWithMethod ? 1 : 0 } };
+  await tx.apertura_caja.update({
+    where: { id_apertura: openCashRegister.id_apertura },
+    data: { total: { increment: netAmount }, ...paymentFields },
+  });
   if (completed) {
     for (const detail of sale.detalles) {
       const product = await tx.producto.findUniqueOrThrow({ where: { id: detail.id_producto } });

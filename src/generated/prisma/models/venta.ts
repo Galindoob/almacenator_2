@@ -46,6 +46,7 @@ export type VentaMinAggregateOutputType = {
   id_venta: string | null
   num_venta: number | null
   id_vendedor: string | null
+  id_apertura_caja: string | null
   valor_total: number | null
   fecha_de_creacion: Date | null
   fecha_pago: Date | null
@@ -61,6 +62,7 @@ export type VentaMaxAggregateOutputType = {
   id_venta: string | null
   num_venta: number | null
   id_vendedor: string | null
+  id_apertura_caja: string | null
   valor_total: number | null
   fecha_de_creacion: Date | null
   fecha_pago: Date | null
@@ -76,6 +78,7 @@ export type VentaCountAggregateOutputType = {
   id_venta: number
   num_venta: number
   id_vendedor: number
+  id_apertura_caja: number
   valor_total: number
   fecha_de_creacion: number
   fecha_pago: number
@@ -109,6 +112,7 @@ export type VentaMinAggregateInputType = {
   id_venta?: true
   num_venta?: true
   id_vendedor?: true
+  id_apertura_caja?: true
   valor_total?: true
   fecha_de_creacion?: true
   fecha_pago?: true
@@ -124,6 +128,7 @@ export type VentaMaxAggregateInputType = {
   id_venta?: true
   num_venta?: true
   id_vendedor?: true
+  id_apertura_caja?: true
   valor_total?: true
   fecha_de_creacion?: true
   fecha_pago?: true
@@ -139,6 +144,7 @@ export type VentaCountAggregateInputType = {
   id_venta?: true
   num_venta?: true
   id_vendedor?: true
+  id_apertura_caja?: true
   valor_total?: true
   fecha_de_creacion?: true
   fecha_pago?: true
@@ -241,6 +247,7 @@ export type VentaGroupByOutputType = {
   id_venta: string
   num_venta: number
   id_vendedor: string
+  id_apertura_caja: string | null
   valor_total: number
   fecha_de_creacion: Date
   fecha_pago: Date | null
@@ -279,6 +286,7 @@ export type ventaWhereInput = {
   id_venta?: Prisma.UuidFilter<"venta"> | string
   num_venta?: Prisma.IntFilter<"venta"> | number
   id_vendedor?: Prisma.UuidFilter<"venta"> | string
+  id_apertura_caja?: Prisma.UuidNullableFilter<"venta"> | string | null
   valor_total?: Prisma.IntFilter<"venta"> | number
   fecha_de_creacion?: Prisma.DateTimeFilter<"venta"> | Date | string
   fecha_pago?: Prisma.DateTimeNullableFilter<"venta"> | Date | string | null
@@ -289,6 +297,7 @@ export type ventaWhereInput = {
   clave_cliente?: Prisma.UuidNullableFilter<"venta"> | string | null
   revision?: Prisma.IntFilter<"venta"> | number
   vendedor?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
+  apertura?: Prisma.XOR<Prisma.Apertura_cajaNullableScalarRelationFilter, Prisma.apertura_cajaWhereInput> | null
   detalles?: Prisma.DetalleListRelationFilter
   pagos?: Prisma.PagosListRelationFilter
 }
@@ -297,6 +306,7 @@ export type ventaOrderByWithRelationInput = {
   id_venta?: Prisma.SortOrder
   num_venta?: Prisma.SortOrder
   id_vendedor?: Prisma.SortOrder
+  id_apertura_caja?: Prisma.SortOrderInput | Prisma.SortOrder
   valor_total?: Prisma.SortOrder
   fecha_de_creacion?: Prisma.SortOrder
   fecha_pago?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -307,6 +317,7 @@ export type ventaOrderByWithRelationInput = {
   clave_cliente?: Prisma.SortOrderInput | Prisma.SortOrder
   revision?: Prisma.SortOrder
   vendedor?: Prisma.UserOrderByWithRelationInput
+  apertura?: Prisma.apertura_cajaOrderByWithRelationInput
   detalles?: Prisma.detalleOrderByRelationAggregateInput
   pagos?: Prisma.pagosOrderByRelationAggregateInput
 }
@@ -319,6 +330,7 @@ export type ventaWhereUniqueInput = Prisma.AtLeast<{
   OR?: Prisma.ventaWhereInput[]
   NOT?: Prisma.ventaWhereInput | Prisma.ventaWhereInput[]
   id_vendedor?: Prisma.UuidFilter<"venta"> | string
+  id_apertura_caja?: Prisma.UuidNullableFilter<"venta"> | string | null
   valor_total?: Prisma.IntFilter<"venta"> | number
   fecha_de_creacion?: Prisma.DateTimeFilter<"venta"> | Date | string
   fecha_pago?: Prisma.DateTimeNullableFilter<"venta"> | Date | string | null
@@ -328,6 +340,7 @@ export type ventaWhereUniqueInput = Prisma.AtLeast<{
   recibo?: Prisma.StringNullableFilter<"venta"> | string | null
   revision?: Prisma.IntFilter<"venta"> | number
   vendedor?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
+  apertura?: Prisma.XOR<Prisma.Apertura_cajaNullableScalarRelationFilter, Prisma.apertura_cajaWhereInput> | null
   detalles?: Prisma.DetalleListRelationFilter
   pagos?: Prisma.PagosListRelationFilter
 }, "id_venta" | "num_venta" | "clave_cliente">
@@ -336,6 +349,7 @@ export type ventaOrderByWithAggregationInput = {
   id_venta?: Prisma.SortOrder
   num_venta?: Prisma.SortOrder
   id_vendedor?: Prisma.SortOrder
+  id_apertura_caja?: Prisma.SortOrderInput | Prisma.SortOrder
   valor_total?: Prisma.SortOrder
   fecha_de_creacion?: Prisma.SortOrder
   fecha_pago?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -359,6 +373,7 @@ export type ventaScalarWhereWithAggregatesInput = {
   id_venta?: Prisma.UuidWithAggregatesFilter<"venta"> | string
   num_venta?: Prisma.IntWithAggregatesFilter<"venta"> | number
   id_vendedor?: Prisma.UuidWithAggregatesFilter<"venta"> | string
+  id_apertura_caja?: Prisma.UuidNullableWithAggregatesFilter<"venta"> | string | null
   valor_total?: Prisma.IntWithAggregatesFilter<"venta"> | number
   fecha_de_creacion?: Prisma.DateTimeWithAggregatesFilter<"venta"> | Date | string
   fecha_pago?: Prisma.DateTimeNullableWithAggregatesFilter<"venta"> | Date | string | null
@@ -383,6 +398,7 @@ export type ventaCreateInput = {
   clave_cliente?: string | null
   revision?: number
   vendedor: Prisma.UserCreateNestedOneWithoutVentasInput
+  apertura?: Prisma.apertura_cajaCreateNestedOneWithoutVentasInput
   detalles?: Prisma.detalleCreateNestedManyWithoutVentaInput
   pagos?: Prisma.pagosCreateNestedManyWithoutVentaInput
 }
@@ -391,6 +407,7 @@ export type ventaUncheckedCreateInput = {
   id_venta?: string
   num_venta?: number
   id_vendedor: string
+  id_apertura_caja?: string | null
   valor_total: number
   fecha_de_creacion?: Date | string
   fecha_pago?: Date | string | null
@@ -416,6 +433,7 @@ export type ventaUpdateInput = {
   clave_cliente?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   revision?: Prisma.IntFieldUpdateOperationsInput | number
   vendedor?: Prisma.UserUpdateOneRequiredWithoutVentasNestedInput
+  apertura?: Prisma.apertura_cajaUpdateOneWithoutVentasNestedInput
   detalles?: Prisma.detalleUpdateManyWithoutVentaNestedInput
   pagos?: Prisma.pagosUpdateManyWithoutVentaNestedInput
 }
@@ -424,6 +442,7 @@ export type ventaUncheckedUpdateInput = {
   id_venta?: Prisma.StringFieldUpdateOperationsInput | string
   num_venta?: Prisma.IntFieldUpdateOperationsInput | number
   id_vendedor?: Prisma.StringFieldUpdateOperationsInput | string
+  id_apertura_caja?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   valor_total?: Prisma.IntFieldUpdateOperationsInput | number
   fecha_de_creacion?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   fecha_pago?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -441,6 +460,7 @@ export type ventaCreateManyInput = {
   id_venta?: string
   num_venta?: number
   id_vendedor: string
+  id_apertura_caja?: string | null
   valor_total: number
   fecha_de_creacion?: Date | string
   fecha_pago?: Date | string | null
@@ -469,6 +489,7 @@ export type ventaUncheckedUpdateManyInput = {
   id_venta?: Prisma.StringFieldUpdateOperationsInput | string
   num_venta?: Prisma.IntFieldUpdateOperationsInput | number
   id_vendedor?: Prisma.StringFieldUpdateOperationsInput | string
+  id_apertura_caja?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   valor_total?: Prisma.IntFieldUpdateOperationsInput | number
   fecha_de_creacion?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   fecha_pago?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -494,6 +515,7 @@ export type ventaCountOrderByAggregateInput = {
   id_venta?: Prisma.SortOrder
   num_venta?: Prisma.SortOrder
   id_vendedor?: Prisma.SortOrder
+  id_apertura_caja?: Prisma.SortOrder
   valor_total?: Prisma.SortOrder
   fecha_de_creacion?: Prisma.SortOrder
   fecha_pago?: Prisma.SortOrder
@@ -517,6 +539,7 @@ export type ventaMaxOrderByAggregateInput = {
   id_venta?: Prisma.SortOrder
   num_venta?: Prisma.SortOrder
   id_vendedor?: Prisma.SortOrder
+  id_apertura_caja?: Prisma.SortOrder
   valor_total?: Prisma.SortOrder
   fecha_de_creacion?: Prisma.SortOrder
   fecha_pago?: Prisma.SortOrder
@@ -532,6 +555,7 @@ export type ventaMinOrderByAggregateInput = {
   id_venta?: Prisma.SortOrder
   num_venta?: Prisma.SortOrder
   id_vendedor?: Prisma.SortOrder
+  id_apertura_caja?: Prisma.SortOrder
   valor_total?: Prisma.SortOrder
   fecha_de_creacion?: Prisma.SortOrder
   fecha_pago?: Prisma.SortOrder
@@ -598,6 +622,48 @@ export type ventaUncheckedUpdateManyWithoutVendedorNestedInput = {
   deleteMany?: Prisma.ventaScalarWhereInput | Prisma.ventaScalarWhereInput[]
 }
 
+export type ventaCreateNestedManyWithoutAperturaInput = {
+  create?: Prisma.XOR<Prisma.ventaCreateWithoutAperturaInput, Prisma.ventaUncheckedCreateWithoutAperturaInput> | Prisma.ventaCreateWithoutAperturaInput[] | Prisma.ventaUncheckedCreateWithoutAperturaInput[]
+  connectOrCreate?: Prisma.ventaCreateOrConnectWithoutAperturaInput | Prisma.ventaCreateOrConnectWithoutAperturaInput[]
+  createMany?: Prisma.ventaCreateManyAperturaInputEnvelope
+  connect?: Prisma.ventaWhereUniqueInput | Prisma.ventaWhereUniqueInput[]
+}
+
+export type ventaUncheckedCreateNestedManyWithoutAperturaInput = {
+  create?: Prisma.XOR<Prisma.ventaCreateWithoutAperturaInput, Prisma.ventaUncheckedCreateWithoutAperturaInput> | Prisma.ventaCreateWithoutAperturaInput[] | Prisma.ventaUncheckedCreateWithoutAperturaInput[]
+  connectOrCreate?: Prisma.ventaCreateOrConnectWithoutAperturaInput | Prisma.ventaCreateOrConnectWithoutAperturaInput[]
+  createMany?: Prisma.ventaCreateManyAperturaInputEnvelope
+  connect?: Prisma.ventaWhereUniqueInput | Prisma.ventaWhereUniqueInput[]
+}
+
+export type ventaUpdateManyWithoutAperturaNestedInput = {
+  create?: Prisma.XOR<Prisma.ventaCreateWithoutAperturaInput, Prisma.ventaUncheckedCreateWithoutAperturaInput> | Prisma.ventaCreateWithoutAperturaInput[] | Prisma.ventaUncheckedCreateWithoutAperturaInput[]
+  connectOrCreate?: Prisma.ventaCreateOrConnectWithoutAperturaInput | Prisma.ventaCreateOrConnectWithoutAperturaInput[]
+  upsert?: Prisma.ventaUpsertWithWhereUniqueWithoutAperturaInput | Prisma.ventaUpsertWithWhereUniqueWithoutAperturaInput[]
+  createMany?: Prisma.ventaCreateManyAperturaInputEnvelope
+  set?: Prisma.ventaWhereUniqueInput | Prisma.ventaWhereUniqueInput[]
+  disconnect?: Prisma.ventaWhereUniqueInput | Prisma.ventaWhereUniqueInput[]
+  delete?: Prisma.ventaWhereUniqueInput | Prisma.ventaWhereUniqueInput[]
+  connect?: Prisma.ventaWhereUniqueInput | Prisma.ventaWhereUniqueInput[]
+  update?: Prisma.ventaUpdateWithWhereUniqueWithoutAperturaInput | Prisma.ventaUpdateWithWhereUniqueWithoutAperturaInput[]
+  updateMany?: Prisma.ventaUpdateManyWithWhereWithoutAperturaInput | Prisma.ventaUpdateManyWithWhereWithoutAperturaInput[]
+  deleteMany?: Prisma.ventaScalarWhereInput | Prisma.ventaScalarWhereInput[]
+}
+
+export type ventaUncheckedUpdateManyWithoutAperturaNestedInput = {
+  create?: Prisma.XOR<Prisma.ventaCreateWithoutAperturaInput, Prisma.ventaUncheckedCreateWithoutAperturaInput> | Prisma.ventaCreateWithoutAperturaInput[] | Prisma.ventaUncheckedCreateWithoutAperturaInput[]
+  connectOrCreate?: Prisma.ventaCreateOrConnectWithoutAperturaInput | Prisma.ventaCreateOrConnectWithoutAperturaInput[]
+  upsert?: Prisma.ventaUpsertWithWhereUniqueWithoutAperturaInput | Prisma.ventaUpsertWithWhereUniqueWithoutAperturaInput[]
+  createMany?: Prisma.ventaCreateManyAperturaInputEnvelope
+  set?: Prisma.ventaWhereUniqueInput | Prisma.ventaWhereUniqueInput[]
+  disconnect?: Prisma.ventaWhereUniqueInput | Prisma.ventaWhereUniqueInput[]
+  delete?: Prisma.ventaWhereUniqueInput | Prisma.ventaWhereUniqueInput[]
+  connect?: Prisma.ventaWhereUniqueInput | Prisma.ventaWhereUniqueInput[]
+  update?: Prisma.ventaUpdateWithWhereUniqueWithoutAperturaInput | Prisma.ventaUpdateWithWhereUniqueWithoutAperturaInput[]
+  updateMany?: Prisma.ventaUpdateManyWithWhereWithoutAperturaInput | Prisma.ventaUpdateManyWithWhereWithoutAperturaInput[]
+  deleteMany?: Prisma.ventaScalarWhereInput | Prisma.ventaScalarWhereInput[]
+}
+
 export type ventaCreateNestedOneWithoutDetallesInput = {
   create?: Prisma.XOR<Prisma.ventaCreateWithoutDetallesInput, Prisma.ventaUncheckedCreateWithoutDetallesInput>
   connectOrCreate?: Prisma.ventaCreateOrConnectWithoutDetallesInput
@@ -638,6 +704,7 @@ export type ventaCreateWithoutVendedorInput = {
   recibo?: string | null
   clave_cliente?: string | null
   revision?: number
+  apertura?: Prisma.apertura_cajaCreateNestedOneWithoutVentasInput
   detalles?: Prisma.detalleCreateNestedManyWithoutVentaInput
   pagos?: Prisma.pagosCreateNestedManyWithoutVentaInput
 }
@@ -645,6 +712,7 @@ export type ventaCreateWithoutVendedorInput = {
 export type ventaUncheckedCreateWithoutVendedorInput = {
   id_venta?: string
   num_venta?: number
+  id_apertura_caja?: string | null
   valor_total: number
   fecha_de_creacion?: Date | string
   fecha_pago?: Date | string | null
@@ -691,6 +759,7 @@ export type ventaScalarWhereInput = {
   id_venta?: Prisma.UuidFilter<"venta"> | string
   num_venta?: Prisma.IntFilter<"venta"> | number
   id_vendedor?: Prisma.UuidFilter<"venta"> | string
+  id_apertura_caja?: Prisma.UuidNullableFilter<"venta"> | string | null
   valor_total?: Prisma.IntFilter<"venta"> | number
   fecha_de_creacion?: Prisma.DateTimeFilter<"venta"> | Date | string
   fecha_pago?: Prisma.DateTimeNullableFilter<"venta"> | Date | string | null
@@ -700,6 +769,66 @@ export type ventaScalarWhereInput = {
   recibo?: Prisma.StringNullableFilter<"venta"> | string | null
   clave_cliente?: Prisma.UuidNullableFilter<"venta"> | string | null
   revision?: Prisma.IntFilter<"venta"> | number
+}
+
+export type ventaCreateWithoutAperturaInput = {
+  id_venta?: string
+  num_venta?: number
+  valor_total: number
+  fecha_de_creacion?: Date | string
+  fecha_pago?: Date | string | null
+  estado: string
+  vuelto?: number
+  redondeo?: number
+  recibo?: string | null
+  clave_cliente?: string | null
+  revision?: number
+  vendedor: Prisma.UserCreateNestedOneWithoutVentasInput
+  detalles?: Prisma.detalleCreateNestedManyWithoutVentaInput
+  pagos?: Prisma.pagosCreateNestedManyWithoutVentaInput
+}
+
+export type ventaUncheckedCreateWithoutAperturaInput = {
+  id_venta?: string
+  num_venta?: number
+  id_vendedor: string
+  valor_total: number
+  fecha_de_creacion?: Date | string
+  fecha_pago?: Date | string | null
+  estado: string
+  vuelto?: number
+  redondeo?: number
+  recibo?: string | null
+  clave_cliente?: string | null
+  revision?: number
+  detalles?: Prisma.detalleUncheckedCreateNestedManyWithoutVentaInput
+  pagos?: Prisma.pagosUncheckedCreateNestedManyWithoutVentaInput
+}
+
+export type ventaCreateOrConnectWithoutAperturaInput = {
+  where: Prisma.ventaWhereUniqueInput
+  create: Prisma.XOR<Prisma.ventaCreateWithoutAperturaInput, Prisma.ventaUncheckedCreateWithoutAperturaInput>
+}
+
+export type ventaCreateManyAperturaInputEnvelope = {
+  data: Prisma.ventaCreateManyAperturaInput | Prisma.ventaCreateManyAperturaInput[]
+  skipDuplicates?: boolean
+}
+
+export type ventaUpsertWithWhereUniqueWithoutAperturaInput = {
+  where: Prisma.ventaWhereUniqueInput
+  update: Prisma.XOR<Prisma.ventaUpdateWithoutAperturaInput, Prisma.ventaUncheckedUpdateWithoutAperturaInput>
+  create: Prisma.XOR<Prisma.ventaCreateWithoutAperturaInput, Prisma.ventaUncheckedCreateWithoutAperturaInput>
+}
+
+export type ventaUpdateWithWhereUniqueWithoutAperturaInput = {
+  where: Prisma.ventaWhereUniqueInput
+  data: Prisma.XOR<Prisma.ventaUpdateWithoutAperturaInput, Prisma.ventaUncheckedUpdateWithoutAperturaInput>
+}
+
+export type ventaUpdateManyWithWhereWithoutAperturaInput = {
+  where: Prisma.ventaScalarWhereInput
+  data: Prisma.XOR<Prisma.ventaUpdateManyMutationInput, Prisma.ventaUncheckedUpdateManyWithoutAperturaInput>
 }
 
 export type ventaCreateWithoutDetallesInput = {
@@ -715,6 +844,7 @@ export type ventaCreateWithoutDetallesInput = {
   clave_cliente?: string | null
   revision?: number
   vendedor: Prisma.UserCreateNestedOneWithoutVentasInput
+  apertura?: Prisma.apertura_cajaCreateNestedOneWithoutVentasInput
   pagos?: Prisma.pagosCreateNestedManyWithoutVentaInput
 }
 
@@ -722,6 +852,7 @@ export type ventaUncheckedCreateWithoutDetallesInput = {
   id_venta?: string
   num_venta?: number
   id_vendedor: string
+  id_apertura_caja?: string | null
   valor_total: number
   fecha_de_creacion?: Date | string
   fecha_pago?: Date | string | null
@@ -762,6 +893,7 @@ export type ventaUpdateWithoutDetallesInput = {
   clave_cliente?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   revision?: Prisma.IntFieldUpdateOperationsInput | number
   vendedor?: Prisma.UserUpdateOneRequiredWithoutVentasNestedInput
+  apertura?: Prisma.apertura_cajaUpdateOneWithoutVentasNestedInput
   pagos?: Prisma.pagosUpdateManyWithoutVentaNestedInput
 }
 
@@ -769,6 +901,7 @@ export type ventaUncheckedUpdateWithoutDetallesInput = {
   id_venta?: Prisma.StringFieldUpdateOperationsInput | string
   num_venta?: Prisma.IntFieldUpdateOperationsInput | number
   id_vendedor?: Prisma.StringFieldUpdateOperationsInput | string
+  id_apertura_caja?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   valor_total?: Prisma.IntFieldUpdateOperationsInput | number
   fecha_de_creacion?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   fecha_pago?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -794,6 +927,7 @@ export type ventaCreateWithoutPagosInput = {
   clave_cliente?: string | null
   revision?: number
   vendedor: Prisma.UserCreateNestedOneWithoutVentasInput
+  apertura?: Prisma.apertura_cajaCreateNestedOneWithoutVentasInput
   detalles?: Prisma.detalleCreateNestedManyWithoutVentaInput
 }
 
@@ -801,6 +935,7 @@ export type ventaUncheckedCreateWithoutPagosInput = {
   id_venta?: string
   num_venta?: number
   id_vendedor: string
+  id_apertura_caja?: string | null
   valor_total: number
   fecha_de_creacion?: Date | string
   fecha_pago?: Date | string | null
@@ -841,6 +976,7 @@ export type ventaUpdateWithoutPagosInput = {
   clave_cliente?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   revision?: Prisma.IntFieldUpdateOperationsInput | number
   vendedor?: Prisma.UserUpdateOneRequiredWithoutVentasNestedInput
+  apertura?: Prisma.apertura_cajaUpdateOneWithoutVentasNestedInput
   detalles?: Prisma.detalleUpdateManyWithoutVentaNestedInput
 }
 
@@ -848,6 +984,7 @@ export type ventaUncheckedUpdateWithoutPagosInput = {
   id_venta?: Prisma.StringFieldUpdateOperationsInput | string
   num_venta?: Prisma.IntFieldUpdateOperationsInput | number
   id_vendedor?: Prisma.StringFieldUpdateOperationsInput | string
+  id_apertura_caja?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   valor_total?: Prisma.IntFieldUpdateOperationsInput | number
   fecha_de_creacion?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   fecha_pago?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -863,6 +1000,7 @@ export type ventaUncheckedUpdateWithoutPagosInput = {
 export type ventaCreateManyVendedorInput = {
   id_venta?: string
   num_venta?: number
+  id_apertura_caja?: string | null
   valor_total: number
   fecha_de_creacion?: Date | string
   fecha_pago?: Date | string | null
@@ -885,6 +1023,7 @@ export type ventaUpdateWithoutVendedorInput = {
   recibo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   clave_cliente?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   revision?: Prisma.IntFieldUpdateOperationsInput | number
+  apertura?: Prisma.apertura_cajaUpdateOneWithoutVentasNestedInput
   detalles?: Prisma.detalleUpdateManyWithoutVentaNestedInput
   pagos?: Prisma.pagosUpdateManyWithoutVentaNestedInput
 }
@@ -892,6 +1031,7 @@ export type ventaUpdateWithoutVendedorInput = {
 export type ventaUncheckedUpdateWithoutVendedorInput = {
   id_venta?: Prisma.StringFieldUpdateOperationsInput | string
   num_venta?: Prisma.IntFieldUpdateOperationsInput | number
+  id_apertura_caja?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   valor_total?: Prisma.IntFieldUpdateOperationsInput | number
   fecha_de_creacion?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   fecha_pago?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -908,6 +1048,70 @@ export type ventaUncheckedUpdateWithoutVendedorInput = {
 export type ventaUncheckedUpdateManyWithoutVendedorInput = {
   id_venta?: Prisma.StringFieldUpdateOperationsInput | string
   num_venta?: Prisma.IntFieldUpdateOperationsInput | number
+  id_apertura_caja?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  valor_total?: Prisma.IntFieldUpdateOperationsInput | number
+  fecha_de_creacion?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  fecha_pago?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  estado?: Prisma.StringFieldUpdateOperationsInput | string
+  vuelto?: Prisma.IntFieldUpdateOperationsInput | number
+  redondeo?: Prisma.IntFieldUpdateOperationsInput | number
+  recibo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  clave_cliente?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  revision?: Prisma.IntFieldUpdateOperationsInput | number
+}
+
+export type ventaCreateManyAperturaInput = {
+  id_venta?: string
+  num_venta?: number
+  id_vendedor: string
+  valor_total: number
+  fecha_de_creacion?: Date | string
+  fecha_pago?: Date | string | null
+  estado: string
+  vuelto?: number
+  redondeo?: number
+  recibo?: string | null
+  clave_cliente?: string | null
+  revision?: number
+}
+
+export type ventaUpdateWithoutAperturaInput = {
+  id_venta?: Prisma.StringFieldUpdateOperationsInput | string
+  valor_total?: Prisma.IntFieldUpdateOperationsInput | number
+  fecha_de_creacion?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  fecha_pago?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  estado?: Prisma.StringFieldUpdateOperationsInput | string
+  vuelto?: Prisma.IntFieldUpdateOperationsInput | number
+  redondeo?: Prisma.IntFieldUpdateOperationsInput | number
+  recibo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  clave_cliente?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  revision?: Prisma.IntFieldUpdateOperationsInput | number
+  vendedor?: Prisma.UserUpdateOneRequiredWithoutVentasNestedInput
+  detalles?: Prisma.detalleUpdateManyWithoutVentaNestedInput
+  pagos?: Prisma.pagosUpdateManyWithoutVentaNestedInput
+}
+
+export type ventaUncheckedUpdateWithoutAperturaInput = {
+  id_venta?: Prisma.StringFieldUpdateOperationsInput | string
+  num_venta?: Prisma.IntFieldUpdateOperationsInput | number
+  id_vendedor?: Prisma.StringFieldUpdateOperationsInput | string
+  valor_total?: Prisma.IntFieldUpdateOperationsInput | number
+  fecha_de_creacion?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  fecha_pago?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  estado?: Prisma.StringFieldUpdateOperationsInput | string
+  vuelto?: Prisma.IntFieldUpdateOperationsInput | number
+  redondeo?: Prisma.IntFieldUpdateOperationsInput | number
+  recibo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  clave_cliente?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  revision?: Prisma.IntFieldUpdateOperationsInput | number
+  detalles?: Prisma.detalleUncheckedUpdateManyWithoutVentaNestedInput
+  pagos?: Prisma.pagosUncheckedUpdateManyWithoutVentaNestedInput
+}
+
+export type ventaUncheckedUpdateManyWithoutAperturaInput = {
+  id_venta?: Prisma.StringFieldUpdateOperationsInput | string
+  num_venta?: Prisma.IntFieldUpdateOperationsInput | number
+  id_vendedor?: Prisma.StringFieldUpdateOperationsInput | string
   valor_total?: Prisma.IntFieldUpdateOperationsInput | number
   fecha_de_creacion?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   fecha_pago?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -963,6 +1167,7 @@ export type ventaSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   id_venta?: boolean
   num_venta?: boolean
   id_vendedor?: boolean
+  id_apertura_caja?: boolean
   valor_total?: boolean
   fecha_de_creacion?: boolean
   fecha_pago?: boolean
@@ -973,6 +1178,7 @@ export type ventaSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   clave_cliente?: boolean
   revision?: boolean
   vendedor?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  apertura?: boolean | Prisma.venta$aperturaArgs<ExtArgs>
   detalles?: boolean | Prisma.venta$detallesArgs<ExtArgs>
   pagos?: boolean | Prisma.venta$pagosArgs<ExtArgs>
   _count?: boolean | Prisma.VentaCountOutputTypeDefaultArgs<ExtArgs>
@@ -982,6 +1188,7 @@ export type ventaSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   id_venta?: boolean
   num_venta?: boolean
   id_vendedor?: boolean
+  id_apertura_caja?: boolean
   valor_total?: boolean
   fecha_de_creacion?: boolean
   fecha_pago?: boolean
@@ -992,12 +1199,14 @@ export type ventaSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   clave_cliente?: boolean
   revision?: boolean
   vendedor?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  apertura?: boolean | Prisma.venta$aperturaArgs<ExtArgs>
 }, ExtArgs["result"]["venta"]>
 
 export type ventaSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id_venta?: boolean
   num_venta?: boolean
   id_vendedor?: boolean
+  id_apertura_caja?: boolean
   valor_total?: boolean
   fecha_de_creacion?: boolean
   fecha_pago?: boolean
@@ -1008,12 +1217,14 @@ export type ventaSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   clave_cliente?: boolean
   revision?: boolean
   vendedor?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  apertura?: boolean | Prisma.venta$aperturaArgs<ExtArgs>
 }, ExtArgs["result"]["venta"]>
 
 export type ventaSelectScalar = {
   id_venta?: boolean
   num_venta?: boolean
   id_vendedor?: boolean
+  id_apertura_caja?: boolean
   valor_total?: boolean
   fecha_de_creacion?: boolean
   fecha_pago?: boolean
@@ -1025,24 +1236,28 @@ export type ventaSelectScalar = {
   revision?: boolean
 }
 
-export type ventaOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id_venta" | "num_venta" | "id_vendedor" | "valor_total" | "fecha_de_creacion" | "fecha_pago" | "estado" | "vuelto" | "redondeo" | "recibo" | "clave_cliente" | "revision", ExtArgs["result"]["venta"]>
+export type ventaOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id_venta" | "num_venta" | "id_vendedor" | "id_apertura_caja" | "valor_total" | "fecha_de_creacion" | "fecha_pago" | "estado" | "vuelto" | "redondeo" | "recibo" | "clave_cliente" | "revision", ExtArgs["result"]["venta"]>
 export type ventaInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   vendedor?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  apertura?: boolean | Prisma.venta$aperturaArgs<ExtArgs>
   detalles?: boolean | Prisma.venta$detallesArgs<ExtArgs>
   pagos?: boolean | Prisma.venta$pagosArgs<ExtArgs>
   _count?: boolean | Prisma.VentaCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type ventaIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   vendedor?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  apertura?: boolean | Prisma.venta$aperturaArgs<ExtArgs>
 }
 export type ventaIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   vendedor?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  apertura?: boolean | Prisma.venta$aperturaArgs<ExtArgs>
 }
 
 export type $ventaPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "venta"
   objects: {
     vendedor: Prisma.$UserPayload<ExtArgs>
+    apertura: Prisma.$apertura_cajaPayload<ExtArgs> | null
     detalles: Prisma.$detallePayload<ExtArgs>[]
     pagos: Prisma.$pagosPayload<ExtArgs>[]
   }
@@ -1050,6 +1265,7 @@ export type $ventaPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
     id_venta: string
     num_venta: number
     id_vendedor: string
+    id_apertura_caja: string | null
     valor_total: number
     fecha_de_creacion: Date
     fecha_pago: Date | null
@@ -1454,6 +1670,7 @@ readonly fields: ventaFieldRefs;
 export interface Prisma__ventaClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   vendedor<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  apertura<T extends Prisma.venta$aperturaArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.venta$aperturaArgs<ExtArgs>>): Prisma.Prisma__apertura_cajaClient<runtime.Types.Result.GetResult<Prisma.$apertura_cajaPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   detalles<T extends Prisma.venta$detallesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.venta$detallesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$detallePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   pagos<T extends Prisma.venta$pagosArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.venta$pagosArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$pagosPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
@@ -1488,6 +1705,7 @@ export interface ventaFieldRefs {
   readonly id_venta: Prisma.FieldRef<"venta", 'String'>
   readonly num_venta: Prisma.FieldRef<"venta", 'Int'>
   readonly id_vendedor: Prisma.FieldRef<"venta", 'String'>
+  readonly id_apertura_caja: Prisma.FieldRef<"venta", 'String'>
   readonly valor_total: Prisma.FieldRef<"venta", 'Int'>
   readonly fecha_de_creacion: Prisma.FieldRef<"venta", 'DateTime'>
   readonly fecha_pago: Prisma.FieldRef<"venta", 'DateTime'>
@@ -1895,6 +2113,25 @@ export type ventaDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Interna
    * Limit how many ventas to delete.
    */
   limit?: number
+}
+
+/**
+ * venta.apertura
+ */
+export type venta$aperturaArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the apertura_caja
+   */
+  select?: Prisma.apertura_cajaSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the apertura_caja
+   */
+  omit?: Prisma.apertura_cajaOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.apertura_cajaInclude<ExtArgs> | null
+  where?: Prisma.apertura_cajaWhereInput
 }
 
 /**

@@ -2,8 +2,8 @@
 import { endSession, hasSessionHint } from "@/lib/client-session";
 
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
-import { Check, KeyRound, Maximize2, Minimize2, Moon, Sun, X } from "lucide-react";
+import { useCallback, useEffect, useState, type FormEvent } from "react";
+import { Check, KeyRound, Maximize2, Minimize2, Moon, Settings2, Sun, UserRound, X } from "lucide-react";
 import { Navbar } from "../components/Navbar";
 import {
   useAppearance,
@@ -38,7 +38,56 @@ type AccountUser = {
   id: string;
   nombre: string;
   apellido: string;
+  roleId: string;
   rol: string;
+};
+
+type RoleOption = { id: string; nombre: string };
+
+const permissionGroups: { title: string; items: { id: string; label: string; requires?: string }[] }[] = [
+  {
+    title: "Productos",
+    items: [
+      { id: "productos_ver", label: "Ver sección de productos" },
+      { id: "productos_crear", label: "Crear productos", requires: "productos_ver" },
+      { id: "productos_stock", label: "Agregar stock de productos", requires: "productos_ver" },
+      { id: "productos_merma", label: "Hacer merma", requires: "productos_ver" },
+      { id: "proveedores_ver", label: "Ver proveedores" },
+      { id: "proveedores_editar", label: "Agregar y editar proveedores", requires: "proveedores_ver" },
+    ],
+  },
+  {
+    title: "Vistas y otras acciones",
+    items: [
+      { id: "reportes_ver", label: "Ver reportes" },
+      { id: "empresa_usuarios_ver", label: "Ver empresas y usuarios" },
+      { id: "precios_ver", label: "Consultar precios" },
+      { id: "transacciones_ver", label: "Ver transacciones" },
+      { id: "academia_ver", label: "Academia MiniGest" },
+      { id: "vencimiento_ver", label: "Ver productos por vencer" },
+      { id: "roles_cambiar", label: "Cambiar roles" },
+      { id: "promociones_crear", label: "Crear promociones" },
+    ],
+  },
+  {
+    title: "Ventas",
+    items: [
+      { id: "caja_abrir_cerrar", label: "Abrir y cerrar cajas" },
+      { id: "ventas_crear", label: "Crear venta" },
+      { id: "caja_ingreso_egreso", label: "Registrar ingreso y egreso" },
+    ],
+  },
+];
+
+type ProfileData = {
+  nombre: string;
+  correo: string | null;
+  rol: string;
+  fono: string | null;
+  direccion: string | null;
+  urlImagen: string | null;
+  totalVentas: number;
+  totalAperturas: number;
 };
 
 const companyFields: {
@@ -62,7 +111,7 @@ const companyFields: {
 export default function ConfiguracionPage() {
   const router = useRouter();
   const [isSessionVerified, setIsSessionVerified] = useState(false);
-  const [activeSection, setActiveSection] = useState<"empresa" | "preferencias" | "usuarios">("empresa");
+  const [activeSection, setActiveSection] = useState<"empresa" | "preferencias" | "usuarios" | "perfil" | "ajustes_tienda">("empresa");
   const {
     colorTheme,
     fontScale,
@@ -167,6 +216,30 @@ export default function ConfiguracionPage() {
             <span className="settings-sidebar-icon" aria-hidden="true">U</span>
             Usuarios
           </button>
+          <button
+            type="button"
+            className={activeSection === "perfil" ? "is-active" : ""}
+            aria-current={activeSection === "perfil" ? "page" : undefined}
+            onClick={() => {
+              clearAppearancePreview();
+              setActiveSection("perfil");
+            }}
+          >
+            <span className="settings-sidebar-icon" aria-hidden="true"><UserRound size={20} /></span>
+            Perfil
+          </button>
+          <button
+            type="button"
+            className={activeSection === "ajustes_tienda" ? "is-active" : ""}
+            aria-current={activeSection === "ajustes_tienda" ? "page" : undefined}
+            onClick={() => {
+              clearAppearancePreview();
+              setActiveSection("ajustes_tienda");
+            }}
+          >
+            <span className="settings-sidebar-icon" aria-hidden="true"><Settings2 size={20} /></span>
+            Ajustes de tienda
+          </button>
         </nav>
 
         <div className="settings-content">
@@ -174,6 +247,10 @@ export default function ConfiguracionPage() {
             <CompanySettings onSaved={syncSavedStoreName} />
           ) : activeSection === "usuarios" ? (
             <UsersSettings />
+          ) : activeSection === "perfil" ? (
+            <ProfileSettings />
+          ) : activeSection === "ajustes_tienda" ? (
+            <StoreSettings />
           ) : (
             <>
               <header className="settings-heading">
@@ -347,10 +424,222 @@ function AccountSettings() {
   );
 }
 
+function ProfileSettings() {
+  const [profile, setProfile] = useState<ProfileData | null>(null);
+  const [fono, setFono] = useState("");
+  const [direccion, setDireccion] = useState("");
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [removeImage, setRemoveImage] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+
+  useEffect(() => {
+    return () => { if (imagePreview) URL.revokeObjectURL(imagePreview); };
+  }, [imagePreview]);
+
+  useEffect(() => {
+    const controller = new AbortController();
+
+    fetch("/api/configuracion/perfil", { cache: "no-store", signal: controller.signal })
+      .then(async (response) => {
+        const result = (await response.json()) as { perfil?: ProfileData; message?: string };
+        if (!response.ok || !result.perfil) {
+          throw new Error(result.message ?? "No se pudo cargar el perfil.");
+        }
+        setProfile(result.perfil);
+        setFono(result.perfil.fono ?? "");
+        setDireccion(result.perfil.direccion ?? "");
+      })
+      .catch((loadError) => {
+        if (!controller.signal.aborted) {
+          setError(loadError instanceof Error ? loadError.message : "No se pudo cargar el perfil.");
+        }
+      });
+
+    return () => controller.abort();
+  }, []);
+
+  async function saveProfile(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (!profile || saving) return;
+    setError("");
+    setSuccess("");
+    if (fono.length > 25 || direccion.length > 200 || /['"]/.test(fono + direccion)) {
+      setError("Revisa el teléfono y la dirección. No pueden contener comillas.");
+      return;
+    }
+    setSaving(true);
+    try {
+      const formData = new FormData();
+      formData.set("fono", fono);
+      formData.set("direccion", direccion);
+      if (imageFile) formData.set("imagen", imageFile);
+      if (removeImage) formData.set("removeImage", "true");
+      const response = await fetch("/api/configuracion/perfil", { method: "PUT", body: formData });
+      const result = (await response.json()) as { message?: string; fono?: string | null; direccion?: string | null; urlImagen?: string | null };
+      if (!response.ok) throw new Error(result.message ?? "No se pudo guardar el perfil.");
+      setProfile({ ...profile, fono: result.fono ?? null, direccion: result.direccion ?? null, urlImagen: result.urlImagen ?? null });
+      setImageFile(null);
+      setImagePreview(null);
+      setRemoveImage(false);
+      setSuccess(result.message ?? "Perfil actualizado correctamente.");
+    } catch (saveError) {
+      setError(saveError instanceof Error ? saveError.message : "No se pudo guardar el perfil.");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  const visibleImage = imagePreview ?? (removeImage ? null : profile?.urlImagen);
+
+  return (
+    <>
+      <header className="settings-heading">
+        <h1>Perfil</h1>
+        <p>Datos y actividad de tu cuenta.</p>
+      </header>
+      {error ? <p className="settings-save-error" role="alert">{error}</p> : null}
+      {!profile && !error ? <p role="status">Cargando perfil...</p> : null}
+      {profile ? (
+        <form className="settings-profile" aria-label="Datos del usuario conectado" onSubmit={saveProfile}>
+          <div className="settings-profile-header">
+            <div className="settings-profile-photo">
+              {visibleImage ? <img src={visibleImage} alt={`Foto de ${profile.nombre}`} /> : (
+                <span className="settings-user-avatar is-large" aria-hidden="true">
+                  {profile.nombre.split(" ").map((part) => part.charAt(0)).slice(0, 2).join("")}
+                </span>
+              )}
+            </div>
+            <div>
+              <h2>{profile.nombre}</h2>
+              <span>{profile.rol}</span>
+            </div>
+          </div>
+          <div className="settings-profile-image-actions">
+            <label>Editar foto <input type="file" accept="image/png,image/jpeg,image/webp,image/gif" onChange={(event) => {
+              const file = event.target.files?.[0] ?? null;
+              if (file && file.size > 5 * 1024 * 1024) { setError("La imagen no puede superar 5 MB."); event.target.value = ""; return; }
+              setImageFile(file);
+              setImagePreview(file ? URL.createObjectURL(file) : null);
+              if (file) setRemoveImage(false);
+              setError("");
+            }} /></label>
+            {visibleImage ? <button type="button" onClick={() => { setImageFile(null); setImagePreview(null); setRemoveImage(true); }}>Quitar foto</button> : null}
+          </div>
+          <dl className="settings-profile-fields">
+            <div><dt>Nombre</dt><dd>{profile.nombre}</dd></div>
+            <div><dt>Correo</dt><dd>{profile.correo ?? "Sin correo registrado"}</dd></div>
+            <div><dt>Rol</dt><dd>{profile.rol}</dd></div>
+          </dl>
+          <div className="settings-profile-edit-fields">
+            <label>Teléfono <input type="tel" value={fono} maxLength={25} placeholder="+569..." onChange={(event) => setFono(event.target.value)} /></label>
+            <label>Dirección <input type="text" value={direccion} maxLength={200} placeholder="Dirección" onChange={(event) => setDireccion(event.target.value)} /></label>
+          </div>
+          <div className="settings-profile-stats">
+            <div><span>Ventas completadas</span><strong>{profile.totalVentas}</strong></div>
+            <div><span>Aperturas de caja</span><strong>{profile.totalAperturas}</strong></div>
+          </div>
+          {error ? <p className="settings-save-error" role="alert">{error}</p> : null}
+          {success ? <p className="settings-save-success" role="status">{success}</p> : null}
+          <div className="settings-company-actions"><button type="submit" className="settings-save-button" disabled={saving}>{saving ? "Guardando..." : "Guardar cambios"}</button></div>
+        </form>
+      ) : null}
+    </>
+  );
+}
+
+function StoreSettings() {
+  const [roles, setRoles] = useState<RoleOption[] | null>(null);
+  const [selectedRoleId, setSelectedRoleId] = useState("");
+  const [selectedPermissions, setSelectedPermissions] = useState<Record<string, string[]>>({});
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    const controller = new AbortController();
+    fetch("/api/configuracion/usuarios", { cache: "no-store", signal: controller.signal })
+      .then(async (response) => {
+        const data = await response.json() as { roles?: RoleOption[]; message?: string };
+        if (!response.ok || !data.roles) throw new Error(data.message ?? "No se pudieron cargar los roles.");
+        setRoles(data.roles);
+      })
+      .catch((reason) => {
+        if (!controller.signal.aborted) setError(reason instanceof Error ? reason.message : "No se pudieron cargar los roles.");
+      });
+    return () => controller.abort();
+  }, []);
+
+  const checked = selectedPermissions[selectedRoleId] ?? [];
+
+  function togglePermission(permissionId: string, enabled: boolean) {
+    setSelectedPermissions((current) => {
+      const next = new Set(current[selectedRoleId] ?? []);
+      if (enabled) next.add(permissionId);
+      else {
+        next.delete(permissionId);
+        for (const group of permissionGroups) {
+          for (const permission of group.items) {
+            if (permission.requires === permissionId) next.delete(permission.id);
+          }
+        }
+      }
+      return { ...current, [selectedRoleId]: [...next] };
+    });
+  }
+
+  return (
+    <>
+      <header className="settings-heading">
+        <h1>Ajustes de tienda</h1>
+      </header>
+      <section className="settings-permissions" aria-labelledby="settings-permissions-title">
+        <h2 id="settings-permissions-title">Permisos de rol</h2>
+        <p>Vista previa de permisos. La selección aún no se guarda.</p>
+        {error ? <p className="settings-save-error" role="alert">{error}</p> : null}
+        <label className="settings-permissions-role">Rol
+          <select value={selectedRoleId} onChange={(event) => setSelectedRoleId(event.target.value)} disabled={!roles}>
+            <option value="">Selecciona un rol</option>
+            {roles?.map((role) => <option key={role.id} value={role.id}>{role.nombre}</option>)}
+          </select>
+        </label>
+        {selectedRoleId ? (
+          <div className="settings-permission-groups">
+            {permissionGroups.map((group) => (
+              <fieldset key={group.title}>
+                <legend>{group.title}</legend>
+                {group.items.map((permission) => {
+                  const disabled = Boolean(permission.requires && !checked.includes(permission.requires));
+                  return (
+                    <label key={permission.id} className={disabled ? "is-disabled" : ""}>
+                      <input
+                        type="checkbox"
+                        checked={checked.includes(permission.id)}
+                        disabled={disabled}
+                        onChange={(event) => togglePermission(permission.id, event.target.checked)}
+                      />
+                      <span>{permission.label}</span>
+                    </label>
+                  );
+                })}
+              </fieldset>
+            ))}
+          </div>
+        ) : <p className="settings-permissions-empty">Selecciona un rol para ver sus permisos.</p>}
+      </section>
+    </>
+  );
+}
+
 function UsersSettings() {
   const [users, setUsers] = useState<AccountUser[] | null>(null);
+  const [roles, setRoles] = useState<RoleOption[]>([]);
+  const [canManageRoles, setCanManageRoles] = useState(false);
+  const [actorRole, setActorRole] = useState<string | null>(null);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+  const [savingRole, setSavingRole] = useState(false);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -361,11 +650,14 @@ function UsersSettings() {
       signal: controller.signal,
     })
       .then(async (response) => {
-        const result = (await response.json()) as { users?: AccountUser[]; message?: string };
+        const result = (await response.json()) as { users?: AccountUser[]; roles?: RoleOption[]; canManageRoles?: boolean; actorRole?: string | null; message?: string };
         if (!response.ok || !result.users) {
           throw new Error(result.message ?? "No se pudieron cargar los usuarios.");
         }
         setUsers(result.users);
+        setRoles(result.roles ?? []);
+        setCanManageRoles(Boolean(result.canManageRoles));
+        setActorRole(result.actorRole ?? null);
         setSelectedId(result.users[0]?.id ?? null);
       })
       .catch((loadError) => {
@@ -378,10 +670,42 @@ function UsersSettings() {
   }, []);
 
   const selectedUser = users?.find((user) => user.id === selectedId);
+  const canEditSelectedRole = Boolean(selectedUser && (
+    (actorRole === "master" && selectedUser.rol !== "master") ||
+    (actorRole === "admin" && ["usuario", "cajero"].includes(selectedUser.rol))
+  ));
+  const availableRoles = roles.filter((role) => {
+    if (!canEditSelectedRole) return role.id === selectedUser?.roleId;
+    return actorRole === "master"
+      ? role.nombre !== "master"
+      : ["usuario", "cajero"].includes(role.nombre);
+  });
   const roleCounts = users?.reduce<Record<string, number>>((counts, user) => {
     counts[user.rol] = (counts[user.rol] ?? 0) + 1;
     return counts;
   }, {});
+
+  async function changeRole(userId: string, roleId: string) {
+    if (!canManageRoles || savingRole) return;
+    setSavingRole(true);
+    setError("");
+    setSuccess("");
+    try {
+      const response = await fetch("/api/configuracion/usuarios", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId, roleId }),
+      });
+      const data = await response.json() as { message?: string; roleId?: string; rol?: string };
+      if (!response.ok || !data.roleId || !data.rol) throw new Error(data.message ?? "No se pudo cambiar el rol.");
+      setUsers((current) => current?.map((user) => user.id === userId ? { ...user, roleId: data.roleId!, rol: data.rol! } : user) ?? null);
+      setSuccess(data.message ?? "Rol actualizado correctamente.");
+    } catch (reason) {
+      setError(reason instanceof Error ? reason.message : "No se pudo cambiar el rol.");
+    } finally {
+      setSavingRole(false);
+    }
+  }
 
   return (
     <>
@@ -389,6 +713,7 @@ function UsersSettings() {
         <h1>Usuarios</h1>
       </header>
       {error ? <p className="settings-save-error" role="alert">{error}</p> : null}
+      {success ? <p className="settings-save-success" role="status">{success}</p> : null}
       {!users && !error ? <p role="status">Cargando usuarios...</p> : null}
       {users ? (
         <>
@@ -430,8 +755,21 @@ function UsersSettings() {
                   <dl>
                     <div><dt>Nombre</dt><dd>{selectedUser.nombre}</dd></div>
                     <div><dt>Apellido</dt><dd>{selectedUser.apellido}</dd></div>
-                    <div><dt>Rol</dt><dd>{selectedUser.rol}</dd></div>
+                    <div><dt>Rol</dt><dd>
+                      <select
+                        className="settings-user-role-select"
+                        aria-label={`Rol de ${selectedUser.nombre} ${selectedUser.apellido}`}
+                        value={selectedUser.roleId}
+                        disabled={!canEditSelectedRole || savingRole}
+                        onChange={(event) => void changeRole(selectedUser.id, event.target.value)}
+                      >
+                        {availableRoles.map((role) => <option key={role.id} value={role.id}>{role.nombre}</option>)}
+                      </select>
+                    </dd></div>
                   </dl>
+                  {!canManageRoles ? <p className="settings-role-notice">Solo una cuenta con rol admin o master puede cambiar roles.</p> : null}
+                  {canManageRoles && selectedUser.rol === "master" ? <p className="settings-role-notice">El rol master es único y no se puede cambiar.</p> : null}
+                  {actorRole === "admin" && !canEditSelectedRole && selectedUser.rol !== "master" ? <p className="settings-role-notice">Admin solo puede alternar entre usuario y cajero.</p> : null}
                 </section>
               ) : null}
             </div>

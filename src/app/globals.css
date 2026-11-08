@@ -1143,6 +1143,36 @@ html[data-appearance-mode="dark"] .navbar-low-stock-trigger.has-alerts { backgro
   opacity: 0.6;
 }
 
+.home-actions button:disabled { cursor: not-allowed; opacity: .55; }
+.cash-payment-grid { grid-template-columns: repeat(2, minmax(160px, 1fr)); gap: 18px; }
+.cash-close-method { color: var(--light-dark-color); display: grid; gap: 7px; text-align: center; width: 100%; }
+.cash-close-method strong { font-size: 1.125rem; }
+.cash-close-method span { font-size: .875rem; }
+.cash-close-method input { min-height: 62px; }
+.cash-close-footer { flex-wrap: wrap; justify-content: space-between; }
+.cash-close-comment { color: var(--foreground); display: grid; flex: 1 1 280px; font-weight: 700; gap: 7px; }
+.cash-close-comment input { background: var(--background); border: 1px solid var(--grey-color); border-radius: 8px; color: var(--foreground); font: inherit; min-height: 48px; padding: 10px 12px; width: 100%; }
+.cash-close-buttons { display: flex; flex-wrap: wrap; gap: 10px; }
+.cash-close-buttons button:first-child { background: var(--background); border: 1px solid var(--accent-color); color: var(--accent-dark); }
+.cash-voucher-overlay { align-items: center; background: rgba(0, 0, 0, .65); display: flex; inset: 0; justify-content: center; padding: 18px; position: fixed; z-index: 1200; }
+.cash-voucher { background: #fff; border-radius: 10px; color: #202829; max-height: calc(100dvh - 36px); max-width: 520px; overflow-y: auto; padding: 30px 28px; position: relative; width: 100%; }
+.cash-voucher-close { align-items: center; background: #f0f3f2; border: 0; border-radius: 50%; color: #202829; cursor: pointer; display: flex; font-size: 1.5rem; height: 32px; justify-content: center; position: absolute; right: 16px; top: 16px; width: 32px; }
+.cash-voucher h2 { font-size: 1.375rem; margin: 0 30px 8px 0; text-align: center; }
+.cash-voucher-store { line-height: 1.5; margin: 0 0 20px; text-align: center; }
+.cash-voucher h3 { background: #eef2f1; border-radius: 5px; font-size: 1rem; margin: 20px 0 10px; padding: 8px 10px; }
+.cash-voucher-lines { display: grid; gap: 8px; margin: 0; }
+.cash-voucher-lines div { display: flex; gap: 12px; justify-content: space-between; }
+.cash-voucher-lines dt { color: #4e5a5c; }
+.cash-voucher-lines dd { font-weight: 700; margin: 0; text-align: right; }
+.cash-voucher-lines .is-total { border-top: 1px solid #bcc7c5; font-weight: 900; padding-top: 8px; }
+.cash-voucher-movement { border-bottom: 1px solid #e2e7e6; display: grid; gap: 4px; padding: 9px 0; }
+.cash-voucher-movement small { color: #617173; }
+.cash-voucher-signature { display: grid; gap: 8px; margin: 52px 20px 18px; text-align: center; }
+.cash-voucher-signature span { border-top: 1px solid #202829; }
+.cash-voucher-note { color: #667475; font-size: .75rem; text-align: center; }
+html[data-appearance-mode="dark"] .cash-voucher { background: #fff; color: #202829; }
+@media (max-width: 760px) { .cash-payment-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } .cash-close-buttons { width: 100%; } .cash-close-buttons button { flex: 1 1 170px; } }
+
 .product-view-shell {
   background:
     linear-gradient(135deg, rgba(var(--accent-tint-rgb), 0.66) 0%, rgba(250, 250, 250, 0.7) 48%, rgba(var(--accent-tint-rgb), 0.6) 100%),
@@ -4009,6 +4039,72 @@ html[data-appearance-mode="dark"][data-high-contrast="true"] .settings-account-m
   margin: 0;
   overflow-wrap: anywhere;
 }
+
+.settings-user-role-select,
+.settings-permissions-role select {
+  background: #fff;
+  border: 1px solid var(--grey-color);
+  border-radius: 8px;
+  color: var(--foreground);
+  font: inherit;
+  min-height: 42px;
+  padding: 8px 10px;
+  width: 100%;
+}
+.settings-user-role-select:disabled { cursor: not-allowed; opacity: .65; }
+.settings-role-notice { color: var(--light-dark-color); font-size: .875rem; margin: 18px 0 0; }
+.settings-permissions { max-width: 780px; }
+.settings-permissions h2 { color: var(--foreground); font-size: 1.25rem; margin: 0 0 8px; }
+.settings-permissions > p { color: var(--light-dark-color); margin: 0 0 20px; }
+.settings-permissions-role { color: var(--foreground); display: grid; font-weight: 700; gap: 8px; max-width: 360px; }
+.settings-permissions-empty { margin-top: 24px !important; }
+.settings-permission-groups { display: grid; gap: 18px; margin-top: 26px; }
+.settings-permission-groups fieldset { border: 1px solid var(--grey-color); border-radius: 10px; display: grid; gap: 10px; margin: 0; min-width: 0; padding: 16px 18px 18px; }
+.settings-permission-groups legend { color: var(--foreground); font-size: 1.125rem; font-weight: 800; padding: 0 8px; }
+.settings-permission-groups label { align-items: center; color: var(--foreground); cursor: pointer; display: flex; gap: 12px; min-height: 28px; }
+.settings-permission-groups label.is-disabled { color: var(--light-dark-color); cursor: not-allowed; opacity: .55; }
+.settings-permission-groups input { accent-color: var(--accent-color); cursor: inherit; height: 18px; margin: 0; width: 18px; }
+html[data-appearance-mode="dark"] :is(.settings-user-role-select, .settings-permissions-role select) { background: #101b1d; border-color: #526365; }
+
+.settings-profile {
+  background: var(--surface-color, #fff);
+  border: 1px solid var(--grey-color);
+  border-radius: 12px;
+  max-width: 760px;
+  padding: 24px;
+}
+
+.settings-profile-header {
+  align-items: center;
+  display: flex;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.settings-profile-header h2 { margin: 0 0 4px; }
+.settings-profile-header span:not(.settings-user-avatar) { color: var(--light-dark-color); }
+.settings-profile-photo, .settings-profile-photo img { border-radius: 50%; height: 72px; width: 72px; }
+.settings-profile-photo img { object-fit: cover; }
+.settings-profile-photo .settings-user-avatar { height: 72px; width: 72px; }
+.settings-profile-image-actions { align-items: center; display: flex; flex-wrap: wrap; gap: 10px; margin: -4px 0 20px; }
+.settings-profile-image-actions label { color: var(--foreground); display: grid; font-weight: 700; gap: 7px; }
+.settings-profile-image-actions label input { color: var(--foreground); font: inherit; max-width: 100%; }
+.settings-profile-image-actions label input::file-selector-button, .settings-profile-image-actions button { background: var(--accent-soft-color); border: 1px solid var(--accent-color); border-radius: 8px; color: var(--accent-dark); cursor: pointer; font: inherit; font-weight: 700; margin-right: 8px; padding: 8px 12px; }
+.settings-profile-edit-fields { display: grid; gap: 16px; margin-top: 20px; }
+.settings-profile-edit-fields label { color: var(--foreground); display: grid; font-weight: 700; gap: 7px; }
+.settings-profile-edit-fields input { background: #fff; border: 1px solid var(--grey-color); border-radius: 8px; color: var(--foreground); font: inherit; min-height: 44px; padding: 9px 12px; width: 100%; }
+.settings-profile-edit-fields input:focus { border-color: var(--accent-color); outline: 2px solid color-mix(in srgb, var(--accent-color) 25%, transparent); }
+.settings-profile-fields { margin: 0; }
+.settings-profile-fields div { border-top: 1px solid var(--grey-color); display: grid; gap: 12px; grid-template-columns: 170px minmax(0, 1fr); padding: 14px 0; }
+.settings-profile-fields dt { color: var(--light-dark-color); }
+.settings-profile-fields dd { font-weight: 700; margin: 0; overflow-wrap: anywhere; }
+.settings-profile-stats { display: grid; gap: 14px; grid-template-columns: repeat(2, minmax(0, 1fr)); margin-top: 20px; }
+.settings-profile-stats div { background: var(--accent-soft-color); border: 1px solid var(--accent-color); border-radius: 10px; display: grid; gap: 6px; padding: 18px; }
+.settings-profile-stats span { color: var(--foreground); font-weight: 700; }
+.settings-profile-stats strong { color: var(--accent-dark); font-size: 2rem; }
+@media (max-width: 600px) { .settings-profile-fields div, .settings-profile-stats { grid-template-columns: 1fr; } }
+html[data-appearance-mode="dark"] .settings-profile { background: #253235; border-color: #526365; }
+html[data-appearance-mode="dark"] .settings-profile-edit-fields input { background: #101b1d; border-color: #526365; }
 
 @media (max-width: 760px) {
   .settings-workspace {

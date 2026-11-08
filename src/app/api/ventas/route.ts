@@ -7,8 +7,9 @@ import { ensureSaleReceipt } from "@/lib/sale-receipt";
 export const GET = withAuth(async (request) => {
   const user = await prisma.user.findUnique({ where: { correo: request.correo }, select: { id: true } });
   if (!user) return NextResponse.json({ message: "Usuario no encontrado." }, { status: 401 });
+  const openCashRegister = await prisma.apertura_caja.findFirst({ where: { horario_cierre: null }, select: { id_apertura: true } });
   const ventas = await prisma.venta.findMany({
-    where: { id_vendedor: user.id, estado: "pendiente" },
+    where: { id_vendedor: user.id, estado: "pendiente", id_apertura_caja: openCashRegister?.id_apertura ?? "00000000-0000-0000-0000-000000000000" },
     orderBy: { fecha_de_creacion: "asc" }, include: saleInclude,
   });
   return NextResponse.json({ status: "ok", ventas }, { headers: { "Cache-Control": "no-store" } });

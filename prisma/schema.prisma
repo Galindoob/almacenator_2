@@ -14,6 +14,9 @@ model User {
   contrasena          String
   roleid              String                @default(dbgenerated("'28ad34ff-cf2e-4851-a7e7-fffa5d5b53cd'::uuid")) @db.Uuid
   correo              String?               @unique @db.VarChar(255)
+  fono                String?               @db.VarChar(60)
+  direccion           String?               @db.VarChar(200)
+  url_imagen          String?               @db.VarChar(500)
   apertura_caja       apertura_caja[]
   movimiento_de_stock movimiento_de_stock[]
   ventas              venta[]
@@ -162,8 +165,8 @@ model empaque {
 model apertura_caja {
   id_apertura         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   id_usuario_apertura String    @db.Uuid
-  horario_apertura    DateTime  @default(now()) @db.Timestamp(6)
-  horario_cierre      DateTime? @db.Timestamp(6)
+  horario_apertura    DateTime  @default(now()) @db.Timestamptz(6)
+  horario_cierre      DateTime? @db.Timestamptz(6)
   venta_boleta        Int       @default(0)
   venta_factura       Int       @default(0)
   venta_debito        Int       @default(0)
@@ -176,10 +179,35 @@ model apertura_caja {
   saldo_cierre        Int?
   diferencia          Int?
   saldo_esperado      Int       @default(0)
+  valor_real          Int       @default(0)
+  retiro              Int       @default(0)
+  comentario          String?   @db.VarChar(255)
   venta_transferencia Int       @default(0)
   total_transferencia Int       @default(0)
   total               Int       @default(0)
   users               User      @relation(fields: [id_usuario_apertura], references: [id], map: "fk_apertura_caja_usuario")
+  ventas              venta[]
+  movimientos         movimiento_caja[]
+}
+
+model razon_movimiento {
+  id_razon     String            @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  razon        String            @unique @db.VarChar(100)
+  movimientos  movimiento_caja[]
+}
+
+model movimiento_caja {
+  id_movimiento    String             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  id_apertura_caja String             @db.Uuid
+  fecha_movimiento DateTime           @default(now()) @db.Timestamptz(6)
+  tipo             String             @db.VarChar(20)
+  comentario       String?            @db.VarChar(255)
+  id_razon         String?            @db.Uuid
+  movimiento       Int
+  apertura         apertura_caja      @relation(fields: [id_apertura_caja], references: [id_apertura], onDelete: Restrict)
+  razon_detalle    razon_movimiento?  @relation(fields: [id_razon], references: [id_razon], onDelete: Restrict)
+
+  @@index([id_apertura_caja])
 }
 
 /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
@@ -235,6 +263,7 @@ model venta {
   id_venta          String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   num_venta         Int       @unique @default(autoincrement())
   id_vendedor       String    @db.Uuid
+  id_apertura_caja  String?   @db.Uuid
   valor_total       Int
   fecha_de_creacion DateTime  @default(now()) @db.Timestamptz(6)
   fecha_pago        DateTime? @db.Timestamptz(6)
@@ -245,8 +274,11 @@ model venta {
   clave_cliente     String?   @unique @db.Uuid
   revision          Int       @default(0)
   vendedor          User      @relation(fields: [id_vendedor], references: [id], onDelete: Restrict, map: "fk_venta_vendedor")
+  apertura          apertura_caja? @relation(fields: [id_apertura_caja], references: [id_apertura], onDelete: Restrict)
   detalles          detalle[]
   pagos             pagos[]
+
+  @@index([id_apertura_caja])
 }
 
 model detalle {

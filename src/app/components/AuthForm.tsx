@@ -27,6 +27,8 @@ export function AuthForm({ mode }: AuthFormProps) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [profileImage, setProfileImage] = useState<File | null>(null);
+  const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [requestingReset, setRequestingReset] = useState(false);
   const [status, setStatus] = useState<{
@@ -141,18 +143,17 @@ export function AuthForm({ mode }: AuthFormProps) {
       return;
     }
 
+    setSubmitting(true);
     try {
+      const formData = new FormData();
+      formData.set("correo", email.trim());
+      formData.set("contrasena", password);
+      formData.set("nombre", firstName.trim());
+      formData.set("apellido", lastName.trim());
+      if (profileImage) formData.set("imagen", profileImage);
       const response = await fetch("/api/register", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          correo: email.trim(),
-          contrasena: password,
-          nombre: firstName.trim(),
-          apellido: lastName.trim(),
-        }),
+        body: formData,
       });
       const data = (await response.json()) as {
         status?: "ok" | "error";
@@ -173,6 +174,8 @@ export function AuthForm({ mode }: AuthFormProps) {
         type: "error",
         message: "No se pudo conectar con el endpoint de registro.",
       });
+    } finally {
+      setSubmitting(false);
     }
   }
 
@@ -320,7 +323,29 @@ export function AuthForm({ mode }: AuthFormProps) {
             </label>
           ) : null}
 
-          <button type="submit">{isRegister ? "Registrar" : "Ingresar"}</button>
+          {isRegister ? (
+            <label>
+              Foto de perfil (opcional)
+              <input
+                type="file"
+                accept="image/png,image/jpeg,image/webp,image/gif"
+                onChange={(event) => {
+                  const file = event.target.files?.[0] ?? null;
+                  if (file && file.size > 5 * 1024 * 1024) {
+                    setStatus({ type: "error", message: "La imagen no puede superar 5 MB." });
+                    event.target.value = "";
+                    setProfileImage(null);
+                    return;
+                  }
+                  setProfileImage(file);
+                  setStatus(null);
+                }}
+              />
+              <small>JPG, PNG, WebP o GIF. Máximo 5 MB.</small>
+            </label>
+          ) : null}
+
+          <button type="submit" disabled={submitting}>{submitting ? "Registrando..." : isRegister ? "Registrar" : "Ingresar"}</button>
         </form>
 
         {!isRegister && submitted && (status?.type === "error" || Object.values(errors).some(Boolean)) ? (

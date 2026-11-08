@@ -83,6 +83,16 @@ export type empaque = Prisma.empaqueModel
  */
 export type apertura_caja = Prisma.apertura_cajaModel
 /**
+ * Model razon_movimiento
+ * 
+ */
+export type razon_movimiento = Prisma.razon_movimientoModel
+/**
+ * Model movimiento_caja
+ * 
+ */
+export type movimiento_caja = Prisma.movimiento_cajaModel
+/**
  * Model historia_caja
  * This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
  */

@@ -1,29 +1,83 @@
 import { NextResponse } from "next/server";
 import { withAuth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
+import { z } from "zod";
 
-export const GET = withAuth(async () => {
+const roleChangeSchema = z.object({
+  userId: z.uuid(),
+  roleId: z.uuid(),
+});
+
+const privilegedRoles = ["admin", "master"];
+const basicRoles = ["usuario", "cajero"];
+
+export const GET = withAuth(async (request) => {
   try {
-    const users = await prisma.user.findMany({
+    const [users, roles, currentUser] = await Promise.all([
+      prisma.user.findMany({
       select: {
         id: true,
         nombre: true,
         apellido: true,
+        roleid: true,
         role: { select: { role: true } },
       },
       orderBy: [{ nombre: "asc" }, { apellido: "asc" }],
-    });
+      }),
+      prisma.role.findMany({ select: { id: true, role: true }, orderBy: { role: "asc" } }),
+      prisma.user.findUnique({ where: { correo: request.correo }, select: { role: { select: { role: true } } } }),
+    ]);
 
     return NextResponse.json({
+      roles: roles.map((role) => ({ id: role.id, nombre: role.role })),
+      canManageRoles: currentUser ? privilegedRoles.includes(currentUser.role.role) : false,
+      actorRole: currentUser?.role.role ?? null,
       users: users.map((user) => ({
         id: user.id,
         nombre: user.nombre,
         apellido: user.apellido,
+        roleId: user.roleid,
         rol: user.role.role,
       })),
     });
   } catch (error) {
     console.error("Error al consultar usuarios:", error);
     return NextResponse.json({ message: "No se pudieron cargar los usuarios." }, { status: 500 });
+  }
+});
+
+export const PATCH = withAuth(async (request) => {
+  const parsed = roleChangeSchema.safeParse(await request.json().catch(() => null));
+  if (!parsed.success) return NextResponse.json({ message: "Selecciona un usuario y un rol válidos." }, { status: 400 });
+
+  try {
+    const [actor, target, nextRole] = await Promise.all([
+      prisma.user.findUnique({ where: { correo: request.correo }, include: { role: true } }),
+      prisma.user.findUnique({ where: { id: parsed.data.userId }, include: { role: true } }),
+      prisma.role.findUnique({ where: { id: parsed.data.roleId } }),
+    ]);
+    if (!actor || !privilegedRoles.includes(actor.role.role)) {
+      return NextResponse.json({ message: "No tienes permisos para cambiar roles." }, { status: 403 });
+    }
+    if (!target || !nextRole) return NextResponse.json({ message: "Usuario o rol no encontrado." }, { status: 404 });
+    if (target.role.role === "master" || nextRole.role === "master") {
+      return NextResponse.json({ message: "El rol master es único y no se puede mover ni asignar desde esta vista." }, { status: 403 });
+    }
+    if (actor.role.role === "admin" && (!basicRoles.includes(target.role.role) || !basicRoles.includes(nextRole.role))) {
+      return NextResponse.json({ message: "Admin solo puede alternar entre usuario y cajero." }, { status: 403 });
+    }
+    if (target.roleid === nextRole.id) return NextResponse.json({ message: "El usuario ya tiene ese rol." }, { status: 400 });
+
+    const updated = await prisma.user.updateMany({
+      where: { id: target.id, roleid: target.roleid },
+      data: { roleid: nextRole.id },
+    });
+    if (updated.count !== 1) {
+      return NextResponse.json({ message: "El rol del usuario cambió. Actualiza la página e inténtalo nuevamente." }, { status: 409 });
+    }
+    return NextResponse.json({ message: "Rol actualizado correctamente.", roleId: nextRole.id, rol: nextRole.role });
+  } catch (error) {
+    console.error("Error actualizando rol de usuario:", error);
+    return NextResponse.json({ message: "No se pudo actualizar el rol." }, { status: 500 });
   }
 });

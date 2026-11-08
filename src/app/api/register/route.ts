@@ -4,6 +4,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/db";
 import { authEmailSchema, registrationPasswordSchema } from "@/lib/auth-validation";
+import { deleteCloudinaryImage, uploadCloudinaryImage } from "@/lib/cloudinary-images";
 import {
   AppInputValidationError,
   assertSafePayloadText,
@@ -18,14 +19,23 @@ const registrationFieldsSchema = z.object({
 });
 
 export async function POST(request: NextRequest) {
-  const rawFields = request.headers.get("content-type")?.includes("application/json")
-    ? await request.json().catch(() => null)
-    : {
-        correo: request.headers.get("correo"),
-        contrasena: request.headers.get("contrasena"),
-        nombre: request.headers.get("nombre"),
-        apellido: request.headers.get("apellido"),
-      };
+  const isMultipart = request.headers.get("content-type")?.includes("multipart/form-data");
+  const formData = isMultipart ? await request.formData().catch(() => null) : null;
+  const rawFields = isMultipart
+    ? {
+        correo: formData?.get("correo"),
+        contrasena: formData?.get("contrasena"),
+        nombre: formData?.get("nombre"),
+        apellido: formData?.get("apellido"),
+      }
+    : request.headers.get("content-type")?.includes("application/json")
+      ? await request.json().catch(() => null)
+      : {
+          correo: request.headers.get("correo"),
+          contrasena: request.headers.get("contrasena"),
+          nombre: request.headers.get("nombre"),
+          apellido: request.headers.get("apellido"),
+        };
   const fields = registrationFieldsSchema.safeParse(rawFields);
 
   if (!fields.success) {
@@ -74,7 +84,20 @@ export async function POST(request: NextRequest) {
     );
   }
 
+  let uploadedImageUrl: string | null = null;
   try {
+    const image = formData?.get("imagen");
+    if (image instanceof File && image.size > 0) {
+      if (!/^(image\/jpeg|image\/png|image\/webp|image\/gif)$/.test(image.type) || image.size > 5 * 1024 * 1024) {
+        return NextResponse.json({ status: "error", message: "Selecciona una imagen válida de hasta 5 MB." }, { status: 400 });
+      }
+    }
+
+    if (await prisma.user.findUnique({ where: { correo: validatedEmail.data }, select: { id: true } })) {
+      return NextResponse.json({ status: "error", message: "El correo ya está registrado." }, { status: 409 });
+    }
+
+    uploadedImageUrl = await uploadCloudinaryImage(image ?? null, "almacenator/usuarios");
     const hashedPassword = await bcrypt.hash(contrasena, 10);
 
     await prisma.$transaction(async (transaction) => {
@@ -90,6 +113,7 @@ export async function POST(request: NextRequest) {
           apellido,
           correo: validatedEmail.data,
           contrasena: hashedPassword,
+          url_imagen: uploadedImageUrl,
           configuracion: {
             create: { empresaId: company.idEmpresa },
           },
@@ -102,6 +126,10 @@ export async function POST(request: NextRequest) {
       { status: 201 },
     );
   } catch (error) {
+    if (uploadedImageUrl) {
+      try { await deleteCloudinaryImage(uploadedImageUrl); }
+      catch (cleanupError) { console.error("Error limpiando imagen de registro:", cleanupError); }
+    }
     if (
       error instanceof Prisma.PrismaClientKnownRequestError &&
       error.code === "P2002"
@@ -115,8 +143,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const message =
-      error instanceof Error ? error.message : "Error al registrar usuario.";
+    const message = error instanceof Error ? error.message : "Error al registrar usuario.";
 
     if (
       message.toLowerCase().includes("duplicate") ||
@@ -134,7 +161,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(
       {
         status: "error",
-        message: `Error interno de Neon: ${message}`,
+        message: "No se pudo registrar el usuario. Inténtalo nuevamente.",
       },
       { status: 500 },
     );

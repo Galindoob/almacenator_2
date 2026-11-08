@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Navbar } from "../components/Navbar";
 import { useAppearance } from "../components/AppearanceProvider";
-import { isSafeAppInput } from "@/lib/input-validation";
 
 type TokenPayload = {
   nombre?: string;
@@ -86,8 +85,9 @@ export default function HomePage() {
   const { storeName } = useAppearance();
   const [payload, setPayload] = useState<TokenPayload | null>(null);
   const [isCashRegisterOpen, setIsCashRegisterOpen] = useState<boolean | null>(null);
+  const [canCloseCashRegister, setCanCloseCashRegister] = useState(false);
+  const [availableOpeningBalance, setAvailableOpeningBalance] = useState<number | null>(null);
   const [isOpenCashModalVisible, setIsOpenCashModalVisible] = useState(false);
-  const [openingAmount, setOpeningAmount] = useState("");
   const [cashMessage, setCashMessage] = useState("");
   const [isSavingCashRegister, setIsSavingCashRegister] = useState(false);
 
@@ -115,23 +115,25 @@ export default function HomePage() {
       }
 
       try {
-        const response = await fetch("/api/caja", {
-          headers: {
-          },
-        });
+        const response = await fetch("/api/caja", { cache: "no-store" });
         const data = (await response.json()) as {
           status?: "ok" | "error";
           abierta?: boolean;
+          puedeCerrar?: boolean;
+          saldoDisponible?: number | null;
+          message?: string;
         };
 
         if (!response.ok || data.status !== "ok") {
-          setIsCashRegisterOpen(false);
+          setCashMessage(data.message ?? "No se pudo consultar la caja.");
           return;
         }
 
         setIsCashRegisterOpen(Boolean(data.abierta));
+        setCanCloseCashRegister(Boolean(data.puedeCerrar));
+        setAvailableOpeningBalance(data.saldoDisponible ?? null);
       } catch {
-        setIsCashRegisterOpen(false);
+        setCashMessage("No se pudo conectar con el servidor de caja.");
       }
     }
 
@@ -145,26 +147,33 @@ export default function HomePage() {
     router.replace("/login");
   }
 
-  function updateOpeningAmount(value: string) {
-    if (isSafeAppInput(value) && /^\d*$/.test(value)) {
-      setOpeningAmount(value);
-      setCashMessage("");
-    }
-  }
-
-  function handleAction(action: HomeAction["action"]) {
+  async function handleAction(action: HomeAction["action"]) {
     if (action === "sale") {
       router.push("/ventas");
       return;
     }
 
     if (action === "close") {
+      try {
+        const response = await fetch("/api/caja", { cache: "no-store" });
+        const data = await response.json() as { abierta?: boolean; puedeCerrar?: boolean; ventasPendientes?: number; message?: string };
+        if (!response.ok || !data.abierta || !data.puedeCerrar) {
+          window.alert(data.message ?? "No puedes cerrar esta caja.");
+          return;
+        }
+        if (data.ventasPendientes) {
+          window.alert(`Hay ${data.ventasPendientes} ${data.ventasPendientes === 1 ? "venta pendiente" : "ventas pendientes"}. Termínalas o elimínalas antes de cerrar la caja.`);
+          return;
+        }
+      } catch {
+        window.alert("No se pudo verificar el estado de la caja.");
+        return;
+      }
       router.push("/cierreCaja");
     }
   }
 
   async function openCashRegister() {
-    const amount = Number(openingAmount);
     const token = hasSessionHint();
 
     if (!token) {
@@ -172,7 +181,8 @@ export default function HomePage() {
       return;
     }
 
-    if (!openingAmount || !Number.isFinite(amount) || amount < 0) {
+    if (availableOpeningBalance === null) {
+      window.alert("Caja vacía, comunicarse con administración.");
       return;
     }
 
@@ -185,7 +195,7 @@ export default function HomePage() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ monto: amount }),
+        body: JSON.stringify({}),
       });
       const data = (await response.json()) as {
         status?: "ok" | "error";
@@ -198,8 +208,9 @@ export default function HomePage() {
       }
 
       setIsCashRegisterOpen(true);
+      setCanCloseCashRegister(true);
+      setAvailableOpeningBalance(null);
       setIsOpenCashModalVisible(false);
-      setOpeningAmount("");
     } catch {
       setCashMessage("No se pudo conectar con el servidor.");
     } finally {
@@ -226,12 +237,15 @@ export default function HomePage() {
         <span className="home-subtitle">Que tengas un gran dia. Hagamos crecer tu negocio.</span>
 
         <nav className="home-actions" aria-label="Acciones principales">
+          {cashMessage && !isOpenCashModalVisible ? <p className="cash-modal-message" role="alert">{cashMessage}</p> : null}
           {isCashRegisterOpen ? (
             homeActions.map((action) => (
               <button
                 type="button"
                 className={`home-action-${action.tone}`}
                 key={action.label}
+                disabled={action.action === "close" && !canCloseCashRegister}
+                title={action.action === "close" && !canCloseCashRegister ? "Solo quien abrió la caja puede cerrarla" : undefined}
                 onClick={() => handleAction(action.action)}
               >
                 <span className="home-action-icon">
@@ -248,7 +262,10 @@ export default function HomePage() {
               type="button"
               className="home-action-cash"
               disabled={isCashRegisterOpen === null}
-              onClick={() => setIsOpenCashModalVisible(true)}
+              onClick={() => {
+                if (availableOpeningBalance === null) window.alert("Caja vacía, comunicarse con administración.");
+                else setIsOpenCashModalVisible(true);
+              }}
             >
               <span className="home-action-icon">
                 <HomeActionIcon name="register" />
@@ -277,19 +294,11 @@ export default function HomePage() {
           />
           <section className="cash-modal" role="dialog" aria-modal="true">
             <h2>Abrir caja</h2>
-            <label>
-              Ingrese monto de apertura de caja
-              <input
-                type="text"
-                inputMode="numeric"
-                value={openingAmount}
-                onChange={(event) => updateOpeningAmount(event.target.value)}
-              />
-            </label>
+            <p>Saldo disponible para la apertura: <strong>$ {availableOpeningBalance?.toLocaleString("es-CL")}</strong></p>
             {cashMessage ? <p className="cash-modal-message">{cashMessage}</p> : null}
             <button
               type="button"
-              disabled={!openingAmount || isSavingCashRegister}
+              disabled={isSavingCashRegister}
               onClick={openCashRegister}
             >
               {isSavingCashRegister ? "Abriendo..." : "Abrir caja"}

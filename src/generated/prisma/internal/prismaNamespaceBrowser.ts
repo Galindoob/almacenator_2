@@ -64,6 +64,8 @@ export const ModelName = {
   instancia_producto: 'instancia_producto',
   empaque: 'empaque',
   apertura_caja: 'apertura_caja',
+  razon_movimiento: 'razon_movimiento',
+  movimiento_caja: 'movimiento_caja',
   historia_caja: 'historia_caja',
   proveedores: 'proveedores',
   medio_pago: 'medio_pago',
@@ -97,7 +99,10 @@ export const UserScalarFieldEnum = {
   apellido: 'apellido',
   contrasena: 'contrasena',
   roleid: 'roleid',
-  correo: 'correo'
+  correo: 'correo',
+  fono: 'fono',
+  direccion: 'direccion',
+  url_imagen: 'url_imagen'
 } as const
 
 export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
@@ -247,12 +252,36 @@ export const Apertura_cajaScalarFieldEnum = {
   saldo_cierre: 'saldo_cierre',
   diferencia: 'diferencia',
   saldo_esperado: 'saldo_esperado',
+  valor_real: 'valor_real',
+  retiro: 'retiro',
+  comentario: 'comentario',
   venta_transferencia: 'venta_transferencia',
   total_transferencia: 'total_transferencia',
   total: 'total'
 } as const
 
 export type Apertura_cajaScalarFieldEnum = (typeof Apertura_cajaScalarFieldEnum)[keyof typeof Apertura_cajaScalarFieldEnum]
+
+
+export const Razon_movimientoScalarFieldEnum = {
+  id_razon: 'id_razon',
+  razon: 'razon'
+} as const
+
+export type Razon_movimientoScalarFieldEnum = (typeof Razon_movimientoScalarFieldEnum)[keyof typeof Razon_movimientoScalarFieldEnum]
+
+
+export const Movimiento_cajaScalarFieldEnum = {
+  id_movimiento: 'id_movimiento',
+  id_apertura_caja: 'id_apertura_caja',
+  fecha_movimiento: 'fecha_movimiento',
+  tipo: 'tipo',
+  comentario: 'comentario',
+  id_razon: 'id_razon',
+  movimiento: 'movimiento'
+} as const
+
+export type Movimiento_cajaScalarFieldEnum = (typeof Movimiento_cajaScalarFieldEnum)[keyof typeof Movimiento_cajaScalarFieldEnum]
 
 
 export const Historia_cajaScalarFieldEnum = {
@@ -314,6 +343,7 @@ export const VentaScalarFieldEnum = {
   id_venta: 'id_venta',
   num_venta: 'num_venta',
   id_vendedor: 'id_vendedor',
+  id_apertura_caja: 'id_apertura_caja',
   valor_total: 'valor_total',
   fecha_de_creacion: 'fecha_de_creacion',
   fecha_pago: 'fecha_pago',
