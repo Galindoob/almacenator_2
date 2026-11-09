@@ -62,6 +62,16 @@ export type Empresa = Prisma.EmpresaModel
  */
 export type Role = Prisma.RoleModel
 /**
+ * Model Permiso
+ * 
+ */
+export type Permiso = Prisma.PermisoModel
+/**
+ * Model RolPermiso
+ * 
+ */
+export type RolPermiso = Prisma.RolPermisoModel
+/**
  * Model Marca
  * 
  */
@@ -106,6 +116,11 @@ export type empaque = Prisma.empaqueModel
  * This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
  */
 export type apertura_caja = Prisma.apertura_cajaModel
+/**
+ * Model capital_caja
+ * 
+ */
+export type capital_caja = Prisma.capital_cajaModel
 /**
  * Model razon_movimiento
  * 

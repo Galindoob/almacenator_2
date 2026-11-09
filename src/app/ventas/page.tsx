@@ -1,4 +1,5 @@
 "use client";
+import { useSyncRevision } from "../components/SyncProvider";
 import { endSession, hasSessionHint } from "@/lib/client-session";
 
 import { useRouter } from "next/navigation";
@@ -227,6 +228,7 @@ function ProductDetails({ product }: { product: Producto }) {
 }
 
 export default function SalesPage() {
+  const syncRevision = useSyncRevision();
   const router = useRouter();
   const { storeName } = useAppearance();
   const [productos, setProductos] = useState<Producto[]>([]);
@@ -256,6 +258,8 @@ export default function SalesPage() {
   const [paymentMethodsError, setPaymentMethodsError] = useState("");
   const [selectedPaymentMethodId, setSelectedPaymentMethodId] = useState<string | null>(null);
   const weightInputs = useRef(new Map<string, HTMLInputElement>());
+  const currentSaleId = activeSale?.id_venta;
+  const currentSaleRevision = activeSale?.revision;
 
   useEffect(() => {
     async function loadProductos() {
@@ -397,6 +401,27 @@ export default function SalesPage() {
       setProductos(data.productos ?? []);
     }
   }
+
+  useEffect(() => {
+    if (syncRevision === 0 || busy || isLoading) return;
+    const controller = new AbortController();
+    fetch("/api/producto", { cache: "no-store", signal: controller.signal })
+      .then(async (response) => response.ok ? response.json() as Promise<{ productos?: Producto[] }> : null)
+      .then((data) => { if (data && !controller.signal.aborted) setProductos(data.productos ?? []); })
+      .catch(() => {});
+    fetch("/api/ventas", { cache: "no-store", signal: controller.signal })
+      .then(async (response) => response.ok ? response.json() as Promise<{ ventas: Sale[] }> : null)
+      .then((data) => {
+        if (!data || controller.signal.aborted) return;
+        setSales(data.ventas);
+        if (currentSaleId) {
+          const current = data.ventas.find((sale) => sale.id_venta === currentSaleId);
+          if (!current || current.revision !== currentSaleRevision) setOperationError("Esta venta cambió en otro dispositivo. Selecciónala nuevamente antes de continuar.");
+        }
+      })
+      .catch(() => {});
+    return () => controller.abort();
+  }, [syncRevision, busy, isLoading, currentSaleId, currentSaleRevision]);
 
   async function mutate(command: SaleCommand) {
     if (busyRef.current) return;

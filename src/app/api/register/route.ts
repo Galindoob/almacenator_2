@@ -106,6 +106,8 @@ export async function POST(request: NextRequest) {
         select: { idEmpresa: true },
       });
       if (!company) throw new Error("No existe una empresa configurada.");
+      const defaultRole = await transaction.role.findUnique({ where: { role: "usuario" }, select: { id: true } });
+      if (!defaultRole) throw new Error("No existe el rol usuario.");
 
       await transaction.user.create({
         data: {
@@ -113,6 +115,7 @@ export async function POST(request: NextRequest) {
           apellido,
           correo: validatedEmail.data,
           contrasena: hashedPassword,
+          roleid: defaultRole.id,
           url_imagen: uploadedImageUrl,
           configuracion: {
             create: { empresaId: company.idEmpresa },

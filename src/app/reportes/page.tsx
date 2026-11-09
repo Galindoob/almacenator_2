@@ -4,6 +4,7 @@ import { endSession, hasSessionHint } from "@/lib/client-session";
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { CartLoader } from "../components/CartLoader";
+import { useSyncRevision } from "../components/SyncProvider";
 
 type Summary = { sales: number; total: number; margin: number };
 type DailyReport = Summary & { date: string };
@@ -65,6 +66,7 @@ function SummaryGroup({ title, summary, loading }: { title: string; summary: Sum
 }
 
 export default function ReportesPage() {
+  const syncRevision = useSyncRevision();
   const router = useRouter();
   const [paymentMethod, setPaymentMethod] = useState("");
   const [selectedMonth, setSelectedMonth] = useState(getCurrentChileMonth);
@@ -131,7 +133,7 @@ export default function ReportesPage() {
       });
 
     return () => controller.abort();
-  }, [paymentMethod, router, selectedMonth]);
+  }, [paymentMethod, router, selectedMonth, syncRevision]);
 
   return (
     <section className="reports-content" aria-labelledby="reports-title">

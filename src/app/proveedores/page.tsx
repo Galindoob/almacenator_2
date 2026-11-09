@@ -5,6 +5,8 @@ import { Fragment, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Navbar } from "../components/Navbar";
 import { CartLoader } from "../components/CartLoader";
+import { usePermissions } from "../components/usePermissions";
+import { useSyncRevision } from "../components/SyncProvider";
 import { isSafeAppInput } from "@/lib/input-validation";
 
 type ProviderProduct = {
@@ -97,6 +99,8 @@ function FieldIcon({ name }: { name: FieldIconName }) {
 }
 
 export default function ProvidersPage() {
+  const can = usePermissions();
+  const syncRevision = useSyncRevision();
   const router = useRouter();
   const [providers, setProviders] = useState<Provider[]>([]);
   const [catalogProducts, setCatalogProducts] = useState<CatalogProduct[]>([]);
@@ -126,7 +130,12 @@ export default function ProvidersPage() {
   const [productManagerMessage, setProductManagerMessage] = useState("");
   const [isSavingProducts, setIsSavingProducts] = useState(false);
 
+  const originalProvider = providers.find((provider) => provider.id_proveedor === selectedProviderId);
+  const formIsDirty = Boolean(form && originalProvider && JSON.stringify(form) !== JSON.stringify(buildProviderForm(originalProvider)));
+
   useEffect(() => {
+    if (formIsDirty || isCreateModalOpen || isImageModalOpen || isProductManagerOpen || isSaving || isCreating || isSavingImage || isSavingProducts) return;
+    const controller = new AbortController();
     async function loadProviders() {
       const token = hasSessionHint();
 
@@ -138,6 +147,7 @@ export default function ProvidersPage() {
       try {
         const response = await fetch("/api/proveedores", {
           headers: {},
+          signal: controller.signal,
         });
         const data = (await response.json()) as {
           status?: "ok" | "error";
@@ -157,17 +167,22 @@ export default function ProvidersPage() {
           return;
         }
 
+        if (controller.signal.aborted) return;
         setProviders(data.proveedores ?? []);
+        const selected = data.proveedores?.find((provider) => provider.id_proveedor === selectedProviderId);
+        if (selected) setForm(buildProviderForm(selected));
         setCatalogProducts(data.productos ?? []);
       } catch {
+        if (controller.signal.aborted) return;
         setError("No se pudo conectar con el servidor.");
       } finally {
-        setIsLoading(false);
+        if (!controller.signal.aborted) setIsLoading(false);
       }
     }
 
     loadProviders();
-  }, [router]);
+    return () => controller.abort();
+  }, [router, syncRevision, formIsDirty, isCreateModalOpen, isImageModalOpen, isProductManagerOpen, isSaving, isCreating, isSavingImage, isSavingProducts, selectedProviderId]);
 
   const filteredProviders = useMemo(() => {
     const query = search.trim().toLocaleLowerCase("es-CL");
@@ -663,6 +678,7 @@ export default function ProvidersPage() {
               <button
                 type="button"
                 aria-label="Agregar proveedor"
+                disabled={!can("proveedores_editar")}
                 title="Agregar proveedor"
                 onClick={openCreateProviderModal}
               >
@@ -749,6 +765,7 @@ export default function ProvidersPage() {
                                     <div className="provider-product-stock-head">
                                       <button
                                         type="button"
+                                        disabled={!can("proveedores_editar")}
                                         onClick={(event) => {
                                           event.stopPropagation();
                                           openProductManager(provider);
@@ -784,6 +801,7 @@ export default function ProvidersPage() {
                                   <p>Este proveedor no tiene productos asociados.</p>
                                   <button
                                     type="button"
+                                    disabled={!can("proveedores_editar")}
                                     onClick={(event) => {
                                       event.stopPropagation();
                                       openProductManager(provider);
@@ -818,6 +836,7 @@ export default function ProvidersPage() {
                 className="provider-image-edit-button"
                 type="button"
                 aria-label="Editar imagen del proveedor"
+                disabled={!can("proveedores_editar")}
                 title="Editar imagen"
                 onClick={openProviderImageModal}
               >
@@ -847,6 +866,7 @@ export default function ProvidersPage() {
                 </span>
                 <input
                   type="text"
+                  disabled={!can("proveedores_editar")}
                   value={form.nombre}
                   onChange={(event) => updateForm("nombre", event.target.value)}
                 />
@@ -859,6 +879,7 @@ export default function ProvidersPage() {
                 </span>
                 <input
                   type="text"
+                  disabled={!can("proveedores_editar")}
                   value={form.nombre_vendedor}
                   onChange={(event) =>
                     updateForm("nombre_vendedor", event.target.value)
@@ -873,6 +894,7 @@ export default function ProvidersPage() {
                 </span>
                 <input
                   type="text"
+                  disabled={!can("proveedores_editar")}
                   inputMode="tel"
                   placeholder="+569 1234 5678"
                   value={form.telefono}
@@ -887,6 +909,7 @@ export default function ProvidersPage() {
                 </span>
                 <input
                   type="email"
+                  disabled={!can("proveedores_editar")}
                   value={form.correo_contacto}
                   onChange={(event) =>
                     updateForm("correo_contacto", event.target.value)
@@ -912,7 +935,7 @@ export default function ProvidersPage() {
               <button
                 className="provider-save-button"
                 type="button"
-                disabled={isSaving}
+                disabled={isSaving || !can("proveedores_editar")}
                 onClick={saveProvider}
               >
                 {isSaving ? "Guardando..." : "Guardar cambios"}

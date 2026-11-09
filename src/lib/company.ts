@@ -6,6 +6,12 @@ export type UserCompany = {
 };
 
 export async function ensureUserCompany(userId: string): Promise<UserCompany> {
+  const [existing] = await prisma.$queryRaw<UserCompany[]>`
+    SELECT e.id_empresa::text AS id, e.nombre_fantasia AS name
+    FROM configuracion_usuario c JOIN empresa e ON e.id_empresa = c.empresa
+    WHERE c.id_usuario = ${userId}::uuid LIMIT 1
+  `;
+  if (existing) return existing;
   const [company] = await prisma.$queryRaw<UserCompany[]>`
     WITH company_to_assign AS (
       SELECT COALESCE(

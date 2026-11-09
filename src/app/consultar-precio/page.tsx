@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Navbar } from "../components/Navbar";
 import { useBarcodeScanner } from "../components/useBarcodeScanner";
+import { useSyncRevision } from "../components/SyncProvider";
 import { isSafeAppInput } from "@/lib/input-validation";
 
 type PriceProduct = {
@@ -26,6 +27,7 @@ function formatPrice(value: number) {
 }
 
 export default function ConsultarPrecioPage() {
+  const syncRevision = useSyncRevision();
   const router = useRouter();
   const [searchText, setSearchText] = useState("");
   const [query, setQuery] = useState("");
@@ -131,7 +133,7 @@ export default function ConsultarPrecioPage() {
 
         const foundProducts = data.productos ?? [];
         setProducts(foundProducts);
-        setSelectedProductId(foundProducts[0]?.id ?? null);
+        setSelectedProductId((current) => foundProducts.some((product) => product.id === current) ? current : foundProducts[0]?.id ?? null);
       } catch (requestError) {
         if (requestError instanceof DOMException && requestError.name === "AbortError") {
           return;
@@ -147,7 +149,7 @@ export default function ConsultarPrecioPage() {
       window.clearTimeout(timeout);
       controller.abort();
     };
-  }, [query, router]);
+  }, [query, router, syncRevision]);
 
   function handleLogout() {
     void endSession();

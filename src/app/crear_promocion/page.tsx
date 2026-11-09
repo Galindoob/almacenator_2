@@ -6,6 +6,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { X, Search, Check } from "lucide-react";
 import { isSafeAppInput, isSafeDescriptionInput } from "@/lib/input-validation";
 import { useBarcodeScanner } from "../components/useBarcodeScanner";
+import { useSyncRevision } from "../components/SyncProvider";
 
 type Product = { id: string; nombre: string; codigoBarra: string | null; precioVenta: number; costo: number; stock: number; urlImagen: string | null; categoriaId: string; marca: { nombre: string }; categoria: { nombreCategoria: string } };
 type PromoKind = "descuento" | "yapa" | "combo";
@@ -24,6 +25,7 @@ type EditablePromotion = {
 const money = (value: number) => `$${Math.round(value).toLocaleString("es-CL")}`;
 
 function CreatePromotionForm() {
+  const syncRevision = useSyncRevision();
   const router = useRouter();
   const editId = useSearchParams().get("id");
   const [products, setProducts] = useState<Product[]>([]);
@@ -86,6 +88,20 @@ function CreatePromotionForm() {
     }).finally(() => { if (!controller.signal.aborted) setLoading(false); });
     return () => controller.abort();
   }, [editId]);
+
+  useEffect(() => {
+    if (!syncRevision || loading || saving) return;
+    const controller = new AbortController();
+    Promise.all([
+      fetch("/api/producto", { cache: "no-store", signal: controller.signal }),
+      fetch("/api/promociones", { cache: "no-store", signal: controller.signal }),
+    ]).then(async ([productsResponse, promotionsResponse]) => {
+      if (!productsResponse.ok || !promotionsResponse.ok) return;
+      const [productData, promotionData] = await Promise.all([productsResponse.json(), promotionsResponse.json()]);
+      if (!controller.signal.aborted) { setProducts(productData.productos ?? []); setProductPromotions(promotionData.promociones ?? []); }
+    }).catch(() => {});
+    return () => controller.abort();
+  }, [syncRevision, loading, saving]);
 
   const selectedProducts = useMemo(() => products.filter((product) => selectedIds.includes(product.id)), [products, selectedIds]);
   const categories = useMemo(() => Array.from(new Map(products.map((product) => [product.categoriaId, product.categoria.nombreCategoria])).entries())

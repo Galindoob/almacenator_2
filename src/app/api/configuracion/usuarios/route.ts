@@ -2,14 +2,13 @@ import { NextResponse } from "next/server";
 import { withAuth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { z } from "zod";
+import { getUserPermissions, roleLevel } from "@/lib/permissions";
 
 const roleChangeSchema = z.object({
   userId: z.uuid(),
   roleId: z.uuid(),
 });
 
-const privilegedRoles = ["admin", "master"];
-const basicRoles = ["usuario", "cajero"];
 
 export const GET = withAuth(async (request) => {
   try {
@@ -19,23 +18,25 @@ export const GET = withAuth(async (request) => {
         id: true,
         nombre: true,
         apellido: true,
+        url_imagen: true,
         roleid: true,
         role: { select: { role: true } },
       },
       orderBy: [{ nombre: "asc" }, { apellido: "asc" }],
       }),
       prisma.role.findMany({ select: { id: true, role: true }, orderBy: { role: "asc" } }),
-      prisma.user.findUnique({ where: { correo: request.correo }, select: { role: { select: { role: true } } } }),
+      getUserPermissions(request.correo),
     ]);
 
     return NextResponse.json({
       roles: roles.map((role) => ({ id: role.id, nombre: role.role })),
-      canManageRoles: currentUser ? privilegedRoles.includes(currentUser.role.role) : false,
-      actorRole: currentUser?.role.role ?? null,
+      canManageRoles: currentUser?.has("roles_cambiar") ?? false,
+      actorRole: currentUser?.role ?? null,
       users: users.map((user) => ({
         id: user.id,
         nombre: user.nombre,
         apellido: user.apellido,
+        urlImagen: user.url_imagen,
         roleId: user.roleid,
         rol: user.role.role,
       })),
@@ -52,19 +53,19 @@ export const PATCH = withAuth(async (request) => {
 
   try {
     const [actor, target, nextRole] = await Promise.all([
-      prisma.user.findUnique({ where: { correo: request.correo }, include: { role: true } }),
+      getUserPermissions(request.correo),
       prisma.user.findUnique({ where: { id: parsed.data.userId }, include: { role: true } }),
       prisma.role.findUnique({ where: { id: parsed.data.roleId } }),
     ]);
-    if (!actor || !privilegedRoles.includes(actor.role.role)) {
+    if (!actor || !actor.has("roles_cambiar")) {
       return NextResponse.json({ message: "No tienes permisos para cambiar roles." }, { status: 403 });
     }
     if (!target || !nextRole) return NextResponse.json({ message: "Usuario o rol no encontrado." }, { status: 404 });
     if (target.role.role === "master" || nextRole.role === "master") {
       return NextResponse.json({ message: "El rol master es único y no se puede mover ni asignar desde esta vista." }, { status: 403 });
     }
-    if (actor.role.role === "admin" && (!basicRoles.includes(target.role.role) || !basicRoles.includes(nextRole.role))) {
-      return NextResponse.json({ message: "Admin solo puede alternar entre usuario y cajero." }, { status: 403 });
+    if (roleLevel(target.role.role) < 0 || roleLevel(nextRole.role) < 0 || roleLevel(actor.role) <= roleLevel(target.role.role) || roleLevel(actor.role) <= roleLevel(nextRole.role)) {
+      return NextResponse.json({ message: "Solo puedes cambiar entre roles inferiores al tuyo." }, { status: 403 });
     }
     if (target.roleid === nextRole.id) return NextResponse.json({ message: "El usuario ya tiene ese rol." }, { status: 400 });
 

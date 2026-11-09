@@ -5,6 +5,9 @@ import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState, type FormEvent } from "react";
 import { Check, KeyRound, Maximize2, Minimize2, Moon, Settings2, Sun, UserRound, X } from "lucide-react";
 import { Navbar } from "../components/Navbar";
+import { usePermissions } from "../components/usePermissions";
+import { useSyncRevision } from "../components/SyncProvider";
+import { FinanceSettings } from "../components/FinanceSettings";
 import {
   useAppearance,
   type AppearancePreferences,
@@ -38,11 +41,12 @@ type AccountUser = {
   id: string;
   nombre: string;
   apellido: string;
+  urlImagen: string | null;
   roleId: string;
   rol: string;
 };
 
-type RoleOption = { id: string; nombre: string };
+type RoleOption = { id: string; nombre: string; puedeEditar?: boolean };
 
 const permissionGroups: { title: string; items: { id: string; label: string; requires?: string }[] }[] = [
   {
@@ -50,8 +54,10 @@ const permissionGroups: { title: string; items: { id: string; label: string; req
     items: [
       { id: "productos_ver", label: "Ver sección de productos" },
       { id: "productos_crear", label: "Crear productos", requires: "productos_ver" },
+      { id: "productos_editar", label: "Editar producto", requires: "productos_ver" },
       { id: "productos_stock", label: "Agregar stock de productos", requires: "productos_ver" },
       { id: "productos_merma", label: "Hacer merma", requires: "productos_ver" },
+      { id: "vencimiento_ver", label: "Ver productos por vencer", requires: "productos_ver" },
       { id: "proveedores_ver", label: "Ver proveedores" },
       { id: "proveedores_editar", label: "Agregar y editar proveedores", requires: "proveedores_ver" },
     ],
@@ -64,8 +70,8 @@ const permissionGroups: { title: string; items: { id: string; label: string; req
       { id: "precios_ver", label: "Consultar precios" },
       { id: "transacciones_ver", label: "Ver transacciones" },
       { id: "academia_ver", label: "Academia MiniGest" },
-      { id: "vencimiento_ver", label: "Ver productos por vencer" },
       { id: "roles_cambiar", label: "Cambiar roles" },
+      { id: "permisos_cambiar", label: "Cambiar permisos de rol" },
       { id: "promociones_crear", label: "Crear promociones" },
     ],
   },
@@ -75,6 +81,7 @@ const permissionGroups: { title: string; items: { id: string; label: string; req
       { id: "caja_abrir_cerrar", label: "Abrir y cerrar cajas" },
       { id: "ventas_crear", label: "Crear venta" },
       { id: "caja_ingreso_egreso", label: "Registrar ingreso y egreso" },
+      { id: "caja_sacar_dinero", label: "Sacar dinero de caja" },
     ],
   },
 ];
@@ -111,7 +118,8 @@ const companyFields: {
 export default function ConfiguracionPage() {
   const router = useRouter();
   const [isSessionVerified, setIsSessionVerified] = useState(false);
-  const [activeSection, setActiveSection] = useState<"empresa" | "preferencias" | "usuarios" | "perfil" | "ajustes_tienda">("empresa");
+  const [activeSection, setActiveSection] = useState<"empresa" | "preferencias" | "usuarios" | "perfil" | "ajustes_tienda" | "finanzas">("preferencias");
+  const can = usePermissions();
   const {
     colorTheme,
     fontScale,
@@ -183,7 +191,7 @@ export default function ConfiguracionPage() {
       <Navbar onLogout={handleLogout} />
       <section className="settings-workspace" aria-label="Configuración">
         <nav className="settings-sidebar" aria-label="Secciones de configuración">
-          <button
+          {can("empresa_usuarios_ver") ? <button
             type="button"
             className={activeSection === "empresa" ? "is-active" : ""}
             aria-current={activeSection === "empresa" ? "page" : undefined}
@@ -194,7 +202,7 @@ export default function ConfiguracionPage() {
           >
             <span className="settings-sidebar-icon" aria-hidden="true">▣</span>
             Empresa
-          </button>
+          </button> : null}
           <button
             type="button"
             className={activeSection === "preferencias" ? "is-active" : ""}
@@ -204,7 +212,7 @@ export default function ConfiguracionPage() {
             <span className="settings-sidebar-icon" aria-hidden="true">⚙</span>
             Preferencias
           </button>
-          <button
+          {can("empresa_usuarios_ver") ? <button
             type="button"
             className={activeSection === "usuarios" ? "is-active" : ""}
             aria-current={activeSection === "usuarios" ? "page" : undefined}
@@ -215,7 +223,7 @@ export default function ConfiguracionPage() {
           >
             <span className="settings-sidebar-icon" aria-hidden="true">U</span>
             Usuarios
-          </button>
+          </button> : null}
           <button
             type="button"
             className={activeSection === "perfil" ? "is-active" : ""}
@@ -228,7 +236,7 @@ export default function ConfiguracionPage() {
             <span className="settings-sidebar-icon" aria-hidden="true"><UserRound size={20} /></span>
             Perfil
           </button>
-          <button
+          {can("permisos_cambiar") ? <button
             type="button"
             className={activeSection === "ajustes_tienda" ? "is-active" : ""}
             aria-current={activeSection === "ajustes_tienda" ? "page" : undefined}
@@ -239,7 +247,10 @@ export default function ConfiguracionPage() {
           >
             <span className="settings-sidebar-icon" aria-hidden="true"><Settings2 size={20} /></span>
             Ajustes de tienda
-          </button>
+          </button> : null}
+          {can("caja_sacar_dinero") ? <button type="button" className={activeSection === "finanzas" ? "is-active" : ""} aria-current={activeSection === "finanzas" ? "page" : undefined} onClick={() => { clearAppearancePreview(); setActiveSection("finanzas"); }}>
+            <span className="settings-sidebar-icon" aria-hidden="true">$</span>Finanzas
+          </button> : null}
         </nav>
 
         <div className="settings-content">
@@ -249,6 +260,8 @@ export default function ConfiguracionPage() {
             <UsersSettings />
           ) : activeSection === "perfil" ? (
             <ProfileSettings />
+          ) : activeSection === "finanzas" ? (
+            <FinanceSettings />
           ) : activeSection === "ajustes_tienda" ? (
             <StoreSettings />
           ) : (
@@ -273,6 +286,7 @@ export default function ConfiguracionPage() {
 }
 
 function AccountSettings() {
+  const syncRevision = useSyncRevision();
   const [savedName, setSavedName] = useState("");
   const [name, setName] = useState("");
   const [currentPassword, setCurrentPassword] = useState("");
@@ -286,6 +300,7 @@ function AccountSettings() {
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
   useEffect(() => {
+    if (modalOpen || saving) return;
     const controller = new AbortController();
     fetch("/api/configuracion/cuenta", { cache: "no-store", signal: controller.signal })
       .then(async (response) => {
@@ -299,7 +314,7 @@ function AccountSettings() {
       })
       .finally(() => { if (!controller.signal.aborted) setLoading(false); });
     return () => controller.abort();
-  }, []);
+  }, [syncRevision, modalOpen, saving]);
 
   const closeModal = useCallback(() => {
     if (saving) return;
@@ -425,6 +440,7 @@ function AccountSettings() {
 }
 
 function ProfileSettings() {
+  const syncRevision = useSyncRevision();
   const [profile, setProfile] = useState<ProfileData | null>(null);
   const [fono, setFono] = useState("");
   const [direccion, setDireccion] = useState("");
@@ -434,12 +450,14 @@ function ProfileSettings() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const profileDirty = Boolean(profile && (fono !== (profile.fono ?? "") || direccion !== (profile.direccion ?? "") || imageFile || removeImage));
 
   useEffect(() => {
     return () => { if (imagePreview) URL.revokeObjectURL(imagePreview); };
   }, [imagePreview]);
 
   useEffect(() => {
+    if (profileDirty || saving) return;
     const controller = new AbortController();
 
     fetch("/api/configuracion/perfil", { cache: "no-store", signal: controller.signal })
@@ -459,7 +477,7 @@ function ProfileSettings() {
       });
 
     return () => controller.abort();
-  }, []);
+  }, [syncRevision, profileDirty, saving]);
 
   async function saveProfile(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -551,28 +569,60 @@ function ProfileSettings() {
 }
 
 function StoreSettings() {
+  const syncRevision = useSyncRevision();
   const [roles, setRoles] = useState<RoleOption[] | null>(null);
   const [selectedRoleId, setSelectedRoleId] = useState("");
   const [selectedPermissions, setSelectedPermissions] = useState<Record<string, string[]>>({});
+  const [savedPermissions, setSavedPermissions] = useState<Record<string, string[]>>({});
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+  const [saving, setSaving] = useState(false);
+  const [canEdit, setCanEdit] = useState(false);
+  const [ownPermissions, setOwnPermissions] = useState<string[]>([]);
+  const [isMasterActor, setIsMasterActor] = useState(false);
+  const permissionsDirty = JSON.stringify(selectedPermissions) !== JSON.stringify(savedPermissions);
 
   useEffect(() => {
+    if (permissionsDirty || saving) return;
     const controller = new AbortController();
-    fetch("/api/configuracion/usuarios", { cache: "no-store", signal: controller.signal })
+    fetch("/api/configuracion/permisos", { cache: "no-store", signal: controller.signal })
       .then(async (response) => {
-        const data = await response.json() as { roles?: RoleOption[]; message?: string };
+        const data = await response.json() as { roles?: (RoleOption & { permisos: string[] })[]; puedeEditar?: boolean; permisosPropios?: string[]; esMaster?: boolean; message?: string };
         if (!response.ok || !data.roles) throw new Error(data.message ?? "No se pudieron cargar los roles.");
-        setRoles(data.roles);
+        const order: Record<string, number> = { master: 0, admin: 1, cajero: 2, usuario: 3 };
+        setRoles([...data.roles].sort((a, b) => (order[a.nombre.toLowerCase()] ?? 99) - (order[b.nombre.toLowerCase()] ?? 99)));
+        setSelectedPermissions(Object.fromEntries(data.roles.map((role) => [role.id, role.permisos])));
+        setSavedPermissions(Object.fromEntries(data.roles.map((role) => [role.id, role.permisos])));
+        setCanEdit(Boolean(data.puedeEditar));
+        setOwnPermissions(data.permisosPropios ?? []);
+        setIsMasterActor(Boolean(data.esMaster));
       })
       .catch((reason) => {
         if (!controller.signal.aborted) setError(reason instanceof Error ? reason.message : "No se pudieron cargar los roles.");
       });
     return () => controller.abort();
-  }, []);
+  }, [syncRevision, permissionsDirty, saving]);
 
   const checked = selectedPermissions[selectedRoleId] ?? [];
+  const isMaster = roles?.find((role) => role.id === selectedRoleId)?.nombre.toLowerCase() === "master";
+  const canEditRole = canEdit && Boolean(roles?.find((role) => role.id === selectedRoleId)?.puedeEditar) && (isMasterActor || checked.every((id) => ownPermissions.includes(id)));
+
+  async function savePermissions() {
+    if (!selectedRoleId || saving || !canEditRole || isMaster) return;
+    setSaving(true); setError(""); setSuccess("");
+    try {
+      const response = await fetch("/api/configuracion/permisos", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ roleId: selectedRoleId, permisos: checked }) });
+      const data = await response.json() as { message?: string };
+      if (!response.ok) throw new Error(data.message ?? "No se pudieron guardar los permisos.");
+      setSavedPermissions((current) => ({ ...current, [selectedRoleId]: checked }));
+      setSuccess(data.message ?? "Permisos guardados correctamente.");
+    } catch (reason) {
+      setError(reason instanceof Error ? reason.message : "No se pudieron guardar los permisos.");
+    } finally { setSaving(false); }
+  }
 
   function togglePermission(permissionId: string, enabled: boolean) {
+    setSuccess("");
     setSelectedPermissions((current) => {
       const next = new Set(current[selectedRoleId] ?? []);
       if (enabled) next.add(permissionId);
@@ -595,21 +645,24 @@ function StoreSettings() {
       </header>
       <section className="settings-permissions" aria-labelledby="settings-permissions-title">
         <h2 id="settings-permissions-title">Permisos de rol</h2>
-        <p>Vista previa de permisos. La selección aún no se guarda.</p>
+        <p>Selecciona un rol para consultar sus permisos guardados.</p>
         {error ? <p className="settings-save-error" role="alert">{error}</p> : null}
+        {success ? <p className="settings-save-success" role="status">{success}</p> : null}
         <label className="settings-permissions-role">Rol
-          <select value={selectedRoleId} onChange={(event) => setSelectedRoleId(event.target.value)} disabled={!roles}>
+          <select value={selectedRoleId} onChange={(event) => { setSelectedPermissions(savedPermissions); setSelectedRoleId(event.target.value); setError(""); setSuccess(""); }} disabled={!roles || saving}>
             <option value="">Selecciona un rol</option>
             {roles?.map((role) => <option key={role.id} value={role.id}>{role.nombre}</option>)}
           </select>
         </label>
         {selectedRoleId ? (
+          <>
+          {isMaster ? <p>Master siempre tiene todos los permisos.</p> : !canEditRole ? <p>No puedes editar los permisos de este rol.</p> : null}
           <div className="settings-permission-groups">
             {permissionGroups.map((group) => (
               <fieldset key={group.title}>
                 <legend>{group.title}</legend>
                 {group.items.map((permission) => {
-                  const disabled = Boolean(permission.requires && !checked.includes(permission.requires));
+                  const disabled = Boolean(isMaster || !canEditRole || saving || (!isMasterActor && !ownPermissions.includes(permission.id)) || (permission.requires && !checked.includes(permission.requires)));
                   return (
                     <label key={permission.id} className={disabled ? "is-disabled" : ""}>
                       <input
@@ -625,6 +678,8 @@ function StoreSettings() {
               </fieldset>
             ))}
           </div>
+          {canEditRole && !isMaster ? <div className="settings-company-actions"><button type="button" className="settings-save-button" disabled={saving} onClick={savePermissions}>{saving ? "Guardando..." : "Guardar cambios"}</button></div> : null}
+          </>
         ) : <p className="settings-permissions-empty">Selecciona un rol para ver sus permisos.</p>}
       </section>
     </>
@@ -632,6 +687,7 @@ function StoreSettings() {
 }
 
 function UsersSettings() {
+  const syncRevision = useSyncRevision();
   const [users, setUsers] = useState<AccountUser[] | null>(null);
   const [roles, setRoles] = useState<RoleOption[]>([]);
   const [canManageRoles, setCanManageRoles] = useState(false);
@@ -640,8 +696,10 @@ function UsersSettings() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [savingRole, setSavingRole] = useState(false);
+  const [roleDraft, setRoleDraft] = useState<{ userId: string; roleId: string } | null>(null);
 
   useEffect(() => {
+    if (roleDraft || savingRole) return;
     const controller = new AbortController();
 
     fetch("/api/configuracion/usuarios", {
@@ -658,7 +716,7 @@ function UsersSettings() {
         setRoles(result.roles ?? []);
         setCanManageRoles(Boolean(result.canManageRoles));
         setActorRole(result.actorRole ?? null);
-        setSelectedId(result.users[0]?.id ?? null);
+        setSelectedId((current) => result.users?.some((user) => user.id === current) ? current : result.users?.[0]?.id ?? null);
       })
       .catch((loadError) => {
         if (!controller.signal.aborted) {
@@ -667,18 +725,15 @@ function UsersSettings() {
       });
 
     return () => controller.abort();
-  }, []);
+  }, [syncRevision, roleDraft, savingRole]);
 
   const selectedUser = users?.find((user) => user.id === selectedId);
-  const canEditSelectedRole = Boolean(selectedUser && (
-    (actorRole === "master" && selectedUser.rol !== "master") ||
-    (actorRole === "admin" && ["usuario", "cajero"].includes(selectedUser.rol))
-  ));
+  const hierarchy: Record<string, number> = { usuario: 0, cajero: 1, admin: 2, master: 3 };
+  const actorLevel = hierarchy[actorRole ?? ""] ?? -1;
+  const canEditSelectedRole = Boolean(canManageRoles && selectedUser && (hierarchy[selectedUser.rol] ?? -1) >= 0 && actorLevel > (hierarchy[selectedUser.rol] ?? -1));
   const availableRoles = roles.filter((role) => {
     if (!canEditSelectedRole) return role.id === selectedUser?.roleId;
-    return actorRole === "master"
-      ? role.nombre !== "master"
-      : ["usuario", "cajero"].includes(role.nombre);
+    return (hierarchy[role.nombre] ?? -1) >= 0 && (hierarchy[role.nombre] ?? -1) < actorLevel;
   });
   const roleCounts = users?.reduce<Record<string, number>>((counts, user) => {
     counts[user.rol] = (counts[user.rol] ?? 0) + 1;
@@ -699,6 +754,7 @@ function UsersSettings() {
       const data = await response.json() as { message?: string; roleId?: string; rol?: string };
       if (!response.ok || !data.roleId || !data.rol) throw new Error(data.message ?? "No se pudo cambiar el rol.");
       setUsers((current) => current?.map((user) => user.id === userId ? { ...user, roleId: data.roleId!, rol: data.rol! } : user) ?? null);
+      setRoleDraft(null);
       setSuccess(data.message ?? "Rol actualizado correctamente.");
     } catch (reason) {
       setError(reason instanceof Error ? reason.message : "No se pudo cambiar el rol.");
@@ -734,10 +790,10 @@ function UsersSettings() {
                     key={user.id}
                     type="button"
                     aria-pressed={selectedId === user.id}
-                    onClick={() => setSelectedId(user.id)}
+                    onClick={() => { setSelectedId(user.id); setRoleDraft(null); setSuccess(""); setError(""); }}
                   >
                     <span className="settings-user-avatar" aria-hidden="true">
-                      {user.nombre.charAt(0)}{user.apellido.charAt(0)}
+                      {user.urlImagen ? <img src={user.urlImagen} alt="" /> : <>{user.nombre.charAt(0)}{user.apellido.charAt(0)}</>}
                     </span>
                     <span className="settings-user-list-text">
                       <strong>{user.nombre} {user.apellido}</strong>
@@ -748,10 +804,15 @@ function UsersSettings() {
               </div>
               {selectedUser ? (
                 <section className="settings-user-detail" aria-label={`Datos de ${selectedUser.nombre} ${selectedUser.apellido}`}>
-                  <span className="settings-user-avatar is-large" aria-hidden="true">
-                    {selectedUser.nombre.charAt(0)}{selectedUser.apellido.charAt(0)}
-                  </span>
-                  <h2>{selectedUser.nombre} {selectedUser.apellido}</h2>
+                  <div className="settings-user-detail-header">
+                    <span className="settings-user-avatar is-large" aria-hidden="true">
+                      {selectedUser.urlImagen ? <img src={selectedUser.urlImagen} alt="" /> : <>{selectedUser.nombre.charAt(0)}{selectedUser.apellido.charAt(0)}</>}
+                    </span>
+                    <div>
+                      <h2>{selectedUser.nombre} {selectedUser.apellido}</h2>
+                      <span className="settings-user-detail-role">{selectedUser.rol}</span>
+                    </div>
+                  </div>
                   <dl>
                     <div><dt>Nombre</dt><dd>{selectedUser.nombre}</dd></div>
                     <div><dt>Apellido</dt><dd>{selectedUser.apellido}</dd></div>
@@ -759,15 +820,16 @@ function UsersSettings() {
                       <select
                         className="settings-user-role-select"
                         aria-label={`Rol de ${selectedUser.nombre} ${selectedUser.apellido}`}
-                        value={selectedUser.roleId}
+                        value={roleDraft?.userId === selectedUser.id ? roleDraft.roleId : selectedUser.roleId}
                         disabled={!canEditSelectedRole || savingRole}
-                        onChange={(event) => void changeRole(selectedUser.id, event.target.value)}
+                        onChange={(event) => { setRoleDraft({ userId: selectedUser.id, roleId: event.target.value }); setSuccess(""); setError(""); }}
                       >
                         {availableRoles.map((role) => <option key={role.id} value={role.id}>{role.nombre}</option>)}
                       </select>
                     </dd></div>
                   </dl>
-                  {!canManageRoles ? <p className="settings-role-notice">Solo una cuenta con rol admin o master puede cambiar roles.</p> : null}
+                  {canEditSelectedRole ? <div className="settings-company-actions"><button type="button" className="settings-save-button" disabled={savingRole || roleDraft?.userId !== selectedUser.id || roleDraft.roleId === selectedUser.roleId} onClick={() => { if (roleDraft?.userId === selectedUser.id) void changeRole(selectedUser.id, roleDraft.roleId); }}>{savingRole ? "Guardando..." : "Guardar rol"}</button></div> : null}
+                  {!canManageRoles ? <p className="settings-role-notice">No tienes permiso para cambiar roles.</p> : null}
                   {canManageRoles && selectedUser.rol === "master" ? <p className="settings-role-notice">El rol master es único y no se puede cambiar.</p> : null}
                   {actorRole === "admin" && !canEditSelectedRole && selectedUser.rol !== "master" ? <p className="settings-role-notice">Admin solo puede alternar entre usuario y cajero.</p> : null}
                 </section>
@@ -780,13 +842,16 @@ function UsersSettings() {
   );
 }
 function CompanySettings({ onSaved }: { onSaved: (name: string) => void }) {
+  const syncRevision = useSyncRevision();
   const [saved, setSaved] = useState<CompanyData | null>(null);
   const [draft, setDraft] = useState<CompanyData | null>(null);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const companyDirty = Boolean(saved && draft && JSON.stringify(saved) !== JSON.stringify(draft));
 
   useEffect(() => {
+    if (companyDirty || saving) return;
     const controller = new AbortController();
 
     fetch("/api/configuracion/empresa", {
@@ -809,7 +874,7 @@ function CompanySettings({ onSaved }: { onSaved: (name: string) => void }) {
       });
 
     return () => controller.abort();
-  }, []);
+  }, [syncRevision, companyDirty, saving]);
 
   function updateField(key: keyof CompanyData, value: string) {
     if (/['"]/.test(value)) return;

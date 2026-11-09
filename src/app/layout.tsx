@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { AppearanceProvider } from "./components/AppearanceProvider";
+import { SyncProvider } from "./components/SyncProvider";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -15,7 +16,7 @@ export default function RootLayout({
   return (
     <html lang="es" className="h-full antialiased">
       <body className="min-h-full flex flex-col">
-        <AppearanceProvider>{children}</AppearanceProvider>
+        <SyncProvider><AppearanceProvider>{children}</AppearanceProvider></SyncProvider>
       </body>
     </html>
   );

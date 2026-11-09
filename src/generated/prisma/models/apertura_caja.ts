@@ -40,7 +40,6 @@ export type Apertura_cajaAvgAggregateOutputType = {
   diferencia: number | null
   saldo_esperado: number | null
   valor_real: number | null
-  retiro: number | null
   venta_transferencia: number | null
   total_transferencia: number | null
   total: number | null
@@ -60,7 +59,6 @@ export type Apertura_cajaSumAggregateOutputType = {
   diferencia: number | null
   saldo_esperado: number | null
   valor_real: number | null
-  retiro: number | null
   venta_transferencia: number | null
   total_transferencia: number | null
   total: number | null
@@ -84,7 +82,6 @@ export type Apertura_cajaMinAggregateOutputType = {
   diferencia: number | null
   saldo_esperado: number | null
   valor_real: number | null
-  retiro: number | null
   comentario: string | null
   venta_transferencia: number | null
   total_transferencia: number | null
@@ -109,7 +106,6 @@ export type Apertura_cajaMaxAggregateOutputType = {
   diferencia: number | null
   saldo_esperado: number | null
   valor_real: number | null
-  retiro: number | null
   comentario: string | null
   venta_transferencia: number | null
   total_transferencia: number | null
@@ -134,7 +130,6 @@ export type Apertura_cajaCountAggregateOutputType = {
   diferencia: number
   saldo_esperado: number
   valor_real: number
-  retiro: number
   comentario: number
   venta_transferencia: number
   total_transferencia: number
@@ -157,7 +152,6 @@ export type Apertura_cajaAvgAggregateInputType = {
   diferencia?: true
   saldo_esperado?: true
   valor_real?: true
-  retiro?: true
   venta_transferencia?: true
   total_transferencia?: true
   total?: true
@@ -177,7 +171,6 @@ export type Apertura_cajaSumAggregateInputType = {
   diferencia?: true
   saldo_esperado?: true
   valor_real?: true
-  retiro?: true
   venta_transferencia?: true
   total_transferencia?: true
   total?: true
@@ -201,7 +194,6 @@ export type Apertura_cajaMinAggregateInputType = {
   diferencia?: true
   saldo_esperado?: true
   valor_real?: true
-  retiro?: true
   comentario?: true
   venta_transferencia?: true
   total_transferencia?: true
@@ -226,7 +218,6 @@ export type Apertura_cajaMaxAggregateInputType = {
   diferencia?: true
   saldo_esperado?: true
   valor_real?: true
-  retiro?: true
   comentario?: true
   venta_transferencia?: true
   total_transferencia?: true
@@ -251,7 +242,6 @@ export type Apertura_cajaCountAggregateInputType = {
   diferencia?: true
   saldo_esperado?: true
   valor_real?: true
-  retiro?: true
   comentario?: true
   venta_transferencia?: true
   total_transferencia?: true
@@ -363,7 +353,6 @@ export type Apertura_cajaGroupByOutputType = {
   diferencia: number | null
   saldo_esperado: number
   valor_real: number
-  retiro: number
   comentario: string | null
   venta_transferencia: number
   total_transferencia: number
@@ -411,7 +400,6 @@ export type apertura_cajaWhereInput = {
   diferencia?: Prisma.IntNullableFilter<"apertura_caja"> | number | null
   saldo_esperado?: Prisma.IntFilter<"apertura_caja"> | number
   valor_real?: Prisma.IntFilter<"apertura_caja"> | number
-  retiro?: Prisma.IntFilter<"apertura_caja"> | number
   comentario?: Prisma.StringNullableFilter<"apertura_caja"> | string | null
   venta_transferencia?: Prisma.IntFilter<"apertura_caja"> | number
   total_transferencia?: Prisma.IntFilter<"apertura_caja"> | number
@@ -419,6 +407,7 @@ export type apertura_cajaWhereInput = {
   users?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   ventas?: Prisma.VentaListRelationFilter
   movimientos?: Prisma.Movimiento_cajaListRelationFilter
+  capital?: Prisma.Capital_cajaListRelationFilter
 }
 
 export type apertura_cajaOrderByWithRelationInput = {
@@ -439,7 +428,6 @@ export type apertura_cajaOrderByWithRelationInput = {
   diferencia?: Prisma.SortOrderInput | Prisma.SortOrder
   saldo_esperado?: Prisma.SortOrder
   valor_real?: Prisma.SortOrder
-  retiro?: Prisma.SortOrder
   comentario?: Prisma.SortOrderInput | Prisma.SortOrder
   venta_transferencia?: Prisma.SortOrder
   total_transferencia?: Prisma.SortOrder
@@ -447,6 +435,7 @@ export type apertura_cajaOrderByWithRelationInput = {
   users?: Prisma.UserOrderByWithRelationInput
   ventas?: Prisma.ventaOrderByRelationAggregateInput
   movimientos?: Prisma.movimiento_cajaOrderByRelationAggregateInput
+  capital?: Prisma.capital_cajaOrderByRelationAggregateInput
 }
 
 export type apertura_cajaWhereUniqueInput = Prisma.AtLeast<{
@@ -470,7 +459,6 @@ export type apertura_cajaWhereUniqueInput = Prisma.AtLeast<{
   diferencia?: Prisma.IntNullableFilter<"apertura_caja"> | number | null
   saldo_esperado?: Prisma.IntFilter<"apertura_caja"> | number
   valor_real?: Prisma.IntFilter<"apertura_caja"> | number
-  retiro?: Prisma.IntFilter<"apertura_caja"> | number
   comentario?: Prisma.StringNullableFilter<"apertura_caja"> | string | null
   venta_transferencia?: Prisma.IntFilter<"apertura_caja"> | number
   total_transferencia?: Prisma.IntFilter<"apertura_caja"> | number
@@ -478,6 +466,7 @@ export type apertura_cajaWhereUniqueInput = Prisma.AtLeast<{
   users?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   ventas?: Prisma.VentaListRelationFilter
   movimientos?: Prisma.Movimiento_cajaListRelationFilter
+  capital?: Prisma.Capital_cajaListRelationFilter
 }, "id_apertura">
 
 export type apertura_cajaOrderByWithAggregationInput = {
@@ -498,7 +487,6 @@ export type apertura_cajaOrderByWithAggregationInput = {
   diferencia?: Prisma.SortOrderInput | Prisma.SortOrder
   saldo_esperado?: Prisma.SortOrder
   valor_real?: Prisma.SortOrder
-  retiro?: Prisma.SortOrder
   comentario?: Prisma.SortOrderInput | Prisma.SortOrder
   venta_transferencia?: Prisma.SortOrder
   total_transferencia?: Prisma.SortOrder
@@ -531,7 +519,6 @@ export type apertura_cajaScalarWhereWithAggregatesInput = {
   diferencia?: Prisma.IntNullableWithAggregatesFilter<"apertura_caja"> | number | null
   saldo_esperado?: Prisma.IntWithAggregatesFilter<"apertura_caja"> | number
   valor_real?: Prisma.IntWithAggregatesFilter<"apertura_caja"> | number
-  retiro?: Prisma.IntWithAggregatesFilter<"apertura_caja"> | number
   comentario?: Prisma.StringNullableWithAggregatesFilter<"apertura_caja"> | string | null
   venta_transferencia?: Prisma.IntWithAggregatesFilter<"apertura_caja"> | number
   total_transferencia?: Prisma.IntWithAggregatesFilter<"apertura_caja"> | number
@@ -555,7 +542,6 @@ export type apertura_cajaCreateInput = {
   diferencia?: number | null
   saldo_esperado?: number
   valor_real?: number
-  retiro?: number
   comentario?: string | null
   venta_transferencia?: number
   total_transferencia?: number
@@ -563,6 +549,7 @@ export type apertura_cajaCreateInput = {
   users: Prisma.UserCreateNestedOneWithoutApertura_cajaInput
   ventas?: Prisma.ventaCreateNestedManyWithoutAperturaInput
   movimientos?: Prisma.movimiento_cajaCreateNestedManyWithoutAperturaInput
+  capital?: Prisma.capital_cajaCreateNestedManyWithoutAperturaInput
 }
 
 export type apertura_cajaUncheckedCreateInput = {
@@ -583,13 +570,13 @@ export type apertura_cajaUncheckedCreateInput = {
   diferencia?: number | null
   saldo_esperado?: number
   valor_real?: number
-  retiro?: number
   comentario?: string | null
   venta_transferencia?: number
   total_transferencia?: number
   total?: number
   ventas?: Prisma.ventaUncheckedCreateNestedManyWithoutAperturaInput
   movimientos?: Prisma.movimiento_cajaUncheckedCreateNestedManyWithoutAperturaInput
+  capital?: Prisma.capital_cajaUncheckedCreateNestedManyWithoutAperturaInput
 }
 
 export type apertura_cajaUpdateInput = {
@@ -609,7 +596,6 @@ export type apertura_cajaUpdateInput = {
   diferencia?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   saldo_esperado?: Prisma.IntFieldUpdateOperationsInput | number
   valor_real?: Prisma.IntFieldUpdateOperationsInput | number
-  retiro?: Prisma.IntFieldUpdateOperationsInput | number
   comentario?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   venta_transferencia?: Prisma.IntFieldUpdateOperationsInput | number
   total_transferencia?: Prisma.IntFieldUpdateOperationsInput | number
@@ -617,6 +603,7 @@ export type apertura_cajaUpdateInput = {
   users?: Prisma.UserUpdateOneRequiredWithoutApertura_cajaNestedInput
   ventas?: Prisma.ventaUpdateManyWithoutAperturaNestedInput
   movimientos?: Prisma.movimiento_cajaUpdateManyWithoutAperturaNestedInput
+  capital?: Prisma.capital_cajaUpdateManyWithoutAperturaNestedInput
 }
 
 export type apertura_cajaUncheckedUpdateInput = {
@@ -637,13 +624,13 @@ export type apertura_cajaUncheckedUpdateInput = {
   diferencia?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   saldo_esperado?: Prisma.IntFieldUpdateOperationsInput | number
   valor_real?: Prisma.IntFieldUpdateOperationsInput | number
-  retiro?: Prisma.IntFieldUpdateOperationsInput | number
   comentario?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   venta_transferencia?: Prisma.IntFieldUpdateOperationsInput | number
   total_transferencia?: Prisma.IntFieldUpdateOperationsInput | number
   total?: Prisma.IntFieldUpdateOperationsInput | number
   ventas?: Prisma.ventaUncheckedUpdateManyWithoutAperturaNestedInput
   movimientos?: Prisma.movimiento_cajaUncheckedUpdateManyWithoutAperturaNestedInput
+  capital?: Prisma.capital_cajaUncheckedUpdateManyWithoutAperturaNestedInput
 }
 
 export type apertura_cajaCreateManyInput = {
@@ -664,7 +651,6 @@ export type apertura_cajaCreateManyInput = {
   diferencia?: number | null
   saldo_esperado?: number
   valor_real?: number
-  retiro?: number
   comentario?: string | null
   venta_transferencia?: number
   total_transferencia?: number
@@ -688,7 +674,6 @@ export type apertura_cajaUpdateManyMutationInput = {
   diferencia?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   saldo_esperado?: Prisma.IntFieldUpdateOperationsInput | number
   valor_real?: Prisma.IntFieldUpdateOperationsInput | number
-  retiro?: Prisma.IntFieldUpdateOperationsInput | number
   comentario?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   venta_transferencia?: Prisma.IntFieldUpdateOperationsInput | number
   total_transferencia?: Prisma.IntFieldUpdateOperationsInput | number
@@ -713,7 +698,6 @@ export type apertura_cajaUncheckedUpdateManyInput = {
   diferencia?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   saldo_esperado?: Prisma.IntFieldUpdateOperationsInput | number
   valor_real?: Prisma.IntFieldUpdateOperationsInput | number
-  retiro?: Prisma.IntFieldUpdateOperationsInput | number
   comentario?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   venta_transferencia?: Prisma.IntFieldUpdateOperationsInput | number
   total_transferencia?: Prisma.IntFieldUpdateOperationsInput | number
@@ -748,7 +732,6 @@ export type apertura_cajaCountOrderByAggregateInput = {
   diferencia?: Prisma.SortOrder
   saldo_esperado?: Prisma.SortOrder
   valor_real?: Prisma.SortOrder
-  retiro?: Prisma.SortOrder
   comentario?: Prisma.SortOrder
   venta_transferencia?: Prisma.SortOrder
   total_transferencia?: Prisma.SortOrder
@@ -769,7 +752,6 @@ export type apertura_cajaAvgOrderByAggregateInput = {
   diferencia?: Prisma.SortOrder
   saldo_esperado?: Prisma.SortOrder
   valor_real?: Prisma.SortOrder
-  retiro?: Prisma.SortOrder
   venta_transferencia?: Prisma.SortOrder
   total_transferencia?: Prisma.SortOrder
   total?: Prisma.SortOrder
@@ -793,7 +775,6 @@ export type apertura_cajaMaxOrderByAggregateInput = {
   diferencia?: Prisma.SortOrder
   saldo_esperado?: Prisma.SortOrder
   valor_real?: Prisma.SortOrder
-  retiro?: Prisma.SortOrder
   comentario?: Prisma.SortOrder
   venta_transferencia?: Prisma.SortOrder
   total_transferencia?: Prisma.SortOrder
@@ -818,7 +799,6 @@ export type apertura_cajaMinOrderByAggregateInput = {
   diferencia?: Prisma.SortOrder
   saldo_esperado?: Prisma.SortOrder
   valor_real?: Prisma.SortOrder
-  retiro?: Prisma.SortOrder
   comentario?: Prisma.SortOrder
   venta_transferencia?: Prisma.SortOrder
   total_transferencia?: Prisma.SortOrder
@@ -839,7 +819,6 @@ export type apertura_cajaSumOrderByAggregateInput = {
   diferencia?: Prisma.SortOrder
   saldo_esperado?: Prisma.SortOrder
   valor_real?: Prisma.SortOrder
-  retiro?: Prisma.SortOrder
   venta_transferencia?: Prisma.SortOrder
   total_transferencia?: Prisma.SortOrder
   total?: Prisma.SortOrder
@@ -897,6 +876,20 @@ export type apertura_cajaUncheckedUpdateManyWithoutUsersNestedInput = {
   deleteMany?: Prisma.apertura_cajaScalarWhereInput | Prisma.apertura_cajaScalarWhereInput[]
 }
 
+export type apertura_cajaCreateNestedOneWithoutCapitalInput = {
+  create?: Prisma.XOR<Prisma.apertura_cajaCreateWithoutCapitalInput, Prisma.apertura_cajaUncheckedCreateWithoutCapitalInput>
+  connectOrCreate?: Prisma.apertura_cajaCreateOrConnectWithoutCapitalInput
+  connect?: Prisma.apertura_cajaWhereUniqueInput
+}
+
+export type apertura_cajaUpdateOneRequiredWithoutCapitalNestedInput = {
+  create?: Prisma.XOR<Prisma.apertura_cajaCreateWithoutCapitalInput, Prisma.apertura_cajaUncheckedCreateWithoutCapitalInput>
+  connectOrCreate?: Prisma.apertura_cajaCreateOrConnectWithoutCapitalInput
+  upsert?: Prisma.apertura_cajaUpsertWithoutCapitalInput
+  connect?: Prisma.apertura_cajaWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.apertura_cajaUpdateToOneWithWhereWithoutCapitalInput, Prisma.apertura_cajaUpdateWithoutCapitalInput>, Prisma.apertura_cajaUncheckedUpdateWithoutCapitalInput>
+}
+
 export type apertura_cajaCreateNestedOneWithoutMovimientosInput = {
   create?: Prisma.XOR<Prisma.apertura_cajaCreateWithoutMovimientosInput, Prisma.apertura_cajaUncheckedCreateWithoutMovimientosInput>
   connectOrCreate?: Prisma.apertura_cajaCreateOrConnectWithoutMovimientosInput
@@ -944,13 +937,13 @@ export type apertura_cajaCreateWithoutUsersInput = {
   diferencia?: number | null
   saldo_esperado?: number
   valor_real?: number
-  retiro?: number
   comentario?: string | null
   venta_transferencia?: number
   total_transferencia?: number
   total?: number
   ventas?: Prisma.ventaCreateNestedManyWithoutAperturaInput
   movimientos?: Prisma.movimiento_cajaCreateNestedManyWithoutAperturaInput
+  capital?: Prisma.capital_cajaCreateNestedManyWithoutAperturaInput
 }
 
 export type apertura_cajaUncheckedCreateWithoutUsersInput = {
@@ -970,13 +963,13 @@ export type apertura_cajaUncheckedCreateWithoutUsersInput = {
   diferencia?: number | null
   saldo_esperado?: number
   valor_real?: number
-  retiro?: number
   comentario?: string | null
   venta_transferencia?: number
   total_transferencia?: number
   total?: number
   ventas?: Prisma.ventaUncheckedCreateNestedManyWithoutAperturaInput
   movimientos?: Prisma.movimiento_cajaUncheckedCreateNestedManyWithoutAperturaInput
+  capital?: Prisma.capital_cajaUncheckedCreateNestedManyWithoutAperturaInput
 }
 
 export type apertura_cajaCreateOrConnectWithoutUsersInput = {
@@ -1026,11 +1019,130 @@ export type apertura_cajaScalarWhereInput = {
   diferencia?: Prisma.IntNullableFilter<"apertura_caja"> | number | null
   saldo_esperado?: Prisma.IntFilter<"apertura_caja"> | number
   valor_real?: Prisma.IntFilter<"apertura_caja"> | number
-  retiro?: Prisma.IntFilter<"apertura_caja"> | number
   comentario?: Prisma.StringNullableFilter<"apertura_caja"> | string | null
   venta_transferencia?: Prisma.IntFilter<"apertura_caja"> | number
   total_transferencia?: Prisma.IntFilter<"apertura_caja"> | number
   total?: Prisma.IntFilter<"apertura_caja"> | number
+}
+
+export type apertura_cajaCreateWithoutCapitalInput = {
+  id_apertura?: string
+  horario_apertura?: Date | string
+  horario_cierre?: Date | string | null
+  venta_boleta?: number
+  venta_factura?: number
+  venta_debito?: number
+  venta_credito?: number
+  venta_efectivo?: number
+  total_debito?: number
+  total_credito?: number
+  total_efectivo?: number
+  saldo_apertura?: number
+  saldo_cierre?: number | null
+  diferencia?: number | null
+  saldo_esperado?: number
+  valor_real?: number
+  comentario?: string | null
+  venta_transferencia?: number
+  total_transferencia?: number
+  total?: number
+  users: Prisma.UserCreateNestedOneWithoutApertura_cajaInput
+  ventas?: Prisma.ventaCreateNestedManyWithoutAperturaInput
+  movimientos?: Prisma.movimiento_cajaCreateNestedManyWithoutAperturaInput
+}
+
+export type apertura_cajaUncheckedCreateWithoutCapitalInput = {
+  id_apertura?: string
+  id_usuario_apertura: string
+  horario_apertura?: Date | string
+  horario_cierre?: Date | string | null
+  venta_boleta?: number
+  venta_factura?: number
+  venta_debito?: number
+  venta_credito?: number
+  venta_efectivo?: number
+  total_debito?: number
+  total_credito?: number
+  total_efectivo?: number
+  saldo_apertura?: number
+  saldo_cierre?: number | null
+  diferencia?: number | null
+  saldo_esperado?: number
+  valor_real?: number
+  comentario?: string | null
+  venta_transferencia?: number
+  total_transferencia?: number
+  total?: number
+  ventas?: Prisma.ventaUncheckedCreateNestedManyWithoutAperturaInput
+  movimientos?: Prisma.movimiento_cajaUncheckedCreateNestedManyWithoutAperturaInput
+}
+
+export type apertura_cajaCreateOrConnectWithoutCapitalInput = {
+  where: Prisma.apertura_cajaWhereUniqueInput
+  create: Prisma.XOR<Prisma.apertura_cajaCreateWithoutCapitalInput, Prisma.apertura_cajaUncheckedCreateWithoutCapitalInput>
+}
+
+export type apertura_cajaUpsertWithoutCapitalInput = {
+  update: Prisma.XOR<Prisma.apertura_cajaUpdateWithoutCapitalInput, Prisma.apertura_cajaUncheckedUpdateWithoutCapitalInput>
+  create: Prisma.XOR<Prisma.apertura_cajaCreateWithoutCapitalInput, Prisma.apertura_cajaUncheckedCreateWithoutCapitalInput>
+  where?: Prisma.apertura_cajaWhereInput
+}
+
+export type apertura_cajaUpdateToOneWithWhereWithoutCapitalInput = {
+  where?: Prisma.apertura_cajaWhereInput
+  data: Prisma.XOR<Prisma.apertura_cajaUpdateWithoutCapitalInput, Prisma.apertura_cajaUncheckedUpdateWithoutCapitalInput>
+}
+
+export type apertura_cajaUpdateWithoutCapitalInput = {
+  id_apertura?: Prisma.StringFieldUpdateOperationsInput | string
+  horario_apertura?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  horario_cierre?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  venta_boleta?: Prisma.IntFieldUpdateOperationsInput | number
+  venta_factura?: Prisma.IntFieldUpdateOperationsInput | number
+  venta_debito?: Prisma.IntFieldUpdateOperationsInput | number
+  venta_credito?: Prisma.IntFieldUpdateOperationsInput | number
+  venta_efectivo?: Prisma.IntFieldUpdateOperationsInput | number
+  total_debito?: Prisma.IntFieldUpdateOperationsInput | number
+  total_credito?: Prisma.IntFieldUpdateOperationsInput | number
+  total_efectivo?: Prisma.IntFieldUpdateOperationsInput | number
+  saldo_apertura?: Prisma.IntFieldUpdateOperationsInput | number
+  saldo_cierre?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  diferencia?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  saldo_esperado?: Prisma.IntFieldUpdateOperationsInput | number
+  valor_real?: Prisma.IntFieldUpdateOperationsInput | number
+  comentario?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  venta_transferencia?: Prisma.IntFieldUpdateOperationsInput | number
+  total_transferencia?: Prisma.IntFieldUpdateOperationsInput | number
+  total?: Prisma.IntFieldUpdateOperationsInput | number
+  users?: Prisma.UserUpdateOneRequiredWithoutApertura_cajaNestedInput
+  ventas?: Prisma.ventaUpdateManyWithoutAperturaNestedInput
+  movimientos?: Prisma.movimiento_cajaUpdateManyWithoutAperturaNestedInput
+}
+
+export type apertura_cajaUncheckedUpdateWithoutCapitalInput = {
+  id_apertura?: Prisma.StringFieldUpdateOperationsInput | string
+  id_usuario_apertura?: Prisma.StringFieldUpdateOperationsInput | string
+  horario_apertura?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  horario_cierre?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  venta_boleta?: Prisma.IntFieldUpdateOperationsInput | number
+  venta_factura?: Prisma.IntFieldUpdateOperationsInput | number
+  venta_debito?: Prisma.IntFieldUpdateOperationsInput | number
+  venta_credito?: Prisma.IntFieldUpdateOperationsInput | number
+  venta_efectivo?: Prisma.IntFieldUpdateOperationsInput | number
+  total_debito?: Prisma.IntFieldUpdateOperationsInput | number
+  total_credito?: Prisma.IntFieldUpdateOperationsInput | number
+  total_efectivo?: Prisma.IntFieldUpdateOperationsInput | number
+  saldo_apertura?: Prisma.IntFieldUpdateOperationsInput | number
+  saldo_cierre?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  diferencia?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  saldo_esperado?: Prisma.IntFieldUpdateOperationsInput | number
+  valor_real?: Prisma.IntFieldUpdateOperationsInput | number
+  comentario?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  venta_transferencia?: Prisma.IntFieldUpdateOperationsInput | number
+  total_transferencia?: Prisma.IntFieldUpdateOperationsInput | number
+  total?: Prisma.IntFieldUpdateOperationsInput | number
+  ventas?: Prisma.ventaUncheckedUpdateManyWithoutAperturaNestedInput
+  movimientos?: Prisma.movimiento_cajaUncheckedUpdateManyWithoutAperturaNestedInput
 }
 
 export type apertura_cajaCreateWithoutMovimientosInput = {
@@ -1050,13 +1162,13 @@ export type apertura_cajaCreateWithoutMovimientosInput = {
   diferencia?: number | null
   saldo_esperado?: number
   valor_real?: number
-  retiro?: number
   comentario?: string | null
   venta_transferencia?: number
   total_transferencia?: number
   total?: number
   users: Prisma.UserCreateNestedOneWithoutApertura_cajaInput
   ventas?: Prisma.ventaCreateNestedManyWithoutAperturaInput
+  capital?: Prisma.capital_cajaCreateNestedManyWithoutAperturaInput
 }
 
 export type apertura_cajaUncheckedCreateWithoutMovimientosInput = {
@@ -1077,12 +1189,12 @@ export type apertura_cajaUncheckedCreateWithoutMovimientosInput = {
   diferencia?: number | null
   saldo_esperado?: number
   valor_real?: number
-  retiro?: number
   comentario?: string | null
   venta_transferencia?: number
   total_transferencia?: number
   total?: number
   ventas?: Prisma.ventaUncheckedCreateNestedManyWithoutAperturaInput
+  capital?: Prisma.capital_cajaUncheckedCreateNestedManyWithoutAperturaInput
 }
 
 export type apertura_cajaCreateOrConnectWithoutMovimientosInput = {
@@ -1118,13 +1230,13 @@ export type apertura_cajaUpdateWithoutMovimientosInput = {
   diferencia?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   saldo_esperado?: Prisma.IntFieldUpdateOperationsInput | number
   valor_real?: Prisma.IntFieldUpdateOperationsInput | number
-  retiro?: Prisma.IntFieldUpdateOperationsInput | number
   comentario?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   venta_transferencia?: Prisma.IntFieldUpdateOperationsInput | number
   total_transferencia?: Prisma.IntFieldUpdateOperationsInput | number
   total?: Prisma.IntFieldUpdateOperationsInput | number
   users?: Prisma.UserUpdateOneRequiredWithoutApertura_cajaNestedInput
   ventas?: Prisma.ventaUpdateManyWithoutAperturaNestedInput
+  capital?: Prisma.capital_cajaUpdateManyWithoutAperturaNestedInput
 }
 
 export type apertura_cajaUncheckedUpdateWithoutMovimientosInput = {
@@ -1145,12 +1257,12 @@ export type apertura_cajaUncheckedUpdateWithoutMovimientosInput = {
   diferencia?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   saldo_esperado?: Prisma.IntFieldUpdateOperationsInput | number
   valor_real?: Prisma.IntFieldUpdateOperationsInput | number
-  retiro?: Prisma.IntFieldUpdateOperationsInput | number
   comentario?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   venta_transferencia?: Prisma.IntFieldUpdateOperationsInput | number
   total_transferencia?: Prisma.IntFieldUpdateOperationsInput | number
   total?: Prisma.IntFieldUpdateOperationsInput | number
   ventas?: Prisma.ventaUncheckedUpdateManyWithoutAperturaNestedInput
+  capital?: Prisma.capital_cajaUncheckedUpdateManyWithoutAperturaNestedInput
 }
 
 export type apertura_cajaCreateWithoutVentasInput = {
@@ -1170,13 +1282,13 @@ export type apertura_cajaCreateWithoutVentasInput = {
   diferencia?: number | null
   saldo_esperado?: number
   valor_real?: number
-  retiro?: number
   comentario?: string | null
   venta_transferencia?: number
   total_transferencia?: number
   total?: number
   users: Prisma.UserCreateNestedOneWithoutApertura_cajaInput
   movimientos?: Prisma.movimiento_cajaCreateNestedManyWithoutAperturaInput
+  capital?: Prisma.capital_cajaCreateNestedManyWithoutAperturaInput
 }
 
 export type apertura_cajaUncheckedCreateWithoutVentasInput = {
@@ -1197,12 +1309,12 @@ export type apertura_cajaUncheckedCreateWithoutVentasInput = {
   diferencia?: number | null
   saldo_esperado?: number
   valor_real?: number
-  retiro?: number
   comentario?: string | null
   venta_transferencia?: number
   total_transferencia?: number
   total?: number
   movimientos?: Prisma.movimiento_cajaUncheckedCreateNestedManyWithoutAperturaInput
+  capital?: Prisma.capital_cajaUncheckedCreateNestedManyWithoutAperturaInput
 }
 
 export type apertura_cajaCreateOrConnectWithoutVentasInput = {
@@ -1238,13 +1350,13 @@ export type apertura_cajaUpdateWithoutVentasInput = {
   diferencia?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   saldo_esperado?: Prisma.IntFieldUpdateOperationsInput | number
   valor_real?: Prisma.IntFieldUpdateOperationsInput | number
-  retiro?: Prisma.IntFieldUpdateOperationsInput | number
   comentario?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   venta_transferencia?: Prisma.IntFieldUpdateOperationsInput | number
   total_transferencia?: Prisma.IntFieldUpdateOperationsInput | number
   total?: Prisma.IntFieldUpdateOperationsInput | number
   users?: Prisma.UserUpdateOneRequiredWithoutApertura_cajaNestedInput
   movimientos?: Prisma.movimiento_cajaUpdateManyWithoutAperturaNestedInput
+  capital?: Prisma.capital_cajaUpdateManyWithoutAperturaNestedInput
 }
 
 export type apertura_cajaUncheckedUpdateWithoutVentasInput = {
@@ -1265,12 +1377,12 @@ export type apertura_cajaUncheckedUpdateWithoutVentasInput = {
   diferencia?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   saldo_esperado?: Prisma.IntFieldUpdateOperationsInput | number
   valor_real?: Prisma.IntFieldUpdateOperationsInput | number
-  retiro?: Prisma.IntFieldUpdateOperationsInput | number
   comentario?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   venta_transferencia?: Prisma.IntFieldUpdateOperationsInput | number
   total_transferencia?: Prisma.IntFieldUpdateOperationsInput | number
   total?: Prisma.IntFieldUpdateOperationsInput | number
   movimientos?: Prisma.movimiento_cajaUncheckedUpdateManyWithoutAperturaNestedInput
+  capital?: Prisma.capital_cajaUncheckedUpdateManyWithoutAperturaNestedInput
 }
 
 export type apertura_cajaCreateManyUsersInput = {
@@ -1290,7 +1402,6 @@ export type apertura_cajaCreateManyUsersInput = {
   diferencia?: number | null
   saldo_esperado?: number
   valor_real?: number
-  retiro?: number
   comentario?: string | null
   venta_transferencia?: number
   total_transferencia?: number
@@ -1314,13 +1425,13 @@ export type apertura_cajaUpdateWithoutUsersInput = {
   diferencia?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   saldo_esperado?: Prisma.IntFieldUpdateOperationsInput | number
   valor_real?: Prisma.IntFieldUpdateOperationsInput | number
-  retiro?: Prisma.IntFieldUpdateOperationsInput | number
   comentario?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   venta_transferencia?: Prisma.IntFieldUpdateOperationsInput | number
   total_transferencia?: Prisma.IntFieldUpdateOperationsInput | number
   total?: Prisma.IntFieldUpdateOperationsInput | number
   ventas?: Prisma.ventaUpdateManyWithoutAperturaNestedInput
   movimientos?: Prisma.movimiento_cajaUpdateManyWithoutAperturaNestedInput
+  capital?: Prisma.capital_cajaUpdateManyWithoutAperturaNestedInput
 }
 
 export type apertura_cajaUncheckedUpdateWithoutUsersInput = {
@@ -1340,13 +1451,13 @@ export type apertura_cajaUncheckedUpdateWithoutUsersInput = {
   diferencia?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   saldo_esperado?: Prisma.IntFieldUpdateOperationsInput | number
   valor_real?: Prisma.IntFieldUpdateOperationsInput | number
-  retiro?: Prisma.IntFieldUpdateOperationsInput | number
   comentario?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   venta_transferencia?: Prisma.IntFieldUpdateOperationsInput | number
   total_transferencia?: Prisma.IntFieldUpdateOperationsInput | number
   total?: Prisma.IntFieldUpdateOperationsInput | number
   ventas?: Prisma.ventaUncheckedUpdateManyWithoutAperturaNestedInput
   movimientos?: Prisma.movimiento_cajaUncheckedUpdateManyWithoutAperturaNestedInput
+  capital?: Prisma.capital_cajaUncheckedUpdateManyWithoutAperturaNestedInput
 }
 
 export type apertura_cajaUncheckedUpdateManyWithoutUsersInput = {
@@ -1366,7 +1477,6 @@ export type apertura_cajaUncheckedUpdateManyWithoutUsersInput = {
   diferencia?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   saldo_esperado?: Prisma.IntFieldUpdateOperationsInput | number
   valor_real?: Prisma.IntFieldUpdateOperationsInput | number
-  retiro?: Prisma.IntFieldUpdateOperationsInput | number
   comentario?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   venta_transferencia?: Prisma.IntFieldUpdateOperationsInput | number
   total_transferencia?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1381,11 +1491,13 @@ export type apertura_cajaUncheckedUpdateManyWithoutUsersInput = {
 export type Apertura_cajaCountOutputType = {
   ventas: number
   movimientos: number
+  capital: number
 }
 
 export type Apertura_cajaCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   ventas?: boolean | Apertura_cajaCountOutputTypeCountVentasArgs
   movimientos?: boolean | Apertura_cajaCountOutputTypeCountMovimientosArgs
+  capital?: boolean | Apertura_cajaCountOutputTypeCountCapitalArgs
 }
 
 /**
@@ -1412,6 +1524,13 @@ export type Apertura_cajaCountOutputTypeCountMovimientosArgs<ExtArgs extends run
   where?: Prisma.movimiento_cajaWhereInput
 }
 
+/**
+ * Apertura_cajaCountOutputType without action
+ */
+export type Apertura_cajaCountOutputTypeCountCapitalArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.capital_cajaWhereInput
+}
+
 
 export type apertura_cajaSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id_apertura?: boolean
@@ -1431,7 +1550,6 @@ export type apertura_cajaSelect<ExtArgs extends runtime.Types.Extensions.Interna
   diferencia?: boolean
   saldo_esperado?: boolean
   valor_real?: boolean
-  retiro?: boolean
   comentario?: boolean
   venta_transferencia?: boolean
   total_transferencia?: boolean
@@ -1439,6 +1557,7 @@ export type apertura_cajaSelect<ExtArgs extends runtime.Types.Extensions.Interna
   users?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   ventas?: boolean | Prisma.apertura_caja$ventasArgs<ExtArgs>
   movimientos?: boolean | Prisma.apertura_caja$movimientosArgs<ExtArgs>
+  capital?: boolean | Prisma.apertura_caja$capitalArgs<ExtArgs>
   _count?: boolean | Prisma.Apertura_cajaCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["apertura_caja"]>
 
@@ -1460,7 +1579,6 @@ export type apertura_cajaSelectCreateManyAndReturn<ExtArgs extends runtime.Types
   diferencia?: boolean
   saldo_esperado?: boolean
   valor_real?: boolean
-  retiro?: boolean
   comentario?: boolean
   venta_transferencia?: boolean
   total_transferencia?: boolean
@@ -1486,7 +1604,6 @@ export type apertura_cajaSelectUpdateManyAndReturn<ExtArgs extends runtime.Types
   diferencia?: boolean
   saldo_esperado?: boolean
   valor_real?: boolean
-  retiro?: boolean
   comentario?: boolean
   venta_transferencia?: boolean
   total_transferencia?: boolean
@@ -1512,18 +1629,18 @@ export type apertura_cajaSelectScalar = {
   diferencia?: boolean
   saldo_esperado?: boolean
   valor_real?: boolean
-  retiro?: boolean
   comentario?: boolean
   venta_transferencia?: boolean
   total_transferencia?: boolean
   total?: boolean
 }
 
-export type apertura_cajaOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id_apertura" | "id_usuario_apertura" | "horario_apertura" | "horario_cierre" | "venta_boleta" | "venta_factura" | "venta_debito" | "venta_credito" | "venta_efectivo" | "total_debito" | "total_credito" | "total_efectivo" | "saldo_apertura" | "saldo_cierre" | "diferencia" | "saldo_esperado" | "valor_real" | "retiro" | "comentario" | "venta_transferencia" | "total_transferencia" | "total", ExtArgs["result"]["apertura_caja"]>
+export type apertura_cajaOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id_apertura" | "id_usuario_apertura" | "horario_apertura" | "horario_cierre" | "venta_boleta" | "venta_factura" | "venta_debito" | "venta_credito" | "venta_efectivo" | "total_debito" | "total_credito" | "total_efectivo" | "saldo_apertura" | "saldo_cierre" | "diferencia" | "saldo_esperado" | "valor_real" | "comentario" | "venta_transferencia" | "total_transferencia" | "total", ExtArgs["result"]["apertura_caja"]>
 export type apertura_cajaInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   users?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   ventas?: boolean | Prisma.apertura_caja$ventasArgs<ExtArgs>
   movimientos?: boolean | Prisma.apertura_caja$movimientosArgs<ExtArgs>
+  capital?: boolean | Prisma.apertura_caja$capitalArgs<ExtArgs>
   _count?: boolean | Prisma.Apertura_cajaCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type apertura_cajaIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1539,6 +1656,7 @@ export type $apertura_cajaPayload<ExtArgs extends runtime.Types.Extensions.Inter
     users: Prisma.$UserPayload<ExtArgs>
     ventas: Prisma.$ventaPayload<ExtArgs>[]
     movimientos: Prisma.$movimiento_cajaPayload<ExtArgs>[]
+    capital: Prisma.$capital_cajaPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id_apertura: string
@@ -1558,7 +1676,6 @@ export type $apertura_cajaPayload<ExtArgs extends runtime.Types.Extensions.Inter
     diferencia: number | null
     saldo_esperado: number
     valor_real: number
-    retiro: number
     comentario: string | null
     venta_transferencia: number
     total_transferencia: number
@@ -1960,6 +2077,7 @@ export interface Prisma__apertura_cajaClient<T, Null = never, ExtArgs extends ru
   users<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   ventas<T extends Prisma.apertura_caja$ventasArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.apertura_caja$ventasArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ventaPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   movimientos<T extends Prisma.apertura_caja$movimientosArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.apertura_caja$movimientosArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$movimiento_cajaPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  capital<T extends Prisma.apertura_caja$capitalArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.apertura_caja$capitalArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$capital_cajaPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2006,7 +2124,6 @@ export interface apertura_cajaFieldRefs {
   readonly diferencia: Prisma.FieldRef<"apertura_caja", 'Int'>
   readonly saldo_esperado: Prisma.FieldRef<"apertura_caja", 'Int'>
   readonly valor_real: Prisma.FieldRef<"apertura_caja", 'Int'>
-  readonly retiro: Prisma.FieldRef<"apertura_caja", 'Int'>
   readonly comentario: Prisma.FieldRef<"apertura_caja", 'String'>
   readonly venta_transferencia: Prisma.FieldRef<"apertura_caja", 'Int'>
   readonly total_transferencia: Prisma.FieldRef<"apertura_caja", 'Int'>
@@ -2457,6 +2574,30 @@ export type apertura_caja$movimientosArgs<ExtArgs extends runtime.Types.Extensio
   take?: number
   skip?: number
   distinct?: Prisma.Movimiento_cajaScalarFieldEnum | Prisma.Movimiento_cajaScalarFieldEnum[]
+}
+
+/**
+ * apertura_caja.capital
+ */
+export type apertura_caja$capitalArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the capital_caja
+   */
+  select?: Prisma.capital_cajaSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the capital_caja
+   */
+  omit?: Prisma.capital_cajaOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.capital_cajaInclude<ExtArgs> | null
+  where?: Prisma.capital_cajaWhereInput
+  orderBy?: Prisma.capital_cajaOrderByWithRelationInput | Prisma.capital_cajaOrderByWithRelationInput[]
+  cursor?: Prisma.capital_cajaWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.Capital_cajaScalarFieldEnum | Prisma.Capital_cajaScalarFieldEnum[]
 }
 
 /**

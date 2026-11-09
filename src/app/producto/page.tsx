@@ -7,6 +7,8 @@ import { CalendarDays } from "lucide-react";
 import { Navbar } from "../components/Navbar";
 import { CartLoader } from "../components/CartLoader";
 import { useBarcodeScanner } from "../components/useBarcodeScanner";
+import { usePermissions } from "../components/usePermissions";
+import { useSyncRevision } from "../components/SyncProvider";
 import { isSafeAppInput, isSafeDescriptionInput } from "@/lib/input-validation";
 
 type Producto = {
@@ -336,6 +338,8 @@ function buildInitialPriceState(producto: Producto): PriceState {
 }
 
 export default function ProductoPage() {
+  const can = usePermissions();
+  const syncRevision = useSyncRevision();
   const router = useRouter();
   const [activeProductTab, setActiveProductTab] = useState<
     "productos" | "promociones" | "vencimiento"
@@ -470,6 +474,8 @@ export default function ProductoPage() {
   }, [router]);
 
   useEffect(() => {
+    if (panelMode === "create" || isEditModalOpen || stockModal || hasPriceChanges || isSavingProduct || isSavingStock || pendingLotDeletion) return;
+    const controller = new AbortController();
     async function loadProductos() {
       const token = hasSessionHint();
 
@@ -482,6 +488,7 @@ export default function ProductoPage() {
         const response = await fetch("/api/producto", {
           headers: {
           },
+          signal: controller.signal,
         });
         const data = (await response.json()) as {
           status?: "ok" | "error";
@@ -502,20 +509,28 @@ export default function ProductoPage() {
           return;
         }
 
+        if (controller.signal.aborted) return;
         setProductos(data.productos ?? []);
+        const selected = data.productos?.find((item) => item.id === selectedProductId);
+        if (selected) setPriceState(buildInitialPriceState(selected));
+        if (syncRevision === 0 && new URLSearchParams(window.location.search).get("tab") === "vencimiento") {
+          setActiveProductTab("vencimiento");
+        }
         if (data.opciones) {
           setOptions(data.opciones);
         }
         setIsLoading(false);
         loadExpiringProducts();
       } catch {
+        if (controller.signal.aborted) return;
         setError("No se pudo conectar con el servidor.");
         setIsLoading(false);
       }
     }
 
     loadProductos();
-  }, [loadExpiringProducts, router]);
+    return () => controller.abort();
+  }, [loadExpiringProducts, router, syncRevision, panelMode, isEditModalOpen, stockModal, hasPriceChanges, isSavingProduct, isSavingStock, pendingLotDeletion, selectedProductId]);
 
   function handleLogout() {
     void endSession();
@@ -1437,6 +1452,7 @@ export default function ProductoPage() {
                 className="product-add-button"
                 type="button"
                 aria-label="Agregar producto"
+                disabled={!can("productos_crear")}
                 title="Agregar producto"
                 onClick={openCreateProductPanel}
               >
@@ -1662,6 +1678,7 @@ function ExpiringProductsTable({
   onToggleProduct,
   onRequestDeleteLot,
 }: ExpiringProductsTableProps) {
+  const can = usePermissions();
   if (isLoading) {
     return <CartLoader label="Cargando productos por vencer..." />;
   }
@@ -1793,6 +1810,7 @@ function ExpiringProductsTable({
                                     type="button"
                                     aria-label={`Eliminar lote ${index + 1}`}
                                     title="Eliminar lote vencido"
+                                    disabled={!can("productos_merma")}
                                     onClick={(event) => {
                                       event.stopPropagation();
                                       onRequestDeleteLot({
@@ -2615,9 +2633,10 @@ function ProductDetail({
   onOpenStockModal,
   onEdit,
 }: ProductDetailProps) {
+  const can = usePermissions();
   const imageUrl = product.urlImagen || "/generic-product.svg";
   const minPrice = Math.max(priceState.costoSinIva, 0);
-  const maxPrice = Math.max(priceState.precioConIva * 3, minPrice + 1);
+  const maxPrice = Math.max(product.precioVenta * 3, minPrice + 1);
   const rangePrice = Math.min(
     Math.max(priceState.precioConIva, minPrice),
     maxPrice,
@@ -2644,6 +2663,7 @@ function ProductDetail({
               className="product-edit-button"
               type="button"
               aria-label="Editar producto"
+              disabled={!can("productos_editar")}
               title="Editar producto"
               onClick={() => onEdit(product)}
             >
@@ -2678,6 +2698,7 @@ function ProductDetail({
 
         {openAccordion === "precio" ? (
           <section className="price-detail-section">
+            <fieldset className="product-price-fields" disabled={!can("productos_editar")}>
             <div className="price-summary">
               <label className="price-main-input">
                 Precio
@@ -2803,6 +2824,7 @@ function ProductDetail({
             ) : null}
 
             {saveMessage ? <p className="product-save-message">{saveMessage}</p> : null}
+            </fieldset>
           </section>
         ) : null}
       </div>
@@ -2829,10 +2851,10 @@ function ProductDetail({
             <div className="inventory-actions">
               {product.controlaStock ? (
                 <>
-                  <button type="button" onClick={() => onOpenStockModal("add")}>
+                  <button type="button" disabled={!can("productos_stock")} onClick={() => onOpenStockModal("add")}>
                     Añadir stock
                   </button>
-                  <button type="button" onClick={() => onOpenStockModal("waste")}>
+                  <button type="button" disabled={!can("productos_merma")} onClick={() => onOpenStockModal("waste")}>
                     Ingresar merma
                   </button>
                 </>

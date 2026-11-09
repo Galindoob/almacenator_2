@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useId, useRef, useState } from "react";
 import { useAppearance } from "./AppearanceProvider";
+import { usePermissions } from "./usePermissions";
 
 type NavbarProps = {
   onLogout?: () => void;
@@ -56,6 +57,7 @@ export function Navbar({
   const lowStockPanelId = useId();
   const lowStockRef = useRef<HTMLDivElement>(null);
   const { storeName, resetThemeForLogout } = useAppearance();
+  const can = usePermissions();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isProductsOpen, setIsProductsOpen] = useState(false);
   const [isReportsOpen, setIsReportsOpen] = useState(false);
@@ -120,7 +122,7 @@ export function Navbar({
       return;
     }
 
-    router.push("/producto");
+    router.push("/producto?tab=vencimiento");
   }
 
   function goToProviders() {
@@ -195,14 +197,16 @@ export function Navbar({
             <button
               type="button"
               className={activeProductTab === "productos" ? "is-active" : ""}
+              disabled={!can("productos_ver")}
               onClick={goToProducts}
             >
               Productos
             </button>
-            <button type="button" className={activeProductTab === "promociones" ? "is-active" : ""} onClick={goToPromotions}>Promociones</button>
+            <button type="button" className={activeProductTab === "promociones" ? "is-active" : ""} disabled={!can("promociones_crear")} onClick={goToPromotions}>Promociones</button>
             <button
               type="button"
               className={activeProductTab === "vencimiento" ? "is-active" : ""}
+              disabled={!can("productos_ver") || !can("vencimiento_ver")}
               onClick={goToExpiringProducts}
             >
               Productos por vencer
@@ -304,41 +308,41 @@ export function Navbar({
               <button type="button" onClick={goToHome}>
                 Caja registradora
               </button>
-              <button
+              {can("productos_ver") || can("promociones_crear") ? <button
                 type="button"
                 aria-controls={productsSubmenuId}
                 aria-expanded={isProductsOpen}
                 onClick={() => setIsProductsOpen((value) => !value)}
               >
                 Gestion de producto
-              </button>
+              </button> : null}
 
               {isProductsOpen ? (
                 <div id={productsSubmenuId} className="side-submenu">
-                  <button type="button" onClick={goToProducts}>
+                  {can("productos_ver") ? <button type="button" onClick={goToProducts}>
                     Productos
-                  </button>
-                  <button type="button" onClick={goToPromotions}>Promociones</button>
-                  <button type="button" onClick={goToExpiringProducts}>
+                  </button> : null}
+                  {can("promociones_crear") ? <button type="button" onClick={goToPromotions}>Promociones</button> : null}
+                  {can("productos_ver") && can("vencimiento_ver") ? <button type="button" onClick={goToExpiringProducts}>
                     Producto por vencer
-                  </button>
+                  </button> : null}
                 </div>
               ) : null}
-              <button type="button" onClick={goToProviders}>
+              {can("proveedores_ver") ? <button type="button" onClick={goToProviders}>
                 Proveedores
-              </button>
-              <button type="button" onClick={goToPriceLookup}>
+              </button> : null}
+              {can("precios_ver") ? <button type="button" onClick={goToPriceLookup}>
                 Consultar precio
-              </button>
-              <button type="button" onClick={goToTransactions}>Transacciones</button>
-              <button
+              </button> : null}
+              {can("transacciones_ver") ? <button type="button" onClick={goToTransactions}>Transacciones</button> : null}
+              {can("reportes_ver") ? <button
                 type="button"
                 aria-controls={reportsSubmenuId}
                 aria-expanded={isReportsOpen}
                 onClick={() => setIsReportsOpen((value) => !value)}
               >
                 Reportes
-              </button>
+              </button> : null}
               {isReportsOpen ? (
                 <div id={reportsSubmenuId} className="side-submenu">
                   <button type="button" onClick={goToInstantReport}>
@@ -349,7 +353,7 @@ export function Navbar({
                   </button>
                 </div>
               ) : null}
-              <button type="button" onClick={goToAcademy}>Academia MiniGest</button>
+              {can("academia_ver") ? <button type="button" onClick={goToAcademy}>Academia MiniGest</button> : null}
               <button type="button" onClick={goToSettings}>
                 Configuración
               </button>

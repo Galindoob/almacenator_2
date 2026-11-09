@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Navbar } from "../components/Navbar";
 import { useAppearance } from "../components/AppearanceProvider";
+import { usePermissions } from "../components/usePermissions";
+import { useSyncRevision } from "../components/SyncProvider";
 
 type TokenPayload = {
   nombre?: string;
@@ -83,13 +85,25 @@ function HomeActionIcon({ name }: { name: HomeAction["icon"] }) {
 export default function HomePage() {
   const router = useRouter();
   const { storeName } = useAppearance();
+  const can = usePermissions();
+  const syncRevision = useSyncRevision();
   const [payload, setPayload] = useState<TokenPayload | null>(null);
   const [isCashRegisterOpen, setIsCashRegisterOpen] = useState<boolean | null>(null);
   const [canCloseCashRegister, setCanCloseCashRegister] = useState(false);
   const [availableOpeningBalance, setAvailableOpeningBalance] = useState<number | null>(null);
   const [isOpenCashModalVisible, setIsOpenCashModalVisible] = useState(false);
+  const [isNoCapitalAlertVisible, setIsNoCapitalAlertVisible] = useState(false);
   const [cashMessage, setCashMessage] = useState("");
   const [isSavingCashRegister, setIsSavingCashRegister] = useState(false);
+
+  useEffect(() => {
+    if (!isNoCapitalAlertVisible) return;
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setIsNoCapitalAlertVisible(false);
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isNoCapitalAlertVisible]);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -140,7 +154,7 @@ export default function HomePage() {
     if (payload) {
       loadCashRegisterState();
     }
-  }, [payload]);
+  }, [payload, syncRevision]);
 
   function handleLogout() {
     void endSession();
@@ -150,6 +164,11 @@ export default function HomePage() {
   async function handleAction(action: HomeAction["action"]) {
     if (action === "sale") {
       router.push("/ventas");
+      return;
+    }
+
+    if (action === "income" || action === "expense") {
+      router.push(action === "income" ? "/registrar_ingreso" : "/registrar_egreso");
       return;
     }
 
@@ -181,8 +200,9 @@ export default function HomePage() {
       return;
     }
 
-    if (availableOpeningBalance === null) {
-      window.alert("Caja vacía, comunicarse con administración.");
+    if (availableOpeningBalance === null || availableOpeningBalance <= 0) {
+      setIsOpenCashModalVisible(false);
+      setIsNoCapitalAlertVisible(true);
       return;
     }
 
@@ -203,6 +223,11 @@ export default function HomePage() {
       };
 
       if (!response.ok || data.status !== "ok") {
+        if (data.message?.startsWith("No hay capital en caja")) {
+          setIsOpenCashModalVisible(false);
+          setIsNoCapitalAlertVisible(true);
+          return;
+        }
         setCashMessage(data.message ?? "No se pudo abrir la caja.");
         return;
       }
@@ -239,7 +264,7 @@ export default function HomePage() {
         <nav className="home-actions" aria-label="Acciones principales">
           {cashMessage && !isOpenCashModalVisible ? <p className="cash-modal-message" role="alert">{cashMessage}</p> : null}
           {isCashRegisterOpen ? (
-            homeActions.map((action) => (
+            homeActions.filter((action) => can(action.action === "sale" ? "ventas_crear" : action.action === "close" ? "caja_abrir_cerrar" : "caja_ingreso_egreso")).map((action) => (
               <button
                 type="button"
                 className={`home-action-${action.tone}`}
@@ -257,13 +282,13 @@ export default function HomePage() {
                 </svg>
               </button>
             ))
-          ) : (
+          ) : can("caja_abrir_cerrar") ? (
             <button
               type="button"
               className="home-action-cash"
               disabled={isCashRegisterOpen === null}
               onClick={() => {
-                if (availableOpeningBalance === null) window.alert("Caja vacía, comunicarse con administración.");
+                if (availableOpeningBalance === null || availableOpeningBalance <= 0) setIsNoCapitalAlertVisible(true);
                 else setIsOpenCashModalVisible(true);
               }}
             >
@@ -275,7 +300,7 @@ export default function HomePage() {
                 <path d="M9 5l7 7-7 7" />
               </svg>
             </button>
-          )}
+          ) : null}
         </nav>
       </section>
 
@@ -296,13 +321,23 @@ export default function HomePage() {
             <h2>Abrir caja</h2>
             <p>Saldo disponible para la apertura: <strong>$ {availableOpeningBalance?.toLocaleString("es-CL")}</strong></p>
             {cashMessage ? <p className="cash-modal-message">{cashMessage}</p> : null}
-            <button
-              type="button"
-              disabled={isSavingCashRegister}
-              onClick={openCashRegister}
-            >
-              {isSavingCashRegister ? "Abriendo..." : "Abrir caja"}
-            </button>
+            <div className="cash-modal-actions">
+              <button type="button" className="cash-modal-cancel" disabled={isSavingCashRegister} onClick={() => { setIsOpenCashModalVisible(false); setCashMessage(""); }}>Cancelar</button>
+              <button type="button" disabled={isSavingCashRegister} onClick={openCashRegister}>
+                {isSavingCashRegister ? "Abriendo..." : "Abrir caja"}
+              </button>
+            </div>
+          </section>
+        </div>
+      ) : null}
+
+      {isNoCapitalAlertVisible ? (
+        <div className="cash-modal-layer" role="presentation">
+          <button className="cash-modal-backdrop" type="button" aria-label="Cerrar alerta" onClick={() => setIsNoCapitalAlertVisible(false)} />
+          <section className="cash-modal" role="alertdialog" aria-modal="true" aria-labelledby="no-capital-title" aria-describedby="no-capital-description">
+            <h2 id="no-capital-title">Caja sin capital</h2>
+            <p id="no-capital-description">No hay capital en caja. Comunícate con administración.</p>
+            <button type="button" autoFocus onClick={() => setIsNoCapitalAlertVisible(false)}>Entendido</button>
           </section>
         </div>
       ) : null}

@@ -11,6 +11,8 @@ import {
   useSyncExternalStore,
 } from "react";
 import { isSafeAppInput } from "@/lib/input-validation";
+import { usePathname } from "next/navigation";
+import { useSyncRevision } from "./SyncProvider";
 
 export type ColorTheme = "green" | "blue" | "orange" | "sky";
 
@@ -109,6 +111,8 @@ function parsePreferences(value: string | null): AppearancePreferences {
 }
 
 export function AppearanceProvider({ children }: { children: ReactNode }) {
+  const syncRevision = useSyncRevision();
+  const pathname = usePathname();
   const [preview, setPreview] = useState<Pick<AppearancePreferences, "colorTheme" | "fontScale" | "interfaceScale"> | null>(null);
   const clearAppearancePreview = useCallback(() => setPreview(null), []);
   const storedPreferences = useSyncExternalStore(
@@ -140,7 +144,7 @@ export function AppearanceProvider({ children }: { children: ReactNode }) {
       }
     }
 
-    void loadPreferences();
+    if (!pathname.startsWith("/configuracion") || syncRevision === 0) void loadPreferences();
     function handleAuthChange() {
       setPreview(null);
       clearCachedPreferences();
@@ -150,7 +154,7 @@ export function AppearanceProvider({ children }: { children: ReactNode }) {
     return () => {
       window.removeEventListener("mini-gest-auth-change", handleAuthChange);
     };
-  }, []);
+  }, [syncRevision, pathname]);
 
   useEffect(() => {
     const root = document.documentElement;

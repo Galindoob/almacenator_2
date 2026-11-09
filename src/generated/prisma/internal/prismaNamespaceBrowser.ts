@@ -55,6 +55,8 @@ export const ModelName = {
   PasswordReset: 'PasswordReset',
   Empresa: 'Empresa',
   Role: 'Role',
+  Permiso: 'Permiso',
+  RolPermiso: 'RolPermiso',
   Marca: 'Marca',
   Categoria: 'Categoria',
   Unidad: 'Unidad',
@@ -64,6 +66,7 @@ export const ModelName = {
   instancia_producto: 'instancia_producto',
   empaque: 'empaque',
   apertura_caja: 'apertura_caja',
+  capital_caja: 'capital_caja',
   razon_movimiento: 'razon_movimiento',
   movimiento_caja: 'movimiento_caja',
   historia_caja: 'historia_caja',
@@ -144,6 +147,22 @@ export const RoleScalarFieldEnum = {
 } as const
 
 export type RoleScalarFieldEnum = (typeof RoleScalarFieldEnum)[keyof typeof RoleScalarFieldEnum]
+
+
+export const PermisoScalarFieldEnum = {
+  id: 'id'
+} as const
+
+export type PermisoScalarFieldEnum = (typeof PermisoScalarFieldEnum)[keyof typeof PermisoScalarFieldEnum]
+
+
+export const RolPermisoScalarFieldEnum = {
+  roleId: 'roleId',
+  permisoId: 'permisoId',
+  habilitado: 'habilitado'
+} as const
+
+export type RolPermisoScalarFieldEnum = (typeof RolPermisoScalarFieldEnum)[keyof typeof RolPermisoScalarFieldEnum]
 
 
 export const MarcaScalarFieldEnum = {
@@ -253,7 +272,6 @@ export const Apertura_cajaScalarFieldEnum = {
   diferencia: 'diferencia',
   saldo_esperado: 'saldo_esperado',
   valor_real: 'valor_real',
-  retiro: 'retiro',
   comentario: 'comentario',
   venta_transferencia: 'venta_transferencia',
   total_transferencia: 'total_transferencia',
@@ -261,6 +279,18 @@ export const Apertura_cajaScalarFieldEnum = {
 } as const
 
 export type Apertura_cajaScalarFieldEnum = (typeof Apertura_cajaScalarFieldEnum)[keyof typeof Apertura_cajaScalarFieldEnum]
+
+
+export const Capital_cajaScalarFieldEnum = {
+  id: 'id',
+  id_apertura_caja: 'id_apertura_caja',
+  id_usuario: 'id_usuario',
+  tipo: 'tipo',
+  monto: 'monto',
+  fecha: 'fecha'
+} as const
+
+export type Capital_cajaScalarFieldEnum = (typeof Capital_cajaScalarFieldEnum)[keyof typeof Capital_cajaScalarFieldEnum]
 
 
 export const Razon_movimientoScalarFieldEnum = {

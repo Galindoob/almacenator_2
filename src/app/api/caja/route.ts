@@ -23,7 +23,6 @@ function serializeCashRegister(cashRegister: CashRecord) {
     saldo_esperado: cashRegister.saldo_esperado,
     diferencia: cashRegister.diferencia,
     valor_real: cashRegister.valor_real,
-    retiro: cashRegister.retiro,
     comentario: cashRegister.comentario,
     venta_debito: cashRegister.venta_debito,
     venta_credito: cashRegister.venta_credito,
@@ -75,6 +74,7 @@ export const POST = withAuth(async (request) => {
 
       const previous = await tx.apertura_caja.findFirst({ where: { horario_cierre: { not: null } }, orderBy: { horario_cierre: "desc" }, select: { valor_real: true } });
       if (!previous) return { status: 409 as const, message: "Caja vacía, comunicarse con administración." };
+      if (previous.valor_real <= 0) return { status: 409 as const, message: "No hay capital en caja. Comunícate con administración." };
 
       const created = await tx.apertura_caja.create({
         data: {
@@ -85,7 +85,6 @@ export const POST = withAuth(async (request) => {
           saldo_cierre: null,
           diferencia: null,
           comentario: null,
-          retiro: 0,
         },
         include: cashInclude,
       });

@@ -4,6 +4,7 @@ import { hasSessionHint } from "@/lib/client-session";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { CartLoader } from "../components/CartLoader";
+import { useSyncRevision } from "../components/SyncProvider";
 
 type CashRegister = {
   id_apertura: string;
@@ -56,6 +57,7 @@ function chileDate(value: string) {
 }
 
 export default function CierreCajaPage() {
+  const syncRevision = useSyncRevision();
   const router = useRouter();
   const [cashRegister, setCashRegister] = useState<CashRegister | null>(null);
   const [cashOnHand, setCashOnHand] = useState("0");
@@ -65,6 +67,8 @@ export default function CierreCajaPage() {
   const [closing, setClosing] = useState(false);
   const [previewing, setPreviewing] = useState(false);
   const [voucher, setVoucher] = useState<Voucher | null>(null);
+  const [cashUnavailable, setCashUnavailable] = useState(false);
+  const cashId = cashRegister?.id_apertura;
 
   useEffect(() => {
     if (!hasSessionHint()) { router.replace("/login"); return; }
@@ -86,6 +90,26 @@ export default function CierreCajaPage() {
       .finally(() => { if (!controller.signal.aborted) setLoading(false); });
     return () => controller.abort();
   }, [router]);
+
+  useEffect(() => {
+    if (!syncRevision || !cashId || closing) return;
+    const controller = new AbortController();
+    fetch("/api/caja", { cache: "no-store", signal: controller.signal })
+      .then(async (response) => response.ok ? response.json() as Promise<{ abierta?: boolean; caja?: CashRegister; puedeCerrar?: boolean; ventasPendientes?: number }> : null)
+      .then((data) => {
+        if (!data || controller.signal.aborted) return;
+        if (!data.abierta || !data.caja || data.caja.id_apertura !== cashId || !data.puedeCerrar) {
+          setCashUnavailable(true);
+          setMessage("La caja ya no está disponible para cerrar. Vuelve al inicio para consultar su estado.");
+        } else {
+          setCashRegister(data.caja);
+          setCashUnavailable(Boolean(data.ventasPendientes));
+          if (data.ventasPendientes) setMessage("Hay ventas pendientes. Termínalas o elimínalas antes de cerrar la caja.");
+          else setMessage((current) => current.startsWith("Hay ventas pendientes.") ? "" : current);
+        }
+      }).catch(() => {});
+    return () => controller.abort();
+  }, [syncRevision, cashId, closing]);
 
   useEffect(() => {
     if (!voucher) return;
@@ -177,8 +201,8 @@ export default function CierreCajaPage() {
           </label>
           {message ? <p role="alert">{message}</p> : null}
           <div className="cash-close-buttons">
-            <button type="button" disabled={cashOnHand === "" || previewing || closing} onClick={previewVoucher}>{previewing ? "Preparando..." : "Ver detalle voucher"}</button>
-            <button type="button" disabled={cashOnHand === "" || closing} onClick={closeCashRegister}>{closing ? "Cerrando..." : "Cerrar caja"}</button>
+            <button type="button" disabled={cashOnHand === "" || previewing || closing || cashUnavailable} onClick={previewVoucher}>{previewing ? "Preparando..." : "Ver detalle voucher"}</button>
+            <button type="button" disabled={cashOnHand === "" || closing || cashUnavailable} onClick={closeCashRegister}>{closing ? "Cerrando..." : "Cerrar caja"}</button>
           </div>
         </div>
       </section>

@@ -5,6 +5,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Search, Trash2, Percent, Tag, Gift, Pencil } from "lucide-react";
 import { CartLoader } from "../components/CartLoader";
 import { useBarcodeScanner } from "../components/useBarcodeScanner";
+import { useSyncRevision } from "../components/SyncProvider";
 
 type Promo = {
   id_promocion: string;
@@ -22,6 +23,7 @@ type Promo = {
 function money(value: number) { return `$${Math.round(value).toLocaleString("es-CL")}`; }
 
 export default function PromotionsPage() {
+  const syncRevision = useSyncRevision();
   const [promotions, setPromotions] = useState<Promo[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [search, setSearch] = useState("");
@@ -47,7 +49,7 @@ export default function PromotionsPage() {
       .then((items) => {
         if (controller.signal.aborted) return;
         setPromotions(items);
-        setSelectedId(items[0]?.id_promocion ?? null);
+        setSelectedId((current) => items.some((item) => item.id_promocion === current) ? current : items[0]?.id_promocion ?? null);
       })
       .catch((err: unknown) => {
         if (!controller.signal.aborted) setError(err instanceof Error ? err.message : "Error cargando promociones.");
@@ -56,7 +58,7 @@ export default function PromotionsPage() {
         if (!controller.signal.aborted) setLoading(false);
       });
     return () => controller.abort();
-  }, []);
+  }, [syncRevision]);
 
   const filtered = useMemo(() => promotions.filter((promo) =>
     `${promo.nombre_promocion} ${promo.producto.nombre} ${promo.producto.codigoBarra ?? ""} ${promo.tipo_promocion.tipo}`.toLocaleLowerCase("es-CL").includes(search.toLocaleLowerCase("es-CL"))), [promotions, search]);

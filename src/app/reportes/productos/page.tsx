@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { endSession } from "@/lib/client-session";
 import { CartLoader } from "../../components/CartLoader";
 import { useBarcodeScanner } from "../../components/useBarcodeScanner";
+import { useSyncRevision } from "../../components/SyncProvider";
 
 type Product = { id: string; nombre: string; codigoBarra: string | null; contenido: number | null; marca: { nombre: string }; categoria: { nombreCategoria: string }; unidad: { unidad: string }; unidad_medida_productos_unidad_medidaTounidad_medida: { nombre: string } | null };
 type Totals = { id: string; quantity: number; revenue: number; cost: number; sales: number };
@@ -27,6 +28,7 @@ function monthName(month: string) {
 }
 
 export default function ReporteProductosPage() {
+  const syncRevision = useSyncRevision();
   const [month, setMonth] = useState(chileMonth);
   const [productId, setProductId] = useState("");
   const [search, setSearch] = useState("");
@@ -52,7 +54,7 @@ export default function ReporteProductosPage() {
       .catch((reason: unknown) => { if (!controller.signal.aborted) setError(reason instanceof Error ? reason.message : "No se pudo cargar el reporte."); })
       .finally(() => { if (!controller.signal.aborted) setLoading(false); });
     return () => controller.abort();
-  }, [month, productId]);
+  }, [month, productId, syncRevision]);
 
   const selectedId = report?.selectedId;
   const selected = report?.products.find((product) => product.id === selectedId);

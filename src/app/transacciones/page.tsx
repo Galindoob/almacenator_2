@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Eye, RefreshCw, X } from "lucide-react";
 import { Navbar } from "../components/Navbar";
 import { CartLoader } from "../components/CartLoader";
+import { useSyncRevision } from "../components/SyncProvider";
 
 const columns = [
   "N° de venta",
@@ -49,6 +50,7 @@ function paymentName(name: string) {
 }
 
 export default function TransaccionesPage() {
+  const syncRevision = useSyncRevision();
   const router = useRouter();
   const [isSessionVerified, setIsSessionVerified] = useState(false);
   const [saleNumber, setSaleNumber] = useState("");
@@ -131,7 +133,7 @@ export default function TransaccionesPage() {
       });
 
     return () => controller.abort();
-  }, [isSessionVerified]);
+  }, [isSessionVerified, syncRevision]);
 
   useEffect(() => {
     if (!isSessionVerified || invalidDateRange) return;
@@ -158,7 +160,7 @@ export default function TransaccionesPage() {
       }
     }, 250);
     return () => { window.clearTimeout(timer); controller.abort(); };
-  }, [isSessionVerified, invalidDateRange, saleNumber, startDate, endDate, status, paymentMethod, page, pageSize, refresh, router]);
+  }, [isSessionVerified, invalidDateRange, saleNumber, startDate, endDate, status, paymentMethod, page, pageSize, refresh, router, syncRevision]);
 
   useEffect(() => {
     const update = () => setRefresh((value) => value + 1);

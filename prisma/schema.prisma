@@ -20,6 +20,7 @@ model User {
   apertura_caja       apertura_caja[]
   movimiento_de_stock movimiento_de_stock[]
   ventas              venta[]
+  capital_caja        capital_caja[]
   configuracion       ConfiguracionUsuario?
   passwordResets      PasswordReset[]
   role                Role                  @relation(fields: [roleid], references: [id], map: "fk_users_role")
@@ -62,8 +63,25 @@ model Role {
   id    String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   role  String @unique @db.VarChar(50)
   users User[]
+  permisos RolPermiso[]
 
   @@map("role")
+}
+
+model Permiso {
+  id String @id @db.VarChar(80)
+  roles RolPermiso[]
+  @@map("permiso")
+}
+
+model RolPermiso {
+  roleId String @map("id_rol") @db.Uuid
+  permisoId String @map("id_permiso") @db.VarChar(80)
+  habilitado Boolean @default(false)
+  role Role @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permiso Permiso @relation(fields: [permisoId], references: [id], onDelete: Cascade)
+  @@id([roleId, permisoId])
+  @@map("rol_permiso")
 }
 
 model Marca {
@@ -180,7 +198,6 @@ model apertura_caja {
   diferencia          Int?
   saldo_esperado      Int       @default(0)
   valor_real          Int       @default(0)
-  retiro              Int       @default(0)
   comentario          String?   @db.VarChar(255)
   venta_transferencia Int       @default(0)
   total_transferencia Int       @default(0)
@@ -188,6 +205,19 @@ model apertura_caja {
   users               User      @relation(fields: [id_usuario_apertura], references: [id], map: "fk_apertura_caja_usuario")
   ventas              venta[]
   movimientos         movimiento_caja[]
+  capital             capital_caja[]
+}
+
+model capital_caja {
+  id               String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  id_apertura_caja String        @db.Uuid
+  id_usuario       String        @db.Uuid
+  tipo             String        @db.VarChar(20)
+  monto            Int
+  fecha            DateTime      @default(now()) @db.Timestamptz(6)
+  apertura         apertura_caja @relation(fields: [id_apertura_caja], references: [id_apertura], onDelete: Restrict, onUpdate: NoAction)
+  usuario          User          @relation(fields: [id_usuario], references: [id], onDelete: Restrict, onUpdate: NoAction)
+  @@index([id_apertura_caja])
 }
 
 model razon_movimiento {
