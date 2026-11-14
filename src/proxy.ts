@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { validateJwtToken } from "@/lib/auth";
 import { readResetIntent, RESET_COOKIE } from "@/lib/password-reset";
+import { hasCashClosingPrivilege } from "@/lib/cash-authorization";
 
 export async function proxy(request: NextRequest) {
   const path = request.nextUrl.pathname;
@@ -43,7 +44,8 @@ export async function proxy(request: NextRequest) {
       const payload = validateJwtToken(token);
       const { getUserPermissions } = await import("@/lib/permissions");
       const access = payload ? await getUserPermissions(payload.correo) : null;
-      if (!access?.has(required) || (path === "/producto" && request.nextUrl.searchParams.get("tab") === "vencimiento" && !access.has("vencimiento_ver"))) return NextResponse.redirect(new URL("/home", request.url));
+      const privilegedCashClose = path.startsWith("/cierreCaja") && access && hasCashClosingPrivilege(access.role);
+      if ((!access?.has(required) && !privilegedCashClose) || (path === "/producto" && request.nextUrl.searchParams.get("tab") === "vencimiento" && !access?.has("vencimiento_ver"))) return NextResponse.redirect(new URL("/home", request.url));
     } catch {
       return new NextResponse("No se pudieron verificar los permisos.", { status: 503 });
     }

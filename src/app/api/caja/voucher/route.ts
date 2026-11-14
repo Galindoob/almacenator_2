@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { withAuth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
+import { canCloseCashRegister } from "@/lib/cash-authorization";
 
 const previewSchema = z.object({
   enCaja: z.number().int().nonnegative().max(2147483647),
@@ -13,7 +14,7 @@ export const POST = withAuth(async (request) => {
   if (!parsed.success) return NextResponse.json({ message: parsed.error.issues[0]?.message ?? "Datos inválidos." }, { status: 400 });
 
   try {
-    const user = await prisma.user.findUnique({ where: { correo: request.correo }, select: { id: true, nombre: true, apellido: true } });
+    const user = await prisma.user.findUnique({ where: { correo: request.correo }, select: { id: true, nombre: true, apellido: true, role: { select: { role: true } } } });
     if (!user) return NextResponse.json({ message: "Usuario no encontrado." }, { status: 404 });
 
     const cashRegister = await prisma.apertura_caja.findFirst({
@@ -24,8 +25,8 @@ export const POST = withAuth(async (request) => {
       },
     });
     if (!cashRegister) return NextResponse.json({ message: "No hay una caja abierta." }, { status: 404 });
-    if (cashRegister.id_usuario_apertura !== user.id) {
-      return NextResponse.json({ message: "Solo quien abrió la caja puede ver el cierre." }, { status: 403 });
+    if (!canCloseCashRegister(user.id, user.role.role, cashRegister.id_usuario_apertura)) {
+      return NextResponse.json({ message: "Solo quien abrió la caja, un administrador o master puede ver el cierre." }, { status: 403 });
     }
 
     const [company, totalVentas, clock] = await Promise.all([

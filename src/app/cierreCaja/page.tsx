@@ -82,7 +82,7 @@ export default function CierreCajaPage() {
         const data = await response.json() as { abierta?: boolean; caja?: CashRegister; puedeCerrar?: boolean; ventasPendientes?: number; message?: string };
         if (!response.ok) throw new Error(data.message ?? "No se pudo cargar la caja.");
         if (!data.abierta || !data.caja) { router.replace("/home"); return; }
-        if (!data.puedeCerrar) { await showDialog({ title: "No se puede cerrar la caja", message: "Solo quien abrió la caja puede cerrarla.", tone: "warning" }); if (!controller.signal.aborted) router.replace("/home"); return; }
+        if (!data.puedeCerrar) { await showDialog({ title: "No se puede cerrar la caja", message: "Solo quien abrió la caja, un administrador o master puede cerrarla.", tone: "warning" }); if (!controller.signal.aborted) router.replace("/home"); return; }
         if (data.ventasPendientes) {
           await showDialog({ title: "Ventas pendientes", message: `Hay ${data.ventasPendientes} ${data.ventasPendientes === 1 ? "venta pendiente" : "ventas pendientes"}. Finalízalas o cancélalas antes de cerrar la caja.`, tone: "warning" });
           if (!controller.signal.aborted) router.replace("/home");
@@ -180,8 +180,26 @@ export default function CierreCajaPage() {
           <section className="cash-close-column">
             <h2>Efectivo total</h2>
             <label>En caja
-              <input type="text" inputMode="numeric" value={cashOnHand} onChange={(event) => {
-                if (/^\d{0,10}$/.test(event.target.value) && Number(event.target.value || 0) <= 2147483647) { setCashOnHand(event.target.value); setMessage(""); }
+              <input type="text" inputMode="numeric" value={cashOnHand} onFocus={(event) => {
+                if (event.currentTarget.value === "0") event.currentTarget.select();
+              }} onChange={(event) => {
+                const input = event.currentTarget;
+                const raw = input.value;
+                if (/^\d*$/.test(raw)) {
+                  const cursorPosition = input.selectionStart ?? raw.length;
+                  const inputType = (event.nativeEvent as InputEvent).inputType;
+                  const insertedBeforeZero = cashOnHand === "0" && raw.length > 1 && raw.endsWith("0") && cursorPosition === raw.length - 1 && (inputType === "insertText" || inputType === "insertFromPaste");
+                  const entered = insertedBeforeZero ? raw.slice(0, -1) : raw;
+                  const normalized = entered.replace(/^0+(?=\d)/, "") || "0";
+                  if (normalized.length > 10 || Number(normalized) > 2147483647) return;
+                  if (normalized !== raw) {
+                    const cursor = Math.max(0, cursorPosition - (entered.length - normalized.length));
+                    input.value = normalized;
+                    input.setSelectionRange(cursor, cursor);
+                  }
+                  setCashOnHand(normalized);
+                  setMessage("");
+                }
               }} />
             </label>
             <label>Esperado <input type="text" readOnly value={currency(cashRegister.saldo_esperado)} /></label>

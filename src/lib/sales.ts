@@ -162,6 +162,10 @@ export async function executeSaleCommand(tx: Tx, userId: string, command: SaleCo
 
   if (command.action === "item") {
     await setItem(tx, sale.id_venta, command.productId, command.quantity);
+    if (command.quantity === 0 && sale.detalles.length === 1 && sale.detalles[0].id_producto === command.productId) {
+      await tx.venta.delete({ where: { id_venta: sale.id_venta } });
+      return null;
+    }
     return readSale(tx, sale.id_venta);
   }
   await lockProducts(tx, sale.detalles.map((d) => d.id_producto));

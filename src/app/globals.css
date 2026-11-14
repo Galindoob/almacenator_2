@@ -3193,6 +3193,8 @@ html[data-appearance-mode="dark"] .cash-voucher { background: #fff; color: #2028
   white-space: nowrap;
 }
 .transactions-receipt-button:hover { background: var(--accent-color); color: #ffffff; }
+.transactions-receipt-button:disabled { opacity: .55; cursor: not-allowed; }
+.transactions-receipt-button:disabled:hover { background: var(--accent-soft-color); color: var(--accent-dark); }
 .transactions-receipt-overlay {
   align-items: center;
   background: rgba(0, 0, 0, 0.66);

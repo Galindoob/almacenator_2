@@ -67,6 +67,7 @@ export type Apertura_cajaSumAggregateOutputType = {
 export type Apertura_cajaMinAggregateOutputType = {
   id_apertura: string | null
   id_usuario_apertura: string | null
+  id_usuario_cierre: string | null
   horario_apertura: Date | null
   horario_cierre: Date | null
   venta_boleta: number | null
@@ -91,6 +92,7 @@ export type Apertura_cajaMinAggregateOutputType = {
 export type Apertura_cajaMaxAggregateOutputType = {
   id_apertura: string | null
   id_usuario_apertura: string | null
+  id_usuario_cierre: string | null
   horario_apertura: Date | null
   horario_cierre: Date | null
   venta_boleta: number | null
@@ -115,6 +117,7 @@ export type Apertura_cajaMaxAggregateOutputType = {
 export type Apertura_cajaCountAggregateOutputType = {
   id_apertura: number
   id_usuario_apertura: number
+  id_usuario_cierre: number
   horario_apertura: number
   horario_cierre: number
   venta_boleta: number
@@ -179,6 +182,7 @@ export type Apertura_cajaSumAggregateInputType = {
 export type Apertura_cajaMinAggregateInputType = {
   id_apertura?: true
   id_usuario_apertura?: true
+  id_usuario_cierre?: true
   horario_apertura?: true
   horario_cierre?: true
   venta_boleta?: true
@@ -203,6 +207,7 @@ export type Apertura_cajaMinAggregateInputType = {
 export type Apertura_cajaMaxAggregateInputType = {
   id_apertura?: true
   id_usuario_apertura?: true
+  id_usuario_cierre?: true
   horario_apertura?: true
   horario_cierre?: true
   venta_boleta?: true
@@ -227,6 +232,7 @@ export type Apertura_cajaMaxAggregateInputType = {
 export type Apertura_cajaCountAggregateInputType = {
   id_apertura?: true
   id_usuario_apertura?: true
+  id_usuario_cierre?: true
   horario_apertura?: true
   horario_cierre?: true
   venta_boleta?: true
@@ -338,6 +344,7 @@ export type apertura_cajaGroupByArgs<ExtArgs extends runtime.Types.Extensions.In
 export type Apertura_cajaGroupByOutputType = {
   id_apertura: string
   id_usuario_apertura: string
+  id_usuario_cierre: string | null
   horario_apertura: Date
   horario_cierre: Date | null
   venta_boleta: number
@@ -385,6 +392,7 @@ export type apertura_cajaWhereInput = {
   NOT?: Prisma.apertura_cajaWhereInput | Prisma.apertura_cajaWhereInput[]
   id_apertura?: Prisma.UuidFilter<"apertura_caja"> | string
   id_usuario_apertura?: Prisma.UuidFilter<"apertura_caja"> | string
+  id_usuario_cierre?: Prisma.UuidNullableFilter<"apertura_caja"> | string | null
   horario_apertura?: Prisma.DateTimeFilter<"apertura_caja"> | Date | string
   horario_cierre?: Prisma.DateTimeNullableFilter<"apertura_caja"> | Date | string | null
   venta_boleta?: Prisma.IntFilter<"apertura_caja"> | number
@@ -405,6 +413,7 @@ export type apertura_cajaWhereInput = {
   total_transferencia?: Prisma.IntFilter<"apertura_caja"> | number
   total?: Prisma.IntFilter<"apertura_caja"> | number
   users?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
+  usuario_cierre?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
   ventas?: Prisma.VentaListRelationFilter
   movimientos?: Prisma.Movimiento_cajaListRelationFilter
   capital?: Prisma.Capital_cajaListRelationFilter
@@ -413,6 +422,7 @@ export type apertura_cajaWhereInput = {
 export type apertura_cajaOrderByWithRelationInput = {
   id_apertura?: Prisma.SortOrder
   id_usuario_apertura?: Prisma.SortOrder
+  id_usuario_cierre?: Prisma.SortOrderInput | Prisma.SortOrder
   horario_apertura?: Prisma.SortOrder
   horario_cierre?: Prisma.SortOrderInput | Prisma.SortOrder
   venta_boleta?: Prisma.SortOrder
@@ -433,6 +443,7 @@ export type apertura_cajaOrderByWithRelationInput = {
   total_transferencia?: Prisma.SortOrder
   total?: Prisma.SortOrder
   users?: Prisma.UserOrderByWithRelationInput
+  usuario_cierre?: Prisma.UserOrderByWithRelationInput
   ventas?: Prisma.ventaOrderByRelationAggregateInput
   movimientos?: Prisma.movimiento_cajaOrderByRelationAggregateInput
   capital?: Prisma.capital_cajaOrderByRelationAggregateInput
@@ -444,6 +455,7 @@ export type apertura_cajaWhereUniqueInput = Prisma.AtLeast<{
   OR?: Prisma.apertura_cajaWhereInput[]
   NOT?: Prisma.apertura_cajaWhereInput | Prisma.apertura_cajaWhereInput[]
   id_usuario_apertura?: Prisma.UuidFilter<"apertura_caja"> | string
+  id_usuario_cierre?: Prisma.UuidNullableFilter<"apertura_caja"> | string | null
   horario_apertura?: Prisma.DateTimeFilter<"apertura_caja"> | Date | string
   horario_cierre?: Prisma.DateTimeNullableFilter<"apertura_caja"> | Date | string | null
   venta_boleta?: Prisma.IntFilter<"apertura_caja"> | number
@@ -464,6 +476,7 @@ export type apertura_cajaWhereUniqueInput = Prisma.AtLeast<{
   total_transferencia?: Prisma.IntFilter<"apertura_caja"> | number
   total?: Prisma.IntFilter<"apertura_caja"> | number
   users?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
+  usuario_cierre?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
   ventas?: Prisma.VentaListRelationFilter
   movimientos?: Prisma.Movimiento_cajaListRelationFilter
   capital?: Prisma.Capital_cajaListRelationFilter
@@ -472,6 +485,7 @@ export type apertura_cajaWhereUniqueInput = Prisma.AtLeast<{
 export type apertura_cajaOrderByWithAggregationInput = {
   id_apertura?: Prisma.SortOrder
   id_usuario_apertura?: Prisma.SortOrder
+  id_usuario_cierre?: Prisma.SortOrderInput | Prisma.SortOrder
   horario_apertura?: Prisma.SortOrder
   horario_cierre?: Prisma.SortOrderInput | Prisma.SortOrder
   venta_boleta?: Prisma.SortOrder
@@ -504,6 +518,7 @@ export type apertura_cajaScalarWhereWithAggregatesInput = {
   NOT?: Prisma.apertura_cajaScalarWhereWithAggregatesInput | Prisma.apertura_cajaScalarWhereWithAggregatesInput[]
   id_apertura?: Prisma.UuidWithAggregatesFilter<"apertura_caja"> | string
   id_usuario_apertura?: Prisma.UuidWithAggregatesFilter<"apertura_caja"> | string
+  id_usuario_cierre?: Prisma.UuidNullableWithAggregatesFilter<"apertura_caja"> | string | null
   horario_apertura?: Prisma.DateTimeWithAggregatesFilter<"apertura_caja"> | Date | string
   horario_cierre?: Prisma.DateTimeNullableWithAggregatesFilter<"apertura_caja"> | Date | string | null
   venta_boleta?: Prisma.IntWithAggregatesFilter<"apertura_caja"> | number
@@ -547,6 +562,7 @@ export type apertura_cajaCreateInput = {
   total_transferencia?: number
   total?: number
   users: Prisma.UserCreateNestedOneWithoutApertura_cajaInput
+  usuario_cierre?: Prisma.UserCreateNestedOneWithoutCierres_cajaInput
   ventas?: Prisma.ventaCreateNestedManyWithoutAperturaInput
   movimientos?: Prisma.movimiento_cajaCreateNestedManyWithoutAperturaInput
   capital?: Prisma.capital_cajaCreateNestedManyWithoutAperturaInput
@@ -555,6 +571,7 @@ export type apertura_cajaCreateInput = {
 export type apertura_cajaUncheckedCreateInput = {
   id_apertura?: string
   id_usuario_apertura: string
+  id_usuario_cierre?: string | null
   horario_apertura?: Date | string
   horario_cierre?: Date | string | null
   venta_boleta?: number
@@ -601,6 +618,7 @@ export type apertura_cajaUpdateInput = {
   total_transferencia?: Prisma.IntFieldUpdateOperationsInput | number
   total?: Prisma.IntFieldUpdateOperationsInput | number
   users?: Prisma.UserUpdateOneRequiredWithoutApertura_cajaNestedInput
+  usuario_cierre?: Prisma.UserUpdateOneWithoutCierres_cajaNestedInput
   ventas?: Prisma.ventaUpdateManyWithoutAperturaNestedInput
   movimientos?: Prisma.movimiento_cajaUpdateManyWithoutAperturaNestedInput
   capital?: Prisma.capital_cajaUpdateManyWithoutAperturaNestedInput
@@ -609,6 +627,7 @@ export type apertura_cajaUpdateInput = {
 export type apertura_cajaUncheckedUpdateInput = {
   id_apertura?: Prisma.StringFieldUpdateOperationsInput | string
   id_usuario_apertura?: Prisma.StringFieldUpdateOperationsInput | string
+  id_usuario_cierre?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   horario_apertura?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   horario_cierre?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   venta_boleta?: Prisma.IntFieldUpdateOperationsInput | number
@@ -636,6 +655,7 @@ export type apertura_cajaUncheckedUpdateInput = {
 export type apertura_cajaCreateManyInput = {
   id_apertura?: string
   id_usuario_apertura: string
+  id_usuario_cierre?: string | null
   horario_apertura?: Date | string
   horario_cierre?: Date | string | null
   venta_boleta?: number
@@ -683,6 +703,7 @@ export type apertura_cajaUpdateManyMutationInput = {
 export type apertura_cajaUncheckedUpdateManyInput = {
   id_apertura?: Prisma.StringFieldUpdateOperationsInput | string
   id_usuario_apertura?: Prisma.StringFieldUpdateOperationsInput | string
+  id_usuario_cierre?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   horario_apertura?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   horario_cierre?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   venta_boleta?: Prisma.IntFieldUpdateOperationsInput | number
@@ -717,6 +738,7 @@ export type apertura_cajaOrderByRelationAggregateInput = {
 export type apertura_cajaCountOrderByAggregateInput = {
   id_apertura?: Prisma.SortOrder
   id_usuario_apertura?: Prisma.SortOrder
+  id_usuario_cierre?: Prisma.SortOrder
   horario_apertura?: Prisma.SortOrder
   horario_cierre?: Prisma.SortOrder
   venta_boleta?: Prisma.SortOrder
@@ -760,6 +782,7 @@ export type apertura_cajaAvgOrderByAggregateInput = {
 export type apertura_cajaMaxOrderByAggregateInput = {
   id_apertura?: Prisma.SortOrder
   id_usuario_apertura?: Prisma.SortOrder
+  id_usuario_cierre?: Prisma.SortOrder
   horario_apertura?: Prisma.SortOrder
   horario_cierre?: Prisma.SortOrder
   venta_boleta?: Prisma.SortOrder
@@ -784,6 +807,7 @@ export type apertura_cajaMaxOrderByAggregateInput = {
 export type apertura_cajaMinOrderByAggregateInput = {
   id_apertura?: Prisma.SortOrder
   id_usuario_apertura?: Prisma.SortOrder
+  id_usuario_cierre?: Prisma.SortOrder
   horario_apertura?: Prisma.SortOrder
   horario_cierre?: Prisma.SortOrder
   venta_boleta?: Prisma.SortOrder
@@ -841,10 +865,24 @@ export type apertura_cajaCreateNestedManyWithoutUsersInput = {
   connect?: Prisma.apertura_cajaWhereUniqueInput | Prisma.apertura_cajaWhereUniqueInput[]
 }
 
+export type apertura_cajaCreateNestedManyWithoutUsuario_cierreInput = {
+  create?: Prisma.XOR<Prisma.apertura_cajaCreateWithoutUsuario_cierreInput, Prisma.apertura_cajaUncheckedCreateWithoutUsuario_cierreInput> | Prisma.apertura_cajaCreateWithoutUsuario_cierreInput[] | Prisma.apertura_cajaUncheckedCreateWithoutUsuario_cierreInput[]
+  connectOrCreate?: Prisma.apertura_cajaCreateOrConnectWithoutUsuario_cierreInput | Prisma.apertura_cajaCreateOrConnectWithoutUsuario_cierreInput[]
+  createMany?: Prisma.apertura_cajaCreateManyUsuario_cierreInputEnvelope
+  connect?: Prisma.apertura_cajaWhereUniqueInput | Prisma.apertura_cajaWhereUniqueInput[]
+}
+
 export type apertura_cajaUncheckedCreateNestedManyWithoutUsersInput = {
   create?: Prisma.XOR<Prisma.apertura_cajaCreateWithoutUsersInput, Prisma.apertura_cajaUncheckedCreateWithoutUsersInput> | Prisma.apertura_cajaCreateWithoutUsersInput[] | Prisma.apertura_cajaUncheckedCreateWithoutUsersInput[]
   connectOrCreate?: Prisma.apertura_cajaCreateOrConnectWithoutUsersInput | Prisma.apertura_cajaCreateOrConnectWithoutUsersInput[]
   createMany?: Prisma.apertura_cajaCreateManyUsersInputEnvelope
+  connect?: Prisma.apertura_cajaWhereUniqueInput | Prisma.apertura_cajaWhereUniqueInput[]
+}
+
+export type apertura_cajaUncheckedCreateNestedManyWithoutUsuario_cierreInput = {
+  create?: Prisma.XOR<Prisma.apertura_cajaCreateWithoutUsuario_cierreInput, Prisma.apertura_cajaUncheckedCreateWithoutUsuario_cierreInput> | Prisma.apertura_cajaCreateWithoutUsuario_cierreInput[] | Prisma.apertura_cajaUncheckedCreateWithoutUsuario_cierreInput[]
+  connectOrCreate?: Prisma.apertura_cajaCreateOrConnectWithoutUsuario_cierreInput | Prisma.apertura_cajaCreateOrConnectWithoutUsuario_cierreInput[]
+  createMany?: Prisma.apertura_cajaCreateManyUsuario_cierreInputEnvelope
   connect?: Prisma.apertura_cajaWhereUniqueInput | Prisma.apertura_cajaWhereUniqueInput[]
 }
 
@@ -862,6 +900,20 @@ export type apertura_cajaUpdateManyWithoutUsersNestedInput = {
   deleteMany?: Prisma.apertura_cajaScalarWhereInput | Prisma.apertura_cajaScalarWhereInput[]
 }
 
+export type apertura_cajaUpdateManyWithoutUsuario_cierreNestedInput = {
+  create?: Prisma.XOR<Prisma.apertura_cajaCreateWithoutUsuario_cierreInput, Prisma.apertura_cajaUncheckedCreateWithoutUsuario_cierreInput> | Prisma.apertura_cajaCreateWithoutUsuario_cierreInput[] | Prisma.apertura_cajaUncheckedCreateWithoutUsuario_cierreInput[]
+  connectOrCreate?: Prisma.apertura_cajaCreateOrConnectWithoutUsuario_cierreInput | Prisma.apertura_cajaCreateOrConnectWithoutUsuario_cierreInput[]
+  upsert?: Prisma.apertura_cajaUpsertWithWhereUniqueWithoutUsuario_cierreInput | Prisma.apertura_cajaUpsertWithWhereUniqueWithoutUsuario_cierreInput[]
+  createMany?: Prisma.apertura_cajaCreateManyUsuario_cierreInputEnvelope
+  set?: Prisma.apertura_cajaWhereUniqueInput | Prisma.apertura_cajaWhereUniqueInput[]
+  disconnect?: Prisma.apertura_cajaWhereUniqueInput | Prisma.apertura_cajaWhereUniqueInput[]
+  delete?: Prisma.apertura_cajaWhereUniqueInput | Prisma.apertura_cajaWhereUniqueInput[]
+  connect?: Prisma.apertura_cajaWhereUniqueInput | Prisma.apertura_cajaWhereUniqueInput[]
+  update?: Prisma.apertura_cajaUpdateWithWhereUniqueWithoutUsuario_cierreInput | Prisma.apertura_cajaUpdateWithWhereUniqueWithoutUsuario_cierreInput[]
+  updateMany?: Prisma.apertura_cajaUpdateManyWithWhereWithoutUsuario_cierreInput | Prisma.apertura_cajaUpdateManyWithWhereWithoutUsuario_cierreInput[]
+  deleteMany?: Prisma.apertura_cajaScalarWhereInput | Prisma.apertura_cajaScalarWhereInput[]
+}
+
 export type apertura_cajaUncheckedUpdateManyWithoutUsersNestedInput = {
   create?: Prisma.XOR<Prisma.apertura_cajaCreateWithoutUsersInput, Prisma.apertura_cajaUncheckedCreateWithoutUsersInput> | Prisma.apertura_cajaCreateWithoutUsersInput[] | Prisma.apertura_cajaUncheckedCreateWithoutUsersInput[]
   connectOrCreate?: Prisma.apertura_cajaCreateOrConnectWithoutUsersInput | Prisma.apertura_cajaCreateOrConnectWithoutUsersInput[]
@@ -873,6 +925,20 @@ export type apertura_cajaUncheckedUpdateManyWithoutUsersNestedInput = {
   connect?: Prisma.apertura_cajaWhereUniqueInput | Prisma.apertura_cajaWhereUniqueInput[]
   update?: Prisma.apertura_cajaUpdateWithWhereUniqueWithoutUsersInput | Prisma.apertura_cajaUpdateWithWhereUniqueWithoutUsersInput[]
   updateMany?: Prisma.apertura_cajaUpdateManyWithWhereWithoutUsersInput | Prisma.apertura_cajaUpdateManyWithWhereWithoutUsersInput[]
+  deleteMany?: Prisma.apertura_cajaScalarWhereInput | Prisma.apertura_cajaScalarWhereInput[]
+}
+
+export type apertura_cajaUncheckedUpdateManyWithoutUsuario_cierreNestedInput = {
+  create?: Prisma.XOR<Prisma.apertura_cajaCreateWithoutUsuario_cierreInput, Prisma.apertura_cajaUncheckedCreateWithoutUsuario_cierreInput> | Prisma.apertura_cajaCreateWithoutUsuario_cierreInput[] | Prisma.apertura_cajaUncheckedCreateWithoutUsuario_cierreInput[]
+  connectOrCreate?: Prisma.apertura_cajaCreateOrConnectWithoutUsuario_cierreInput | Prisma.apertura_cajaCreateOrConnectWithoutUsuario_cierreInput[]
+  upsert?: Prisma.apertura_cajaUpsertWithWhereUniqueWithoutUsuario_cierreInput | Prisma.apertura_cajaUpsertWithWhereUniqueWithoutUsuario_cierreInput[]
+  createMany?: Prisma.apertura_cajaCreateManyUsuario_cierreInputEnvelope
+  set?: Prisma.apertura_cajaWhereUniqueInput | Prisma.apertura_cajaWhereUniqueInput[]
+  disconnect?: Prisma.apertura_cajaWhereUniqueInput | Prisma.apertura_cajaWhereUniqueInput[]
+  delete?: Prisma.apertura_cajaWhereUniqueInput | Prisma.apertura_cajaWhereUniqueInput[]
+  connect?: Prisma.apertura_cajaWhereUniqueInput | Prisma.apertura_cajaWhereUniqueInput[]
+  update?: Prisma.apertura_cajaUpdateWithWhereUniqueWithoutUsuario_cierreInput | Prisma.apertura_cajaUpdateWithWhereUniqueWithoutUsuario_cierreInput[]
+  updateMany?: Prisma.apertura_cajaUpdateManyWithWhereWithoutUsuario_cierreInput | Prisma.apertura_cajaUpdateManyWithWhereWithoutUsuario_cierreInput[]
   deleteMany?: Prisma.apertura_cajaScalarWhereInput | Prisma.apertura_cajaScalarWhereInput[]
 }
 
@@ -941,6 +1007,7 @@ export type apertura_cajaCreateWithoutUsersInput = {
   venta_transferencia?: number
   total_transferencia?: number
   total?: number
+  usuario_cierre?: Prisma.UserCreateNestedOneWithoutCierres_cajaInput
   ventas?: Prisma.ventaCreateNestedManyWithoutAperturaInput
   movimientos?: Prisma.movimiento_cajaCreateNestedManyWithoutAperturaInput
   capital?: Prisma.capital_cajaCreateNestedManyWithoutAperturaInput
@@ -948,6 +1015,7 @@ export type apertura_cajaCreateWithoutUsersInput = {
 
 export type apertura_cajaUncheckedCreateWithoutUsersInput = {
   id_apertura?: string
+  id_usuario_cierre?: string | null
   horario_apertura?: Date | string
   horario_cierre?: Date | string | null
   venta_boleta?: number
@@ -982,6 +1050,70 @@ export type apertura_cajaCreateManyUsersInputEnvelope = {
   skipDuplicates?: boolean
 }
 
+export type apertura_cajaCreateWithoutUsuario_cierreInput = {
+  id_apertura?: string
+  horario_apertura?: Date | string
+  horario_cierre?: Date | string | null
+  venta_boleta?: number
+  venta_factura?: number
+  venta_debito?: number
+  venta_credito?: number
+  venta_efectivo?: number
+  total_debito?: number
+  total_credito?: number
+  total_efectivo?: number
+  saldo_apertura?: number
+  saldo_cierre?: number | null
+  diferencia?: number | null
+  saldo_esperado?: number
+  valor_real?: number
+  comentario?: string | null
+  venta_transferencia?: number
+  total_transferencia?: number
+  total?: number
+  users: Prisma.UserCreateNestedOneWithoutApertura_cajaInput
+  ventas?: Prisma.ventaCreateNestedManyWithoutAperturaInput
+  movimientos?: Prisma.movimiento_cajaCreateNestedManyWithoutAperturaInput
+  capital?: Prisma.capital_cajaCreateNestedManyWithoutAperturaInput
+}
+
+export type apertura_cajaUncheckedCreateWithoutUsuario_cierreInput = {
+  id_apertura?: string
+  id_usuario_apertura: string
+  horario_apertura?: Date | string
+  horario_cierre?: Date | string | null
+  venta_boleta?: number
+  venta_factura?: number
+  venta_debito?: number
+  venta_credito?: number
+  venta_efectivo?: number
+  total_debito?: number
+  total_credito?: number
+  total_efectivo?: number
+  saldo_apertura?: number
+  saldo_cierre?: number | null
+  diferencia?: number | null
+  saldo_esperado?: number
+  valor_real?: number
+  comentario?: string | null
+  venta_transferencia?: number
+  total_transferencia?: number
+  total?: number
+  ventas?: Prisma.ventaUncheckedCreateNestedManyWithoutAperturaInput
+  movimientos?: Prisma.movimiento_cajaUncheckedCreateNestedManyWithoutAperturaInput
+  capital?: Prisma.capital_cajaUncheckedCreateNestedManyWithoutAperturaInput
+}
+
+export type apertura_cajaCreateOrConnectWithoutUsuario_cierreInput = {
+  where: Prisma.apertura_cajaWhereUniqueInput
+  create: Prisma.XOR<Prisma.apertura_cajaCreateWithoutUsuario_cierreInput, Prisma.apertura_cajaUncheckedCreateWithoutUsuario_cierreInput>
+}
+
+export type apertura_cajaCreateManyUsuario_cierreInputEnvelope = {
+  data: Prisma.apertura_cajaCreateManyUsuario_cierreInput | Prisma.apertura_cajaCreateManyUsuario_cierreInput[]
+  skipDuplicates?: boolean
+}
+
 export type apertura_cajaUpsertWithWhereUniqueWithoutUsersInput = {
   where: Prisma.apertura_cajaWhereUniqueInput
   update: Prisma.XOR<Prisma.apertura_cajaUpdateWithoutUsersInput, Prisma.apertura_cajaUncheckedUpdateWithoutUsersInput>
@@ -1004,6 +1136,7 @@ export type apertura_cajaScalarWhereInput = {
   NOT?: Prisma.apertura_cajaScalarWhereInput | Prisma.apertura_cajaScalarWhereInput[]
   id_apertura?: Prisma.UuidFilter<"apertura_caja"> | string
   id_usuario_apertura?: Prisma.UuidFilter<"apertura_caja"> | string
+  id_usuario_cierre?: Prisma.UuidNullableFilter<"apertura_caja"> | string | null
   horario_apertura?: Prisma.DateTimeFilter<"apertura_caja"> | Date | string
   horario_cierre?: Prisma.DateTimeNullableFilter<"apertura_caja"> | Date | string | null
   venta_boleta?: Prisma.IntFilter<"apertura_caja"> | number
@@ -1023,6 +1156,22 @@ export type apertura_cajaScalarWhereInput = {
   venta_transferencia?: Prisma.IntFilter<"apertura_caja"> | number
   total_transferencia?: Prisma.IntFilter<"apertura_caja"> | number
   total?: Prisma.IntFilter<"apertura_caja"> | number
+}
+
+export type apertura_cajaUpsertWithWhereUniqueWithoutUsuario_cierreInput = {
+  where: Prisma.apertura_cajaWhereUniqueInput
+  update: Prisma.XOR<Prisma.apertura_cajaUpdateWithoutUsuario_cierreInput, Prisma.apertura_cajaUncheckedUpdateWithoutUsuario_cierreInput>
+  create: Prisma.XOR<Prisma.apertura_cajaCreateWithoutUsuario_cierreInput, Prisma.apertura_cajaUncheckedCreateWithoutUsuario_cierreInput>
+}
+
+export type apertura_cajaUpdateWithWhereUniqueWithoutUsuario_cierreInput = {
+  where: Prisma.apertura_cajaWhereUniqueInput
+  data: Prisma.XOR<Prisma.apertura_cajaUpdateWithoutUsuario_cierreInput, Prisma.apertura_cajaUncheckedUpdateWithoutUsuario_cierreInput>
+}
+
+export type apertura_cajaUpdateManyWithWhereWithoutUsuario_cierreInput = {
+  where: Prisma.apertura_cajaScalarWhereInput
+  data: Prisma.XOR<Prisma.apertura_cajaUpdateManyMutationInput, Prisma.apertura_cajaUncheckedUpdateManyWithoutUsuario_cierreInput>
 }
 
 export type apertura_cajaCreateWithoutCapitalInput = {
@@ -1047,6 +1196,7 @@ export type apertura_cajaCreateWithoutCapitalInput = {
   total_transferencia?: number
   total?: number
   users: Prisma.UserCreateNestedOneWithoutApertura_cajaInput
+  usuario_cierre?: Prisma.UserCreateNestedOneWithoutCierres_cajaInput
   ventas?: Prisma.ventaCreateNestedManyWithoutAperturaInput
   movimientos?: Prisma.movimiento_cajaCreateNestedManyWithoutAperturaInput
 }
@@ -1054,6 +1204,7 @@ export type apertura_cajaCreateWithoutCapitalInput = {
 export type apertura_cajaUncheckedCreateWithoutCapitalInput = {
   id_apertura?: string
   id_usuario_apertura: string
+  id_usuario_cierre?: string | null
   horario_apertura?: Date | string
   horario_cierre?: Date | string | null
   venta_boleta?: number
@@ -1115,6 +1266,7 @@ export type apertura_cajaUpdateWithoutCapitalInput = {
   total_transferencia?: Prisma.IntFieldUpdateOperationsInput | number
   total?: Prisma.IntFieldUpdateOperationsInput | number
   users?: Prisma.UserUpdateOneRequiredWithoutApertura_cajaNestedInput
+  usuario_cierre?: Prisma.UserUpdateOneWithoutCierres_cajaNestedInput
   ventas?: Prisma.ventaUpdateManyWithoutAperturaNestedInput
   movimientos?: Prisma.movimiento_cajaUpdateManyWithoutAperturaNestedInput
 }
@@ -1122,6 +1274,7 @@ export type apertura_cajaUpdateWithoutCapitalInput = {
 export type apertura_cajaUncheckedUpdateWithoutCapitalInput = {
   id_apertura?: Prisma.StringFieldUpdateOperationsInput | string
   id_usuario_apertura?: Prisma.StringFieldUpdateOperationsInput | string
+  id_usuario_cierre?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   horario_apertura?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   horario_cierre?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   venta_boleta?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1167,6 +1320,7 @@ export type apertura_cajaCreateWithoutMovimientosInput = {
   total_transferencia?: number
   total?: number
   users: Prisma.UserCreateNestedOneWithoutApertura_cajaInput
+  usuario_cierre?: Prisma.UserCreateNestedOneWithoutCierres_cajaInput
   ventas?: Prisma.ventaCreateNestedManyWithoutAperturaInput
   capital?: Prisma.capital_cajaCreateNestedManyWithoutAperturaInput
 }
@@ -1174,6 +1328,7 @@ export type apertura_cajaCreateWithoutMovimientosInput = {
 export type apertura_cajaUncheckedCreateWithoutMovimientosInput = {
   id_apertura?: string
   id_usuario_apertura: string
+  id_usuario_cierre?: string | null
   horario_apertura?: Date | string
   horario_cierre?: Date | string | null
   venta_boleta?: number
@@ -1235,6 +1390,7 @@ export type apertura_cajaUpdateWithoutMovimientosInput = {
   total_transferencia?: Prisma.IntFieldUpdateOperationsInput | number
   total?: Prisma.IntFieldUpdateOperationsInput | number
   users?: Prisma.UserUpdateOneRequiredWithoutApertura_cajaNestedInput
+  usuario_cierre?: Prisma.UserUpdateOneWithoutCierres_cajaNestedInput
   ventas?: Prisma.ventaUpdateManyWithoutAperturaNestedInput
   capital?: Prisma.capital_cajaUpdateManyWithoutAperturaNestedInput
 }
@@ -1242,6 +1398,7 @@ export type apertura_cajaUpdateWithoutMovimientosInput = {
 export type apertura_cajaUncheckedUpdateWithoutMovimientosInput = {
   id_apertura?: Prisma.StringFieldUpdateOperationsInput | string
   id_usuario_apertura?: Prisma.StringFieldUpdateOperationsInput | string
+  id_usuario_cierre?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   horario_apertura?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   horario_cierre?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   venta_boleta?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1287,6 +1444,7 @@ export type apertura_cajaCreateWithoutVentasInput = {
   total_transferencia?: number
   total?: number
   users: Prisma.UserCreateNestedOneWithoutApertura_cajaInput
+  usuario_cierre?: Prisma.UserCreateNestedOneWithoutCierres_cajaInput
   movimientos?: Prisma.movimiento_cajaCreateNestedManyWithoutAperturaInput
   capital?: Prisma.capital_cajaCreateNestedManyWithoutAperturaInput
 }
@@ -1294,6 +1452,7 @@ export type apertura_cajaCreateWithoutVentasInput = {
 export type apertura_cajaUncheckedCreateWithoutVentasInput = {
   id_apertura?: string
   id_usuario_apertura: string
+  id_usuario_cierre?: string | null
   horario_apertura?: Date | string
   horario_cierre?: Date | string | null
   venta_boleta?: number
@@ -1355,6 +1514,7 @@ export type apertura_cajaUpdateWithoutVentasInput = {
   total_transferencia?: Prisma.IntFieldUpdateOperationsInput | number
   total?: Prisma.IntFieldUpdateOperationsInput | number
   users?: Prisma.UserUpdateOneRequiredWithoutApertura_cajaNestedInput
+  usuario_cierre?: Prisma.UserUpdateOneWithoutCierres_cajaNestedInput
   movimientos?: Prisma.movimiento_cajaUpdateManyWithoutAperturaNestedInput
   capital?: Prisma.capital_cajaUpdateManyWithoutAperturaNestedInput
 }
@@ -1362,6 +1522,7 @@ export type apertura_cajaUpdateWithoutVentasInput = {
 export type apertura_cajaUncheckedUpdateWithoutVentasInput = {
   id_apertura?: Prisma.StringFieldUpdateOperationsInput | string
   id_usuario_apertura?: Prisma.StringFieldUpdateOperationsInput | string
+  id_usuario_cierre?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   horario_apertura?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   horario_cierre?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   venta_boleta?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1387,6 +1548,31 @@ export type apertura_cajaUncheckedUpdateWithoutVentasInput = {
 
 export type apertura_cajaCreateManyUsersInput = {
   id_apertura?: string
+  id_usuario_cierre?: string | null
+  horario_apertura?: Date | string
+  horario_cierre?: Date | string | null
+  venta_boleta?: number
+  venta_factura?: number
+  venta_debito?: number
+  venta_credito?: number
+  venta_efectivo?: number
+  total_debito?: number
+  total_credito?: number
+  total_efectivo?: number
+  saldo_apertura?: number
+  saldo_cierre?: number | null
+  diferencia?: number | null
+  saldo_esperado?: number
+  valor_real?: number
+  comentario?: string | null
+  venta_transferencia?: number
+  total_transferencia?: number
+  total?: number
+}
+
+export type apertura_cajaCreateManyUsuario_cierreInput = {
+  id_apertura?: string
+  id_usuario_apertura: string
   horario_apertura?: Date | string
   horario_cierre?: Date | string | null
   venta_boleta?: number
@@ -1429,6 +1615,7 @@ export type apertura_cajaUpdateWithoutUsersInput = {
   venta_transferencia?: Prisma.IntFieldUpdateOperationsInput | number
   total_transferencia?: Prisma.IntFieldUpdateOperationsInput | number
   total?: Prisma.IntFieldUpdateOperationsInput | number
+  usuario_cierre?: Prisma.UserUpdateOneWithoutCierres_cajaNestedInput
   ventas?: Prisma.ventaUpdateManyWithoutAperturaNestedInput
   movimientos?: Prisma.movimiento_cajaUpdateManyWithoutAperturaNestedInput
   capital?: Prisma.capital_cajaUpdateManyWithoutAperturaNestedInput
@@ -1436,6 +1623,7 @@ export type apertura_cajaUpdateWithoutUsersInput = {
 
 export type apertura_cajaUncheckedUpdateWithoutUsersInput = {
   id_apertura?: Prisma.StringFieldUpdateOperationsInput | string
+  id_usuario_cierre?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   horario_apertura?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   horario_cierre?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   venta_boleta?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1462,6 +1650,85 @@ export type apertura_cajaUncheckedUpdateWithoutUsersInput = {
 
 export type apertura_cajaUncheckedUpdateManyWithoutUsersInput = {
   id_apertura?: Prisma.StringFieldUpdateOperationsInput | string
+  id_usuario_cierre?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  horario_apertura?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  horario_cierre?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  venta_boleta?: Prisma.IntFieldUpdateOperationsInput | number
+  venta_factura?: Prisma.IntFieldUpdateOperationsInput | number
+  venta_debito?: Prisma.IntFieldUpdateOperationsInput | number
+  venta_credito?: Prisma.IntFieldUpdateOperationsInput | number
+  venta_efectivo?: Prisma.IntFieldUpdateOperationsInput | number
+  total_debito?: Prisma.IntFieldUpdateOperationsInput | number
+  total_credito?: Prisma.IntFieldUpdateOperationsInput | number
+  total_efectivo?: Prisma.IntFieldUpdateOperationsInput | number
+  saldo_apertura?: Prisma.IntFieldUpdateOperationsInput | number
+  saldo_cierre?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  diferencia?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  saldo_esperado?: Prisma.IntFieldUpdateOperationsInput | number
+  valor_real?: Prisma.IntFieldUpdateOperationsInput | number
+  comentario?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  venta_transferencia?: Prisma.IntFieldUpdateOperationsInput | number
+  total_transferencia?: Prisma.IntFieldUpdateOperationsInput | number
+  total?: Prisma.IntFieldUpdateOperationsInput | number
+}
+
+export type apertura_cajaUpdateWithoutUsuario_cierreInput = {
+  id_apertura?: Prisma.StringFieldUpdateOperationsInput | string
+  horario_apertura?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  horario_cierre?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  venta_boleta?: Prisma.IntFieldUpdateOperationsInput | number
+  venta_factura?: Prisma.IntFieldUpdateOperationsInput | number
+  venta_debito?: Prisma.IntFieldUpdateOperationsInput | number
+  venta_credito?: Prisma.IntFieldUpdateOperationsInput | number
+  venta_efectivo?: Prisma.IntFieldUpdateOperationsInput | number
+  total_debito?: Prisma.IntFieldUpdateOperationsInput | number
+  total_credito?: Prisma.IntFieldUpdateOperationsInput | number
+  total_efectivo?: Prisma.IntFieldUpdateOperationsInput | number
+  saldo_apertura?: Prisma.IntFieldUpdateOperationsInput | number
+  saldo_cierre?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  diferencia?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  saldo_esperado?: Prisma.IntFieldUpdateOperationsInput | number
+  valor_real?: Prisma.IntFieldUpdateOperationsInput | number
+  comentario?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  venta_transferencia?: Prisma.IntFieldUpdateOperationsInput | number
+  total_transferencia?: Prisma.IntFieldUpdateOperationsInput | number
+  total?: Prisma.IntFieldUpdateOperationsInput | number
+  users?: Prisma.UserUpdateOneRequiredWithoutApertura_cajaNestedInput
+  ventas?: Prisma.ventaUpdateManyWithoutAperturaNestedInput
+  movimientos?: Prisma.movimiento_cajaUpdateManyWithoutAperturaNestedInput
+  capital?: Prisma.capital_cajaUpdateManyWithoutAperturaNestedInput
+}
+
+export type apertura_cajaUncheckedUpdateWithoutUsuario_cierreInput = {
+  id_apertura?: Prisma.StringFieldUpdateOperationsInput | string
+  id_usuario_apertura?: Prisma.StringFieldUpdateOperationsInput | string
+  horario_apertura?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  horario_cierre?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  venta_boleta?: Prisma.IntFieldUpdateOperationsInput | number
+  venta_factura?: Prisma.IntFieldUpdateOperationsInput | number
+  venta_debito?: Prisma.IntFieldUpdateOperationsInput | number
+  venta_credito?: Prisma.IntFieldUpdateOperationsInput | number
+  venta_efectivo?: Prisma.IntFieldUpdateOperationsInput | number
+  total_debito?: Prisma.IntFieldUpdateOperationsInput | number
+  total_credito?: Prisma.IntFieldUpdateOperationsInput | number
+  total_efectivo?: Prisma.IntFieldUpdateOperationsInput | number
+  saldo_apertura?: Prisma.IntFieldUpdateOperationsInput | number
+  saldo_cierre?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  diferencia?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  saldo_esperado?: Prisma.IntFieldUpdateOperationsInput | number
+  valor_real?: Prisma.IntFieldUpdateOperationsInput | number
+  comentario?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  venta_transferencia?: Prisma.IntFieldUpdateOperationsInput | number
+  total_transferencia?: Prisma.IntFieldUpdateOperationsInput | number
+  total?: Prisma.IntFieldUpdateOperationsInput | number
+  ventas?: Prisma.ventaUncheckedUpdateManyWithoutAperturaNestedInput
+  movimientos?: Prisma.movimiento_cajaUncheckedUpdateManyWithoutAperturaNestedInput
+  capital?: Prisma.capital_cajaUncheckedUpdateManyWithoutAperturaNestedInput
+}
+
+export type apertura_cajaUncheckedUpdateManyWithoutUsuario_cierreInput = {
+  id_apertura?: Prisma.StringFieldUpdateOperationsInput | string
+  id_usuario_apertura?: Prisma.StringFieldUpdateOperationsInput | string
   horario_apertura?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   horario_cierre?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   venta_boleta?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1535,6 +1802,7 @@ export type Apertura_cajaCountOutputTypeCountCapitalArgs<ExtArgs extends runtime
 export type apertura_cajaSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id_apertura?: boolean
   id_usuario_apertura?: boolean
+  id_usuario_cierre?: boolean
   horario_apertura?: boolean
   horario_cierre?: boolean
   venta_boleta?: boolean
@@ -1555,6 +1823,7 @@ export type apertura_cajaSelect<ExtArgs extends runtime.Types.Extensions.Interna
   total_transferencia?: boolean
   total?: boolean
   users?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  usuario_cierre?: boolean | Prisma.apertura_caja$usuario_cierreArgs<ExtArgs>
   ventas?: boolean | Prisma.apertura_caja$ventasArgs<ExtArgs>
   movimientos?: boolean | Prisma.apertura_caja$movimientosArgs<ExtArgs>
   capital?: boolean | Prisma.apertura_caja$capitalArgs<ExtArgs>
@@ -1564,6 +1833,7 @@ export type apertura_cajaSelect<ExtArgs extends runtime.Types.Extensions.Interna
 export type apertura_cajaSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id_apertura?: boolean
   id_usuario_apertura?: boolean
+  id_usuario_cierre?: boolean
   horario_apertura?: boolean
   horario_cierre?: boolean
   venta_boleta?: boolean
@@ -1584,11 +1854,13 @@ export type apertura_cajaSelectCreateManyAndReturn<ExtArgs extends runtime.Types
   total_transferencia?: boolean
   total?: boolean
   users?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  usuario_cierre?: boolean | Prisma.apertura_caja$usuario_cierreArgs<ExtArgs>
 }, ExtArgs["result"]["apertura_caja"]>
 
 export type apertura_cajaSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id_apertura?: boolean
   id_usuario_apertura?: boolean
+  id_usuario_cierre?: boolean
   horario_apertura?: boolean
   horario_cierre?: boolean
   venta_boleta?: boolean
@@ -1609,11 +1881,13 @@ export type apertura_cajaSelectUpdateManyAndReturn<ExtArgs extends runtime.Types
   total_transferencia?: boolean
   total?: boolean
   users?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  usuario_cierre?: boolean | Prisma.apertura_caja$usuario_cierreArgs<ExtArgs>
 }, ExtArgs["result"]["apertura_caja"]>
 
 export type apertura_cajaSelectScalar = {
   id_apertura?: boolean
   id_usuario_apertura?: boolean
+  id_usuario_cierre?: boolean
   horario_apertura?: boolean
   horario_cierre?: boolean
   venta_boleta?: boolean
@@ -1635,9 +1909,10 @@ export type apertura_cajaSelectScalar = {
   total?: boolean
 }
 
-export type apertura_cajaOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id_apertura" | "id_usuario_apertura" | "horario_apertura" | "horario_cierre" | "venta_boleta" | "venta_factura" | "venta_debito" | "venta_credito" | "venta_efectivo" | "total_debito" | "total_credito" | "total_efectivo" | "saldo_apertura" | "saldo_cierre" | "diferencia" | "saldo_esperado" | "valor_real" | "comentario" | "venta_transferencia" | "total_transferencia" | "total", ExtArgs["result"]["apertura_caja"]>
+export type apertura_cajaOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id_apertura" | "id_usuario_apertura" | "id_usuario_cierre" | "horario_apertura" | "horario_cierre" | "venta_boleta" | "venta_factura" | "venta_debito" | "venta_credito" | "venta_efectivo" | "total_debito" | "total_credito" | "total_efectivo" | "saldo_apertura" | "saldo_cierre" | "diferencia" | "saldo_esperado" | "valor_real" | "comentario" | "venta_transferencia" | "total_transferencia" | "total", ExtArgs["result"]["apertura_caja"]>
 export type apertura_cajaInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   users?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  usuario_cierre?: boolean | Prisma.apertura_caja$usuario_cierreArgs<ExtArgs>
   ventas?: boolean | Prisma.apertura_caja$ventasArgs<ExtArgs>
   movimientos?: boolean | Prisma.apertura_caja$movimientosArgs<ExtArgs>
   capital?: boolean | Prisma.apertura_caja$capitalArgs<ExtArgs>
@@ -1645,15 +1920,18 @@ export type apertura_cajaInclude<ExtArgs extends runtime.Types.Extensions.Intern
 }
 export type apertura_cajaIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   users?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  usuario_cierre?: boolean | Prisma.apertura_caja$usuario_cierreArgs<ExtArgs>
 }
 export type apertura_cajaIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   users?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  usuario_cierre?: boolean | Prisma.apertura_caja$usuario_cierreArgs<ExtArgs>
 }
 
 export type $apertura_cajaPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "apertura_caja"
   objects: {
     users: Prisma.$UserPayload<ExtArgs>
+    usuario_cierre: Prisma.$UserPayload<ExtArgs> | null
     ventas: Prisma.$ventaPayload<ExtArgs>[]
     movimientos: Prisma.$movimiento_cajaPayload<ExtArgs>[]
     capital: Prisma.$capital_cajaPayload<ExtArgs>[]
@@ -1661,6 +1939,7 @@ export type $apertura_cajaPayload<ExtArgs extends runtime.Types.Extensions.Inter
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id_apertura: string
     id_usuario_apertura: string
+    id_usuario_cierre: string | null
     horario_apertura: Date
     horario_cierre: Date | null
     venta_boleta: number
@@ -2075,6 +2354,7 @@ readonly fields: apertura_cajaFieldRefs;
 export interface Prisma__apertura_cajaClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   users<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  usuario_cierre<T extends Prisma.apertura_caja$usuario_cierreArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.apertura_caja$usuario_cierreArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   ventas<T extends Prisma.apertura_caja$ventasArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.apertura_caja$ventasArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ventaPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   movimientos<T extends Prisma.apertura_caja$movimientosArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.apertura_caja$movimientosArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$movimiento_cajaPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   capital<T extends Prisma.apertura_caja$capitalArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.apertura_caja$capitalArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$capital_cajaPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -2109,6 +2389,7 @@ export interface Prisma__apertura_cajaClient<T, Null = never, ExtArgs extends ru
 export interface apertura_cajaFieldRefs {
   readonly id_apertura: Prisma.FieldRef<"apertura_caja", 'String'>
   readonly id_usuario_apertura: Prisma.FieldRef<"apertura_caja", 'String'>
+  readonly id_usuario_cierre: Prisma.FieldRef<"apertura_caja", 'String'>
   readonly horario_apertura: Prisma.FieldRef<"apertura_caja", 'DateTime'>
   readonly horario_cierre: Prisma.FieldRef<"apertura_caja", 'DateTime'>
   readonly venta_boleta: Prisma.FieldRef<"apertura_caja", 'Int'>
@@ -2526,6 +2807,25 @@ export type apertura_cajaDeleteManyArgs<ExtArgs extends runtime.Types.Extensions
    * Limit how many apertura_cajas to delete.
    */
   limit?: number
+}
+
+/**
+ * apertura_caja.usuario_cierre
+ */
+export type apertura_caja$usuario_cierreArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the User
+   */
+  select?: Prisma.UserSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the User
+   */
+  omit?: Prisma.UserOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UserInclude<ExtArgs> | null
+  where?: Prisma.UserWhereInput
 }
 
 /**

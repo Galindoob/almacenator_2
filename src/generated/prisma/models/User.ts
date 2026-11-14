@@ -215,6 +215,7 @@ export type UserWhereInput = {
   direccion?: Prisma.StringNullableFilter<"User"> | string | null
   url_imagen?: Prisma.StringNullableFilter<"User"> | string | null
   apertura_caja?: Prisma.Apertura_cajaListRelationFilter
+  cierres_caja?: Prisma.Apertura_cajaListRelationFilter
   movimiento_de_stock?: Prisma.Movimiento_de_stockListRelationFilter
   ventas?: Prisma.VentaListRelationFilter
   capital_caja?: Prisma.Capital_cajaListRelationFilter
@@ -234,6 +235,7 @@ export type UserOrderByWithRelationInput = {
   direccion?: Prisma.SortOrderInput | Prisma.SortOrder
   url_imagen?: Prisma.SortOrderInput | Prisma.SortOrder
   apertura_caja?: Prisma.apertura_cajaOrderByRelationAggregateInput
+  cierres_caja?: Prisma.apertura_cajaOrderByRelationAggregateInput
   movimiento_de_stock?: Prisma.movimiento_de_stockOrderByRelationAggregateInput
   ventas?: Prisma.ventaOrderByRelationAggregateInput
   capital_caja?: Prisma.capital_cajaOrderByRelationAggregateInput
@@ -256,6 +258,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   direccion?: Prisma.StringNullableFilter<"User"> | string | null
   url_imagen?: Prisma.StringNullableFilter<"User"> | string | null
   apertura_caja?: Prisma.Apertura_cajaListRelationFilter
+  cierres_caja?: Prisma.Apertura_cajaListRelationFilter
   movimiento_de_stock?: Prisma.Movimiento_de_stockListRelationFilter
   ventas?: Prisma.VentaListRelationFilter
   capital_caja?: Prisma.Capital_cajaListRelationFilter
@@ -304,6 +307,7 @@ export type UserCreateInput = {
   direccion?: string | null
   url_imagen?: string | null
   apertura_caja?: Prisma.apertura_cajaCreateNestedManyWithoutUsersInput
+  cierres_caja?: Prisma.apertura_cajaCreateNestedManyWithoutUsuario_cierreInput
   movimiento_de_stock?: Prisma.movimiento_de_stockCreateNestedManyWithoutUsersInput
   ventas?: Prisma.ventaCreateNestedManyWithoutVendedorInput
   capital_caja?: Prisma.capital_cajaCreateNestedManyWithoutUsuarioInput
@@ -323,6 +327,7 @@ export type UserUncheckedCreateInput = {
   direccion?: string | null
   url_imagen?: string | null
   apertura_caja?: Prisma.apertura_cajaUncheckedCreateNestedManyWithoutUsersInput
+  cierres_caja?: Prisma.apertura_cajaUncheckedCreateNestedManyWithoutUsuario_cierreInput
   movimiento_de_stock?: Prisma.movimiento_de_stockUncheckedCreateNestedManyWithoutUsersInput
   ventas?: Prisma.ventaUncheckedCreateNestedManyWithoutVendedorInput
   capital_caja?: Prisma.capital_cajaUncheckedCreateNestedManyWithoutUsuarioInput
@@ -340,6 +345,7 @@ export type UserUpdateInput = {
   direccion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   url_imagen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   apertura_caja?: Prisma.apertura_cajaUpdateManyWithoutUsersNestedInput
+  cierres_caja?: Prisma.apertura_cajaUpdateManyWithoutUsuario_cierreNestedInput
   movimiento_de_stock?: Prisma.movimiento_de_stockUpdateManyWithoutUsersNestedInput
   ventas?: Prisma.ventaUpdateManyWithoutVendedorNestedInput
   capital_caja?: Prisma.capital_cajaUpdateManyWithoutUsuarioNestedInput
@@ -359,6 +365,7 @@ export type UserUncheckedUpdateInput = {
   direccion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   url_imagen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   apertura_caja?: Prisma.apertura_cajaUncheckedUpdateManyWithoutUsersNestedInput
+  cierres_caja?: Prisma.apertura_cajaUncheckedUpdateManyWithoutUsuario_cierreNestedInput
   movimiento_de_stock?: Prisma.movimiento_de_stockUncheckedUpdateManyWithoutUsersNestedInput
   ventas?: Prisma.ventaUncheckedUpdateManyWithoutVendedorNestedInput
   capital_caja?: Prisma.capital_cajaUncheckedUpdateManyWithoutUsuarioNestedInput
@@ -452,6 +459,11 @@ export type UserOrderByRelationAggregateInput = {
   _count?: Prisma.SortOrder
 }
 
+export type UserNullableScalarRelationFilter = {
+  is?: Prisma.UserWhereInput | null
+  isNot?: Prisma.UserWhereInput | null
+}
+
 export type StringFieldUpdateOperationsInput = {
   set?: string
 }
@@ -536,12 +548,28 @@ export type UserCreateNestedOneWithoutApertura_cajaInput = {
   connect?: Prisma.UserWhereUniqueInput
 }
 
+export type UserCreateNestedOneWithoutCierres_cajaInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutCierres_cajaInput, Prisma.UserUncheckedCreateWithoutCierres_cajaInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutCierres_cajaInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
 export type UserUpdateOneRequiredWithoutApertura_cajaNestedInput = {
   create?: Prisma.XOR<Prisma.UserCreateWithoutApertura_cajaInput, Prisma.UserUncheckedCreateWithoutApertura_cajaInput>
   connectOrCreate?: Prisma.UserCreateOrConnectWithoutApertura_cajaInput
   upsert?: Prisma.UserUpsertWithoutApertura_cajaInput
   connect?: Prisma.UserWhereUniqueInput
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutApertura_cajaInput, Prisma.UserUpdateWithoutApertura_cajaInput>, Prisma.UserUncheckedUpdateWithoutApertura_cajaInput>
+}
+
+export type UserUpdateOneWithoutCierres_cajaNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutCierres_cajaInput, Prisma.UserUncheckedCreateWithoutCierres_cajaInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutCierres_cajaInput
+  upsert?: Prisma.UserUpsertWithoutCierres_cajaInput
+  disconnect?: Prisma.UserWhereInput | boolean
+  delete?: Prisma.UserWhereInput | boolean
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutCierres_cajaInput, Prisma.UserUpdateWithoutCierres_cajaInput>, Prisma.UserUncheckedUpdateWithoutCierres_cajaInput>
 }
 
 export type UserCreateNestedOneWithoutCapital_cajaInput = {
@@ -596,6 +624,7 @@ export type UserCreateWithoutPasswordResetsInput = {
   direccion?: string | null
   url_imagen?: string | null
   apertura_caja?: Prisma.apertura_cajaCreateNestedManyWithoutUsersInput
+  cierres_caja?: Prisma.apertura_cajaCreateNestedManyWithoutUsuario_cierreInput
   movimiento_de_stock?: Prisma.movimiento_de_stockCreateNestedManyWithoutUsersInput
   ventas?: Prisma.ventaCreateNestedManyWithoutVendedorInput
   capital_caja?: Prisma.capital_cajaCreateNestedManyWithoutUsuarioInput
@@ -614,6 +643,7 @@ export type UserUncheckedCreateWithoutPasswordResetsInput = {
   direccion?: string | null
   url_imagen?: string | null
   apertura_caja?: Prisma.apertura_cajaUncheckedCreateNestedManyWithoutUsersInput
+  cierres_caja?: Prisma.apertura_cajaUncheckedCreateNestedManyWithoutUsuario_cierreInput
   movimiento_de_stock?: Prisma.movimiento_de_stockUncheckedCreateNestedManyWithoutUsersInput
   ventas?: Prisma.ventaUncheckedCreateNestedManyWithoutVendedorInput
   capital_caja?: Prisma.capital_cajaUncheckedCreateNestedManyWithoutUsuarioInput
@@ -646,6 +676,7 @@ export type UserUpdateWithoutPasswordResetsInput = {
   direccion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   url_imagen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   apertura_caja?: Prisma.apertura_cajaUpdateManyWithoutUsersNestedInput
+  cierres_caja?: Prisma.apertura_cajaUpdateManyWithoutUsuario_cierreNestedInput
   movimiento_de_stock?: Prisma.movimiento_de_stockUpdateManyWithoutUsersNestedInput
   ventas?: Prisma.ventaUpdateManyWithoutVendedorNestedInput
   capital_caja?: Prisma.capital_cajaUpdateManyWithoutUsuarioNestedInput
@@ -664,6 +695,7 @@ export type UserUncheckedUpdateWithoutPasswordResetsInput = {
   direccion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   url_imagen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   apertura_caja?: Prisma.apertura_cajaUncheckedUpdateManyWithoutUsersNestedInput
+  cierres_caja?: Prisma.apertura_cajaUncheckedUpdateManyWithoutUsuario_cierreNestedInput
   movimiento_de_stock?: Prisma.movimiento_de_stockUncheckedUpdateManyWithoutUsersNestedInput
   ventas?: Prisma.ventaUncheckedUpdateManyWithoutVendedorNestedInput
   capital_caja?: Prisma.capital_cajaUncheckedUpdateManyWithoutUsuarioNestedInput
@@ -680,6 +712,7 @@ export type UserCreateWithoutRoleInput = {
   direccion?: string | null
   url_imagen?: string | null
   apertura_caja?: Prisma.apertura_cajaCreateNestedManyWithoutUsersInput
+  cierres_caja?: Prisma.apertura_cajaCreateNestedManyWithoutUsuario_cierreInput
   movimiento_de_stock?: Prisma.movimiento_de_stockCreateNestedManyWithoutUsersInput
   ventas?: Prisma.ventaCreateNestedManyWithoutVendedorInput
   capital_caja?: Prisma.capital_cajaCreateNestedManyWithoutUsuarioInput
@@ -697,6 +730,7 @@ export type UserUncheckedCreateWithoutRoleInput = {
   direccion?: string | null
   url_imagen?: string | null
   apertura_caja?: Prisma.apertura_cajaUncheckedCreateNestedManyWithoutUsersInput
+  cierres_caja?: Prisma.apertura_cajaUncheckedCreateNestedManyWithoutUsuario_cierreInput
   movimiento_de_stock?: Prisma.movimiento_de_stockUncheckedCreateNestedManyWithoutUsersInput
   ventas?: Prisma.ventaUncheckedCreateNestedManyWithoutVendedorInput
   capital_caja?: Prisma.capital_cajaUncheckedCreateNestedManyWithoutUsuarioInput
@@ -755,6 +789,7 @@ export type UserCreateWithoutMovimiento_de_stockInput = {
   direccion?: string | null
   url_imagen?: string | null
   apertura_caja?: Prisma.apertura_cajaCreateNestedManyWithoutUsersInput
+  cierres_caja?: Prisma.apertura_cajaCreateNestedManyWithoutUsuario_cierreInput
   ventas?: Prisma.ventaCreateNestedManyWithoutVendedorInput
   capital_caja?: Prisma.capital_cajaCreateNestedManyWithoutUsuarioInput
   configuracion?: Prisma.ConfiguracionUsuarioCreateNestedOneWithoutUsuarioInput
@@ -773,6 +808,7 @@ export type UserUncheckedCreateWithoutMovimiento_de_stockInput = {
   direccion?: string | null
   url_imagen?: string | null
   apertura_caja?: Prisma.apertura_cajaUncheckedCreateNestedManyWithoutUsersInput
+  cierres_caja?: Prisma.apertura_cajaUncheckedCreateNestedManyWithoutUsuario_cierreInput
   ventas?: Prisma.ventaUncheckedCreateNestedManyWithoutVendedorInput
   capital_caja?: Prisma.capital_cajaUncheckedCreateNestedManyWithoutUsuarioInput
   configuracion?: Prisma.ConfiguracionUsuarioUncheckedCreateNestedOneWithoutUsuarioInput
@@ -805,6 +841,7 @@ export type UserUpdateWithoutMovimiento_de_stockInput = {
   direccion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   url_imagen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   apertura_caja?: Prisma.apertura_cajaUpdateManyWithoutUsersNestedInput
+  cierres_caja?: Prisma.apertura_cajaUpdateManyWithoutUsuario_cierreNestedInput
   ventas?: Prisma.ventaUpdateManyWithoutVendedorNestedInput
   capital_caja?: Prisma.capital_cajaUpdateManyWithoutUsuarioNestedInput
   configuracion?: Prisma.ConfiguracionUsuarioUpdateOneWithoutUsuarioNestedInput
@@ -823,6 +860,7 @@ export type UserUncheckedUpdateWithoutMovimiento_de_stockInput = {
   direccion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   url_imagen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   apertura_caja?: Prisma.apertura_cajaUncheckedUpdateManyWithoutUsersNestedInput
+  cierres_caja?: Prisma.apertura_cajaUncheckedUpdateManyWithoutUsuario_cierreNestedInput
   ventas?: Prisma.ventaUncheckedUpdateManyWithoutVendedorNestedInput
   capital_caja?: Prisma.capital_cajaUncheckedUpdateManyWithoutUsuarioNestedInput
   configuracion?: Prisma.ConfiguracionUsuarioUncheckedUpdateOneWithoutUsuarioNestedInput
@@ -838,6 +876,7 @@ export type UserCreateWithoutApertura_cajaInput = {
   fono?: string | null
   direccion?: string | null
   url_imagen?: string | null
+  cierres_caja?: Prisma.apertura_cajaCreateNestedManyWithoutUsuario_cierreInput
   movimiento_de_stock?: Prisma.movimiento_de_stockCreateNestedManyWithoutUsersInput
   ventas?: Prisma.ventaCreateNestedManyWithoutVendedorInput
   capital_caja?: Prisma.capital_cajaCreateNestedManyWithoutUsuarioInput
@@ -856,6 +895,7 @@ export type UserUncheckedCreateWithoutApertura_cajaInput = {
   fono?: string | null
   direccion?: string | null
   url_imagen?: string | null
+  cierres_caja?: Prisma.apertura_cajaUncheckedCreateNestedManyWithoutUsuario_cierreInput
   movimiento_de_stock?: Prisma.movimiento_de_stockUncheckedCreateNestedManyWithoutUsersInput
   ventas?: Prisma.ventaUncheckedCreateNestedManyWithoutVendedorInput
   capital_caja?: Prisma.capital_cajaUncheckedCreateNestedManyWithoutUsuarioInput
@@ -866,6 +906,47 @@ export type UserUncheckedCreateWithoutApertura_cajaInput = {
 export type UserCreateOrConnectWithoutApertura_cajaInput = {
   where: Prisma.UserWhereUniqueInput
   create: Prisma.XOR<Prisma.UserCreateWithoutApertura_cajaInput, Prisma.UserUncheckedCreateWithoutApertura_cajaInput>
+}
+
+export type UserCreateWithoutCierres_cajaInput = {
+  id?: string
+  nombre: string
+  apellido: string
+  contrasena: string
+  correo?: string | null
+  fono?: string | null
+  direccion?: string | null
+  url_imagen?: string | null
+  apertura_caja?: Prisma.apertura_cajaCreateNestedManyWithoutUsersInput
+  movimiento_de_stock?: Prisma.movimiento_de_stockCreateNestedManyWithoutUsersInput
+  ventas?: Prisma.ventaCreateNestedManyWithoutVendedorInput
+  capital_caja?: Prisma.capital_cajaCreateNestedManyWithoutUsuarioInput
+  configuracion?: Prisma.ConfiguracionUsuarioCreateNestedOneWithoutUsuarioInput
+  passwordResets?: Prisma.PasswordResetCreateNestedManyWithoutUserInput
+  role?: Prisma.RoleCreateNestedOneWithoutUsersInput
+}
+
+export type UserUncheckedCreateWithoutCierres_cajaInput = {
+  id?: string
+  nombre: string
+  apellido: string
+  contrasena: string
+  roleid?: string
+  correo?: string | null
+  fono?: string | null
+  direccion?: string | null
+  url_imagen?: string | null
+  apertura_caja?: Prisma.apertura_cajaUncheckedCreateNestedManyWithoutUsersInput
+  movimiento_de_stock?: Prisma.movimiento_de_stockUncheckedCreateNestedManyWithoutUsersInput
+  ventas?: Prisma.ventaUncheckedCreateNestedManyWithoutVendedorInput
+  capital_caja?: Prisma.capital_cajaUncheckedCreateNestedManyWithoutUsuarioInput
+  configuracion?: Prisma.ConfiguracionUsuarioUncheckedCreateNestedOneWithoutUsuarioInput
+  passwordResets?: Prisma.PasswordResetUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutCierres_cajaInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutCierres_cajaInput, Prisma.UserUncheckedCreateWithoutCierres_cajaInput>
 }
 
 export type UserUpsertWithoutApertura_cajaInput = {
@@ -888,6 +969,7 @@ export type UserUpdateWithoutApertura_cajaInput = {
   fono?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   direccion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   url_imagen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cierres_caja?: Prisma.apertura_cajaUpdateManyWithoutUsuario_cierreNestedInput
   movimiento_de_stock?: Prisma.movimiento_de_stockUpdateManyWithoutUsersNestedInput
   ventas?: Prisma.ventaUpdateManyWithoutVendedorNestedInput
   capital_caja?: Prisma.capital_cajaUpdateManyWithoutUsuarioNestedInput
@@ -906,6 +988,54 @@ export type UserUncheckedUpdateWithoutApertura_cajaInput = {
   fono?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   direccion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   url_imagen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cierres_caja?: Prisma.apertura_cajaUncheckedUpdateManyWithoutUsuario_cierreNestedInput
+  movimiento_de_stock?: Prisma.movimiento_de_stockUncheckedUpdateManyWithoutUsersNestedInput
+  ventas?: Prisma.ventaUncheckedUpdateManyWithoutVendedorNestedInput
+  capital_caja?: Prisma.capital_cajaUncheckedUpdateManyWithoutUsuarioNestedInput
+  configuracion?: Prisma.ConfiguracionUsuarioUncheckedUpdateOneWithoutUsuarioNestedInput
+  passwordResets?: Prisma.PasswordResetUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserUpsertWithoutCierres_cajaInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutCierres_cajaInput, Prisma.UserUncheckedUpdateWithoutCierres_cajaInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutCierres_cajaInput, Prisma.UserUncheckedCreateWithoutCierres_cajaInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutCierres_cajaInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutCierres_cajaInput, Prisma.UserUncheckedUpdateWithoutCierres_cajaInput>
+}
+
+export type UserUpdateWithoutCierres_cajaInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  nombre?: Prisma.StringFieldUpdateOperationsInput | string
+  apellido?: Prisma.StringFieldUpdateOperationsInput | string
+  contrasena?: Prisma.StringFieldUpdateOperationsInput | string
+  correo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  fono?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  direccion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  url_imagen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  apertura_caja?: Prisma.apertura_cajaUpdateManyWithoutUsersNestedInput
+  movimiento_de_stock?: Prisma.movimiento_de_stockUpdateManyWithoutUsersNestedInput
+  ventas?: Prisma.ventaUpdateManyWithoutVendedorNestedInput
+  capital_caja?: Prisma.capital_cajaUpdateManyWithoutUsuarioNestedInput
+  configuracion?: Prisma.ConfiguracionUsuarioUpdateOneWithoutUsuarioNestedInput
+  passwordResets?: Prisma.PasswordResetUpdateManyWithoutUserNestedInput
+  role?: Prisma.RoleUpdateOneRequiredWithoutUsersNestedInput
+}
+
+export type UserUncheckedUpdateWithoutCierres_cajaInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  nombre?: Prisma.StringFieldUpdateOperationsInput | string
+  apellido?: Prisma.StringFieldUpdateOperationsInput | string
+  contrasena?: Prisma.StringFieldUpdateOperationsInput | string
+  roleid?: Prisma.StringFieldUpdateOperationsInput | string
+  correo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  fono?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  direccion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  url_imagen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  apertura_caja?: Prisma.apertura_cajaUncheckedUpdateManyWithoutUsersNestedInput
   movimiento_de_stock?: Prisma.movimiento_de_stockUncheckedUpdateManyWithoutUsersNestedInput
   ventas?: Prisma.ventaUncheckedUpdateManyWithoutVendedorNestedInput
   capital_caja?: Prisma.capital_cajaUncheckedUpdateManyWithoutUsuarioNestedInput
@@ -923,6 +1053,7 @@ export type UserCreateWithoutCapital_cajaInput = {
   direccion?: string | null
   url_imagen?: string | null
   apertura_caja?: Prisma.apertura_cajaCreateNestedManyWithoutUsersInput
+  cierres_caja?: Prisma.apertura_cajaCreateNestedManyWithoutUsuario_cierreInput
   movimiento_de_stock?: Prisma.movimiento_de_stockCreateNestedManyWithoutUsersInput
   ventas?: Prisma.ventaCreateNestedManyWithoutVendedorInput
   configuracion?: Prisma.ConfiguracionUsuarioCreateNestedOneWithoutUsuarioInput
@@ -941,6 +1072,7 @@ export type UserUncheckedCreateWithoutCapital_cajaInput = {
   direccion?: string | null
   url_imagen?: string | null
   apertura_caja?: Prisma.apertura_cajaUncheckedCreateNestedManyWithoutUsersInput
+  cierres_caja?: Prisma.apertura_cajaUncheckedCreateNestedManyWithoutUsuario_cierreInput
   movimiento_de_stock?: Prisma.movimiento_de_stockUncheckedCreateNestedManyWithoutUsersInput
   ventas?: Prisma.ventaUncheckedCreateNestedManyWithoutVendedorInput
   configuracion?: Prisma.ConfiguracionUsuarioUncheckedCreateNestedOneWithoutUsuarioInput
@@ -973,6 +1105,7 @@ export type UserUpdateWithoutCapital_cajaInput = {
   direccion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   url_imagen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   apertura_caja?: Prisma.apertura_cajaUpdateManyWithoutUsersNestedInput
+  cierres_caja?: Prisma.apertura_cajaUpdateManyWithoutUsuario_cierreNestedInput
   movimiento_de_stock?: Prisma.movimiento_de_stockUpdateManyWithoutUsersNestedInput
   ventas?: Prisma.ventaUpdateManyWithoutVendedorNestedInput
   configuracion?: Prisma.ConfiguracionUsuarioUpdateOneWithoutUsuarioNestedInput
@@ -991,6 +1124,7 @@ export type UserUncheckedUpdateWithoutCapital_cajaInput = {
   direccion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   url_imagen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   apertura_caja?: Prisma.apertura_cajaUncheckedUpdateManyWithoutUsersNestedInput
+  cierres_caja?: Prisma.apertura_cajaUncheckedUpdateManyWithoutUsuario_cierreNestedInput
   movimiento_de_stock?: Prisma.movimiento_de_stockUncheckedUpdateManyWithoutUsersNestedInput
   ventas?: Prisma.ventaUncheckedUpdateManyWithoutVendedorNestedInput
   configuracion?: Prisma.ConfiguracionUsuarioUncheckedUpdateOneWithoutUsuarioNestedInput
@@ -1007,6 +1141,7 @@ export type UserCreateWithoutVentasInput = {
   direccion?: string | null
   url_imagen?: string | null
   apertura_caja?: Prisma.apertura_cajaCreateNestedManyWithoutUsersInput
+  cierres_caja?: Prisma.apertura_cajaCreateNestedManyWithoutUsuario_cierreInput
   movimiento_de_stock?: Prisma.movimiento_de_stockCreateNestedManyWithoutUsersInput
   capital_caja?: Prisma.capital_cajaCreateNestedManyWithoutUsuarioInput
   configuracion?: Prisma.ConfiguracionUsuarioCreateNestedOneWithoutUsuarioInput
@@ -1025,6 +1160,7 @@ export type UserUncheckedCreateWithoutVentasInput = {
   direccion?: string | null
   url_imagen?: string | null
   apertura_caja?: Prisma.apertura_cajaUncheckedCreateNestedManyWithoutUsersInput
+  cierres_caja?: Prisma.apertura_cajaUncheckedCreateNestedManyWithoutUsuario_cierreInput
   movimiento_de_stock?: Prisma.movimiento_de_stockUncheckedCreateNestedManyWithoutUsersInput
   capital_caja?: Prisma.capital_cajaUncheckedCreateNestedManyWithoutUsuarioInput
   configuracion?: Prisma.ConfiguracionUsuarioUncheckedCreateNestedOneWithoutUsuarioInput
@@ -1057,6 +1193,7 @@ export type UserUpdateWithoutVentasInput = {
   direccion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   url_imagen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   apertura_caja?: Prisma.apertura_cajaUpdateManyWithoutUsersNestedInput
+  cierres_caja?: Prisma.apertura_cajaUpdateManyWithoutUsuario_cierreNestedInput
   movimiento_de_stock?: Prisma.movimiento_de_stockUpdateManyWithoutUsersNestedInput
   capital_caja?: Prisma.capital_cajaUpdateManyWithoutUsuarioNestedInput
   configuracion?: Prisma.ConfiguracionUsuarioUpdateOneWithoutUsuarioNestedInput
@@ -1075,6 +1212,7 @@ export type UserUncheckedUpdateWithoutVentasInput = {
   direccion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   url_imagen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   apertura_caja?: Prisma.apertura_cajaUncheckedUpdateManyWithoutUsersNestedInput
+  cierres_caja?: Prisma.apertura_cajaUncheckedUpdateManyWithoutUsuario_cierreNestedInput
   movimiento_de_stock?: Prisma.movimiento_de_stockUncheckedUpdateManyWithoutUsersNestedInput
   capital_caja?: Prisma.capital_cajaUncheckedUpdateManyWithoutUsuarioNestedInput
   configuracion?: Prisma.ConfiguracionUsuarioUncheckedUpdateOneWithoutUsuarioNestedInput
@@ -1091,6 +1229,7 @@ export type UserCreateWithoutConfiguracionInput = {
   direccion?: string | null
   url_imagen?: string | null
   apertura_caja?: Prisma.apertura_cajaCreateNestedManyWithoutUsersInput
+  cierres_caja?: Prisma.apertura_cajaCreateNestedManyWithoutUsuario_cierreInput
   movimiento_de_stock?: Prisma.movimiento_de_stockCreateNestedManyWithoutUsersInput
   ventas?: Prisma.ventaCreateNestedManyWithoutVendedorInput
   capital_caja?: Prisma.capital_cajaCreateNestedManyWithoutUsuarioInput
@@ -1109,6 +1248,7 @@ export type UserUncheckedCreateWithoutConfiguracionInput = {
   direccion?: string | null
   url_imagen?: string | null
   apertura_caja?: Prisma.apertura_cajaUncheckedCreateNestedManyWithoutUsersInput
+  cierres_caja?: Prisma.apertura_cajaUncheckedCreateNestedManyWithoutUsuario_cierreInput
   movimiento_de_stock?: Prisma.movimiento_de_stockUncheckedCreateNestedManyWithoutUsersInput
   ventas?: Prisma.ventaUncheckedCreateNestedManyWithoutVendedorInput
   capital_caja?: Prisma.capital_cajaUncheckedCreateNestedManyWithoutUsuarioInput
@@ -1141,6 +1281,7 @@ export type UserUpdateWithoutConfiguracionInput = {
   direccion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   url_imagen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   apertura_caja?: Prisma.apertura_cajaUpdateManyWithoutUsersNestedInput
+  cierres_caja?: Prisma.apertura_cajaUpdateManyWithoutUsuario_cierreNestedInput
   movimiento_de_stock?: Prisma.movimiento_de_stockUpdateManyWithoutUsersNestedInput
   ventas?: Prisma.ventaUpdateManyWithoutVendedorNestedInput
   capital_caja?: Prisma.capital_cajaUpdateManyWithoutUsuarioNestedInput
@@ -1159,6 +1300,7 @@ export type UserUncheckedUpdateWithoutConfiguracionInput = {
   direccion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   url_imagen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   apertura_caja?: Prisma.apertura_cajaUncheckedUpdateManyWithoutUsersNestedInput
+  cierres_caja?: Prisma.apertura_cajaUncheckedUpdateManyWithoutUsuario_cierreNestedInput
   movimiento_de_stock?: Prisma.movimiento_de_stockUncheckedUpdateManyWithoutUsersNestedInput
   ventas?: Prisma.ventaUncheckedUpdateManyWithoutVendedorNestedInput
   capital_caja?: Prisma.capital_cajaUncheckedUpdateManyWithoutUsuarioNestedInput
@@ -1186,6 +1328,7 @@ export type UserUpdateWithoutRoleInput = {
   direccion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   url_imagen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   apertura_caja?: Prisma.apertura_cajaUpdateManyWithoutUsersNestedInput
+  cierres_caja?: Prisma.apertura_cajaUpdateManyWithoutUsuario_cierreNestedInput
   movimiento_de_stock?: Prisma.movimiento_de_stockUpdateManyWithoutUsersNestedInput
   ventas?: Prisma.ventaUpdateManyWithoutVendedorNestedInput
   capital_caja?: Prisma.capital_cajaUpdateManyWithoutUsuarioNestedInput
@@ -1203,6 +1346,7 @@ export type UserUncheckedUpdateWithoutRoleInput = {
   direccion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   url_imagen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   apertura_caja?: Prisma.apertura_cajaUncheckedUpdateManyWithoutUsersNestedInput
+  cierres_caja?: Prisma.apertura_cajaUncheckedUpdateManyWithoutUsuario_cierreNestedInput
   movimiento_de_stock?: Prisma.movimiento_de_stockUncheckedUpdateManyWithoutUsersNestedInput
   ventas?: Prisma.ventaUncheckedUpdateManyWithoutVendedorNestedInput
   capital_caja?: Prisma.capital_cajaUncheckedUpdateManyWithoutUsuarioNestedInput
@@ -1228,6 +1372,7 @@ export type UserUncheckedUpdateManyWithoutRoleInput = {
 
 export type UserCountOutputType = {
   apertura_caja: number
+  cierres_caja: number
   movimiento_de_stock: number
   ventas: number
   capital_caja: number
@@ -1236,6 +1381,7 @@ export type UserCountOutputType = {
 
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   apertura_caja?: boolean | UserCountOutputTypeCountApertura_cajaArgs
+  cierres_caja?: boolean | UserCountOutputTypeCountCierres_cajaArgs
   movimiento_de_stock?: boolean | UserCountOutputTypeCountMovimiento_de_stockArgs
   ventas?: boolean | UserCountOutputTypeCountVentasArgs
   capital_caja?: boolean | UserCountOutputTypeCountCapital_cajaArgs
@@ -1256,6 +1402,13 @@ export type UserCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensi
  * UserCountOutputType without action
  */
 export type UserCountOutputTypeCountApertura_cajaArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.apertura_cajaWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountCierres_cajaArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.apertura_cajaWhereInput
 }
 
@@ -1299,6 +1452,7 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   direccion?: boolean
   url_imagen?: boolean
   apertura_caja?: boolean | Prisma.User$apertura_cajaArgs<ExtArgs>
+  cierres_caja?: boolean | Prisma.User$cierres_cajaArgs<ExtArgs>
   movimiento_de_stock?: boolean | Prisma.User$movimiento_de_stockArgs<ExtArgs>
   ventas?: boolean | Prisma.User$ventasArgs<ExtArgs>
   capital_caja?: boolean | Prisma.User$capital_cajaArgs<ExtArgs>
@@ -1349,6 +1503,7 @@ export type UserSelectScalar = {
 export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "nombre" | "apellido" | "contrasena" | "roleid" | "correo" | "fono" | "direccion" | "url_imagen", ExtArgs["result"]["user"]>
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   apertura_caja?: boolean | Prisma.User$apertura_cajaArgs<ExtArgs>
+  cierres_caja?: boolean | Prisma.User$cierres_cajaArgs<ExtArgs>
   movimiento_de_stock?: boolean | Prisma.User$movimiento_de_stockArgs<ExtArgs>
   ventas?: boolean | Prisma.User$ventasArgs<ExtArgs>
   capital_caja?: boolean | Prisma.User$capital_cajaArgs<ExtArgs>
@@ -1368,6 +1523,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   name: "User"
   objects: {
     apertura_caja: Prisma.$apertura_cajaPayload<ExtArgs>[]
+    cierres_caja: Prisma.$apertura_cajaPayload<ExtArgs>[]
     movimiento_de_stock: Prisma.$movimiento_de_stockPayload<ExtArgs>[]
     ventas: Prisma.$ventaPayload<ExtArgs>[]
     capital_caja: Prisma.$capital_cajaPayload<ExtArgs>[]
@@ -1780,6 +1936,7 @@ readonly fields: UserFieldRefs;
 export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   apertura_caja<T extends Prisma.User$apertura_cajaArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$apertura_cajaArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$apertura_cajaPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  cierres_caja<T extends Prisma.User$cierres_cajaArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$cierres_cajaArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$apertura_cajaPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   movimiento_de_stock<T extends Prisma.User$movimiento_de_stockArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$movimiento_de_stockArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$movimiento_de_stockPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   ventas<T extends Prisma.User$ventasArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$ventasArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ventaPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   capital_caja<T extends Prisma.User$capital_cajaArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$capital_cajaArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$capital_cajaPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -2228,6 +2385,30 @@ export type UserDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Internal
  * User.apertura_caja
  */
 export type User$apertura_cajaArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the apertura_caja
+   */
+  select?: Prisma.apertura_cajaSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the apertura_caja
+   */
+  omit?: Prisma.apertura_cajaOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.apertura_cajaInclude<ExtArgs> | null
+  where?: Prisma.apertura_cajaWhereInput
+  orderBy?: Prisma.apertura_cajaOrderByWithRelationInput | Prisma.apertura_cajaOrderByWithRelationInput[]
+  cursor?: Prisma.apertura_cajaWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.Apertura_cajaScalarFieldEnum | Prisma.Apertura_cajaScalarFieldEnum[]
+}
+
+/**
+ * User.cierres_caja
+ */
+export type User$cierres_cajaArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   /**
    * Select specific fields to fetch from the apertura_caja
    */

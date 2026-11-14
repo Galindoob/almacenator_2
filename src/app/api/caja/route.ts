@@ -3,6 +3,7 @@ import { z } from "zod";
 import type { Prisma } from "@/generated/prisma/client";
 import { withAuth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
+import { canCloseCashRegister } from "@/lib/cash-authorization";
 
 const closingSchema = z.object({
   saldo_cierre: z.number().int().nonnegative().max(2147483647),
@@ -39,7 +40,7 @@ function serializeCashRegister(cashRegister: CashRecord) {
 
 export const GET = withAuth(async (request) => {
   try {
-    const user = await prisma.user.findUnique({ where: { correo: request.correo }, select: { id: true } });
+    const user = await prisma.user.findUnique({ where: { correo: request.correo }, select: { id: true, role: { select: { role: true } } } });
     if (!user) return NextResponse.json({ message: "Usuario no encontrado." }, { status: 404 });
 
     const open = await prisma.apertura_caja.findFirst({ where: { horario_cierre: null }, include: cashInclude, orderBy: { horario_apertura: "desc" } });
@@ -51,7 +52,7 @@ export const GET = withAuth(async (request) => {
       status: "ok",
       abierta: Boolean(open),
       caja: open ? serializeCashRegister(open) : null,
-      puedeCerrar: Boolean(open && open.id_usuario_apertura === user.id),
+      puedeCerrar: Boolean(open && canCloseCashRegister(user.id, user.role.role, open.id_usuario_apertura)),
       ventasPendientes,
       ventasCompletadas,
       saldoDisponible: previous?.valor_real ?? null,
@@ -111,7 +112,8 @@ export const PATCH = withAuth(async (request) => {
       await tx.$queryRaw`SELECT pg_advisory_xact_lock(79104001)::text AS locked`;
       const open = await tx.apertura_caja.findFirst({ where: { horario_cierre: null } });
       if (!open) return { status: 404 as const, message: "No hay una caja abierta." };
-      if (open.id_usuario_apertura !== user.id) return { status: 403 as const, message: "Solo quien abrió la caja puede cerrarla." };
+      const currentUser = await tx.user.findUnique({ where: { id: user.id }, select: { role: { select: { role: true } } } });
+      if (!currentUser || !canCloseCashRegister(user.id, currentUser.role.role, open.id_usuario_apertura)) return { status: 403 as const, message: "Solo quien abrió la caja, un administrador o master puede cerrarla." };
 
       const pending = await tx.venta.count({ where: { id_apertura_caja: open.id_apertura, estado: "pendiente" } });
       if (pending > 0) return { status: 409 as const, message: `Hay ${pending} ${pending === 1 ? "venta pendiente" : "ventas pendientes"}. Termínalas o elimínalas antes de cerrar la caja.` };
@@ -122,6 +124,7 @@ export const PATCH = withAuth(async (request) => {
       const [closed] = await tx.$queryRaw<{ horario_cierre: Date }[]>`
         UPDATE apertura_caja SET
           horario_cierre = NOW(),
+          id_usuario_cierre = ${user.id}::uuid,
           saldo_cierre = ${closingAmount},
           valor_real = ${closingAmount},
           diferencia = ${difference},

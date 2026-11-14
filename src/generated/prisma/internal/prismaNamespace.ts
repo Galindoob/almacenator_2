@@ -2641,6 +2641,7 @@ export type EmpaqueScalarFieldEnum = (typeof EmpaqueScalarFieldEnum)[keyof typeo
 export const Apertura_cajaScalarFieldEnum = {
   id_apertura: 'id_apertura',
   id_usuario_apertura: 'id_usuario_apertura',
+  id_usuario_cierre: 'id_usuario_cierre',
   horario_apertura: 'horario_apertura',
   horario_cierre: 'horario_cierre',
   venta_boleta: 'venta_boleta',

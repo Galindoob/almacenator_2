@@ -3,7 +3,7 @@ import { endSession, hasSessionHint } from "@/lib/client-session";
 
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Eye, RefreshCw, X } from "lucide-react";
+import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Eye, RefreshCw, ShoppingBasket, X } from "lucide-react";
 import { Navbar } from "../components/Navbar";
 import { CartLoader } from "../components/CartLoader";
 import { useSyncRevision } from "../components/SyncProvider";
@@ -53,6 +53,7 @@ export default function TransaccionesPage() {
   const syncRevision = useSyncRevision();
   const router = useRouter();
   const [isSessionVerified, setIsSessionVerified] = useState(false);
+  const [canCreateSale, setCanCreateSale] = useState(false);
   const [saleNumber, setSaleNumber] = useState("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
@@ -87,9 +88,12 @@ export default function TransaccionesPage() {
       cache: "no-store",
       signal: controller.signal,
     })
-      .then((response) => {
+      .then(async (response) => {
         if (!isActive) return;
         if (response.ok) {
+          const data = await response.json() as { user?: { permisos?: string[] } };
+          if (!isActive) return;
+          setCanCreateSale(Boolean(data.user?.permisos?.includes("ventas_crear")));
           setIsSessionVerified(true);
           return;
         }
@@ -319,7 +323,18 @@ export default function TransaccionesPage() {
                   <tr key={transaction.id_venta}>
                     <td>{transaction.num_venta}</td>
                     <td>
-                      {transaction.recibo ? (
+                      {transaction.estado === "pendiente" ? (
+                        <button
+                          className="transactions-receipt-button"
+                          type="button"
+                          disabled={!canCreateSale}
+                          title={canCreateSale ? "Continuar venta pendiente" : "Necesitas permiso para crear ventas"}
+                          aria-label={`Continuar venta ${transaction.num_venta}`}
+                          onClick={() => router.push(`/ventas?continuar=${encodeURIComponent(transaction.id_venta)}`)}
+                        >
+                          <ShoppingBasket size={17} aria-hidden="true" /> Continuar
+                        </button>
+                      ) : transaction.recibo ? (
                         <button
                           className="transactions-receipt-button"
                           type="button"

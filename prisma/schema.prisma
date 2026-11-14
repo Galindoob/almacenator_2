@@ -17,7 +17,8 @@ model User {
   fono                String?               @db.VarChar(60)
   direccion           String?               @db.VarChar(200)
   url_imagen          String?               @db.VarChar(500)
-  apertura_caja       apertura_caja[]
+  apertura_caja       apertura_caja[]       @relation("CajaApertura")
+  cierres_caja        apertura_caja[]       @relation("CajaCierre")
   movimiento_de_stock movimiento_de_stock[]
   ventas              venta[]
   capital_caja        capital_caja[]
@@ -183,6 +184,7 @@ model empaque {
 model apertura_caja {
   id_apertura         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   id_usuario_apertura String    @db.Uuid
+  id_usuario_cierre   String?   @db.Uuid
   horario_apertura    DateTime  @default(now()) @db.Timestamptz(6)
   horario_cierre      DateTime? @db.Timestamptz(6)
   venta_boleta        Int       @default(0)
@@ -202,7 +204,8 @@ model apertura_caja {
   venta_transferencia Int       @default(0)
   total_transferencia Int       @default(0)
   total               Int       @default(0)
-  users               User      @relation(fields: [id_usuario_apertura], references: [id], map: "fk_apertura_caja_usuario")
+  users               User      @relation("CajaApertura", fields: [id_usuario_apertura], references: [id], map: "fk_apertura_caja_usuario")
+  usuario_cierre      User?     @relation("CajaCierre", fields: [id_usuario_cierre], references: [id], onDelete: Restrict, map: "fk_caja_usuario_cierre")
   ventas              venta[]
   movimientos         movimiento_caja[]
   capital             capital_caja[]

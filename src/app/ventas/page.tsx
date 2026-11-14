@@ -299,9 +299,15 @@ export default function SalesPage() {
         if (!salesResponse.ok) throw new Error("No se pudieron cargar las ventas.");
         const saved = await salesResponse.json() as { ventas: Sale[] };
         setSales(saved.ventas);
-        if (saved.ventas[0]) {
-          setActiveSale(saved.ventas[0]);
-          setCart(saleCart(saved.ventas[0]));
+        const requestedId = new URLSearchParams(window.location.search).get("continuar");
+        const selected = requestedId ? saved.ventas.find((sale) => sale.id_venta === requestedId) : saved.ventas[0];
+        if (selected) {
+          setActiveSale(selected);
+          setCart(saleCart(selected));
+        } else if (requestedId) {
+          setActiveSale(null);
+          setCart([]);
+          setOperationError("No se pudo continuar esta venta. Comprueba que siga pendiente, pertenezca a tu usuario y corresponda a la caja abierta.");
         }
       } catch {
         setError("No se pudo conectar con el servidor.");

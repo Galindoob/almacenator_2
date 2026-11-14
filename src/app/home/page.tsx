@@ -9,6 +9,7 @@ import { CartLoader } from "../components/CartLoader";
 import { useAppearance } from "../components/AppearanceProvider";
 import { usePermissions } from "../components/usePermissions";
 import { useSyncRevision } from "../components/SyncProvider";
+import { hasCashClosingPrivilege } from "@/lib/cash-authorization";
 
 type TokenPayload = {
   nombre?: string;
@@ -273,13 +274,13 @@ export default function HomePage() {
           {cashMessage && !isOpenCashModalVisible ? <p className="cash-modal-message" role="alert">{cashMessage}</p> : null}
           {isCashRegisterOpen === null && !cashMessage ? <CartLoader compact label="Consultando la caja..." /> : null}
           {isCashRegisterOpen === null && !cashMessage ? null : isCashRegisterOpen ? (
-            homeActions.filter((action) => can(action.action === "sale" ? "ventas_crear" : action.action === "close" ? "caja_abrir_cerrar" : "caja_ingreso_egreso")).map((action) => (
+            homeActions.filter((action) => (action.action === "close" && hasCashClosingPrivilege(payload.rol ?? "")) || can(action.action === "sale" ? "ventas_crear" : action.action === "close" ? "caja_abrir_cerrar" : "caja_ingreso_egreso")).map((action) => (
               <button
                 type="button"
                 className={`home-action-${action.tone}`}
                 key={action.label}
                 disabled={action.action === "close" && !canCloseCashRegister}
-                title={action.action === "close" && !canCloseCashRegister ? "Solo quien abrió la caja puede cerrarla" : undefined}
+                title={action.action === "close" && !canCloseCashRegister ? "Solo quien abrió la caja, un administrador o master puede cerrarla" : undefined}
                 onClick={() => handleAction(action.action)}
               >
                 <span className="home-action-icon">
@@ -311,7 +312,7 @@ export default function HomePage() {
             </button>
           ) : null}
           {isCashRegisterOpen && !canCloseCashRegister && can("caja_abrir_cerrar") ? (
-            <p role="status">Solo quien abrió la caja puede cerrarla{cashRegisterOpener ? `: ${cashRegisterOpener}` : ""}.</p>
+            <p role="status">La caja fue abierta por {cashRegisterOpener || "otro usuario"}. Solo esa persona, un administrador o master puede cerrarla.</p>
           ) : null}
         </nav>
       </section>

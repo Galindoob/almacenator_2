@@ -9,7 +9,7 @@ export const GET = withAuth(async (request) => {
   try {
     const [actor, cajas, ventas, movimientos] = await Promise.all([
       prisma.user.findUnique({ where: { correo: request.correo }, include: { role: true } }),
-      prisma.apertura_caja.findMany({ orderBy: { horario_apertura: "desc" }, include: { users: { select: { nombre: true, apellido: true } } } }),
+      prisma.apertura_caja.findMany({ orderBy: { horario_apertura: "desc" }, include: { users: { select: { nombre: true, apellido: true } }, usuario_cierre: { select: { nombre: true, apellido: true } } } }),
       prisma.venta.groupBy({ by: ["id_vendedor"], where: { estado: "completado" }, _count: { _all: true }, _sum: { valor_total: true } }),
       prisma.capital_caja.findMany({ orderBy: { fecha: "desc" }, include: { usuario: { select: { nombre: true, apellido: true } } } }),
     ]);

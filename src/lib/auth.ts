@@ -1,5 +1,6 @@
 import jwt from "jsonwebtoken";
 import { NextRequest, NextResponse } from "next/server";
+import { hasCashClosingPrivilege } from "@/lib/cash-authorization";
 
 export type JwtPayload = {
   nombre: string;
@@ -83,7 +84,8 @@ export function withAuth(
         const access = await getUserPermissions(payload.correo);
         if (!access) return NextResponse.json({ message: "Usuario no encontrado." }, { status: 401 });
         if (path === "/api/producto" && method === "DELETE" && access.role !== "master") return NextResponse.json({ message: "No tienes permiso para eliminar productos." }, { status: 403 });
-        if (!required.some((permission) => access.has(permission))) return NextResponse.json({ message: "No tienes permiso para realizar esta acción." }, { status: 403 });
+        const privilegedCashClose = hasCashClosingPrivilege(access.role) && ((path === "/api/caja" && method === "PATCH") || (path === "/api/caja/voucher" && method === "POST"));
+        if (!privilegedCashClose && !required.some((permission) => access.has(permission))) return NextResponse.json({ message: "No tienes permiso para realizar esta acción." }, { status: 403 });
         if (path === "/api/producto-vencimiento" && method !== "GET" && !access.has("vencimiento_ver")) return NextResponse.json({ message: "No tienes permiso para ver productos por vencer." }, { status: 403 });
       } catch (error) {
         console.error("Error verificando permisos:", error);
