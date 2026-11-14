@@ -12,7 +12,7 @@ function configureCloudinary() {
     process.env.CLOUDINARY_SECRET;
 
   if (!cloudName || !apiKey || !apiSecret) {
-    throw new Error("Cloudinary no esta configurado.");
+    throw new Error("Cloudinary no está configurado.");
   }
 
   cloudinary.config({

@@ -36,7 +36,7 @@ export const POST = withAuth(async (request) => {
 
     return NextResponse.json({
       titulo: "Comprobante cierre de caja",
-      tienda: company?.nombreFantasia ?? "Mini Gest",
+      tienda: company?.nombreFantasia ?? "MiniGest",
       rut: company?.rut ?? "",
       fechaApertura: cashRegister.horario_apertura,
       fechaCierre: clock[0].ahora,

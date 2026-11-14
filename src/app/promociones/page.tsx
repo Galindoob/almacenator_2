@@ -1,9 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Search, Trash2, Percent, Tag, Gift, Pencil } from "lucide-react";
 import { CartLoader } from "../components/CartLoader";
+import { useAppDialog } from "../components/AppDialogProvider";
 import { useBarcodeScanner } from "../components/useBarcodeScanner";
 import { useSyncRevision } from "../components/SyncProvider";
 
@@ -23,11 +24,14 @@ type Promo = {
 function money(value: number) { return `$${Math.round(value).toLocaleString("es-CL")}`; }
 
 export default function PromotionsPage() {
+  const showDialog = useAppDialog();
   const syncRevision = useSyncRevision();
   const [promotions, setPromotions] = useState<Promo[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
+  const [deleting, setDeleting] = useState(false);
+  const deletingRef = useRef(false);
   const [error, setError] = useState("");
   const [includeVat, setIncludeVat] = useState(true);
   const { onSearchKeyDown } = useBarcodeScanner((code) => {
@@ -76,14 +80,25 @@ export default function PromotionsPage() {
   const displayedCost = normalCost * costMultiplier;
 
   async function deletePromotion(promo: Promo) {
-    if (!window.confirm(`¿Eliminar la promoción "${promo.nombre_promocion}" para ${promo.producto.nombre}?`)) return;
-    const response = await fetch("/api/promociones", {
-      method: "DELETE", headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id: promo.id_promocion }),
-    });
-    const data = await response.json();
-    if (!response.ok) { setError(data.message ?? "No se pudo eliminar."); return; }
-    setPromotions((current) => current.filter((item) => item.id_promocion !== promo.id_promocion));
+    if (deletingRef.current) return;
+    if (!await showDialog({ title: "Eliminar promoción", message: `¿Eliminar la promoción "${promo.nombre_promocion}" para ${promo.producto.nombre}?`, tone: "warning", confirm: true, confirmLabel: "Eliminar" })) return;
+    if (deletingRef.current) return;
+    deletingRef.current = true;
+    setDeleting(true);
+    try {
+      const response = await fetch("/api/promociones", {
+        method: "DELETE", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: promo.id_promocion }),
+      });
+      const data = await response.json();
+      if (!response.ok) { setError(data.message ?? "No se pudo eliminar."); return; }
+      setPromotions((current) => current.filter((item) => item.id_promocion !== promo.id_promocion));
+    } catch {
+      setError("No se pudo conectar con el servidor para eliminar la promoción.");
+    } finally {
+      deletingRef.current = false;
+      setDeleting(false);
+    }
   }
 
   return (
@@ -93,6 +108,7 @@ export default function PromotionsPage() {
         <section className="promotions-list" aria-label="Promociones registradas">
           <label className="promotions-search"><Search aria-hidden="true"/><input type="search" placeholder="Buscar promoción, producto o código de barras" value={search} onKeyDown={onSearchKeyDown} onChange={(event) => setSearch(event.target.value)} /></label>
           <div className="promotions-table-heading"><span>Nombre</span><span>Precio</span><span aria-label="Acciones" /></div>
+          {deleting ? <CartLoader compact label="Eliminando promoción..." /> : null}
           <div className="promotions-rows">
             {loading ? <CartLoader label="Cargando promociones..." /> : error ? <p className="promotions-state is-error">{error}</p> : filtered.length === 0 ? <p className="promotions-state">No hay promociones registradas.</p> : filtered.map((promo) => (
               <article className={`promotions-row${selectedId === promo.id_promocion ? " is-selected" : ""}`} key={promo.id_promocion}>
@@ -100,7 +116,7 @@ export default function PromotionsPage() {
                   <strong>{promo.nombre_promocion}</strong><span>{promo.producto.nombre} · {promo.tipo_promocion.tipo}</span>
                 </button>
                 <span className="promotions-row-price">{money(promo.tipo_promocion.tipo === "combo" ? promo.precio_combo ?? 0 : promo.producto.precioVenta)}</span>
-                <button type="button" className="promotions-delete" title="Eliminar promoción" aria-label={`Eliminar ${promo.nombre_promocion}`} onClick={() => void deletePromotion(promo)}><Trash2 aria-hidden="true" /></button>
+                <button type="button" className="promotions-delete" title="Eliminar promoción" aria-label={`Eliminar ${promo.nombre_promocion}`} disabled={deleting} onClick={() => void deletePromotion(promo)}><Trash2 aria-hidden="true" /></button>
               </article>
             ))}
           </div>

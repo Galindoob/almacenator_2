@@ -64,7 +64,7 @@ export async function sendResetEmail(to: string, code: string) {
     body: JSON.stringify({
       from,
       to: [to],
-      subject: "Código para restablecer tu contraseña de Mini Gest",
+      subject: "Código para restablecer tu contraseña de MiniGest",
       text: `Tu código de recuperación es ${code}. Vence en 10 minutos. Si no solicitaste este cambio, ignora este mensaje.`,
     }),
     cache: "no-store",

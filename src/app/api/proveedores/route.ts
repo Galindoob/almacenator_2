@@ -152,7 +152,7 @@ export const POST = withAuth(async (request) => {
 
     if (email && !emailPattern.test(email)) {
       return NextResponse.json(
-        { status: "error", message: "Ingresa un correo con formato valido." },
+        { status: "error", message: "Ingresa un correo con formato válido." },
         { status: 400 },
       );
     }
@@ -232,7 +232,7 @@ export const PUT = withAuth(async (request) => {
 
     if (email && !emailPattern.test(email)) {
       return NextResponse.json(
-        { status: "error", message: "Ingresa un correo con formato valido." },
+        { status: "error", message: "Ingresa un correo con formato válido." },
         { status: 400 },
       );
     }
@@ -298,7 +298,7 @@ export const PATCH = withAuth(async (request) => {
 
     if (!providerId || !Array.isArray(payload.productos_asignados)) {
       return NextResponse.json(
-        { status: "error", message: "La asignacion de productos no es valida." },
+        { status: "error", message: "La asignación de productos no es válida." },
         { status: 400 },
       );
     }

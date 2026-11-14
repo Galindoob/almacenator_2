@@ -574,7 +574,7 @@ export const POST = withAuth(async (request) => {
 
       if (duplicatedCategoria) {
         return NextResponse.json(
-          { status: "error", message: "La categoria ingresada ya existe." },
+          { status: "error", message: "La categoría ingresada ya existe." },
           { status: 409 },
         );
       }

@@ -6,7 +6,7 @@ import { ensureSaleReceipt } from "@/lib/sale-receipt";
 
 export const GET = withAuth(async (request) => {
   const parsed = transactionQuerySchema.safeParse(Object.fromEntries(request.nextUrl.searchParams));
-  if (!parsed.success) return NextResponse.json({ message: parsed.error.issues[0]?.message ?? "Filtros invalidos." }, { status: 400 });
+  if (!parsed.success) return NextResponse.json({ message: parsed.error.issues[0]?.message ?? "Filtros inválidos." }, { status: 400 });
   try {
     const missingReceipts = await prisma.venta.findMany({
       where: { estado: "completado", recibo: null },

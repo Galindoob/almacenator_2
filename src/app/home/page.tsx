@@ -4,6 +4,8 @@ import { endSession, hasSessionHint } from "@/lib/client-session";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Navbar } from "../components/Navbar";
+import { useAppDialog } from "../components/AppDialogProvider";
+import { CartLoader } from "../components/CartLoader";
 import { useAppearance } from "../components/AppearanceProvider";
 import { usePermissions } from "../components/usePermissions";
 import { useSyncRevision } from "../components/SyncProvider";
@@ -83,13 +85,16 @@ function HomeActionIcon({ name }: { name: HomeAction["icon"] }) {
 }
 
 export default function HomePage() {
+  const showDialog = useAppDialog();
   const router = useRouter();
   const { storeName } = useAppearance();
   const can = usePermissions();
   const syncRevision = useSyncRevision();
   const [payload, setPayload] = useState<TokenPayload | null>(null);
+  const [sessionError, setSessionError] = useState("");
   const [isCashRegisterOpen, setIsCashRegisterOpen] = useState<boolean | null>(null);
   const [canCloseCashRegister, setCanCloseCashRegister] = useState(false);
+  const [cashRegisterOpener, setCashRegisterOpener] = useState("");
   const [availableOpeningBalance, setAvailableOpeningBalance] = useState<number | null>(null);
   const [isOpenCashModalVisible, setIsOpenCashModalVisible] = useState(false);
   const [isNoCapitalAlertVisible, setIsNoCapitalAlertVisible] = useState(false);
@@ -110,13 +115,14 @@ export default function HomePage() {
     fetch("/api/session", { cache: "no-store", signal: controller.signal })
       .then(async (response) => {
         if (!response.ok) {
-          if (response.status === 401) void endSession();
+          if (response.status === 401) { void endSession(); router.replace("/login"); }
+          else setSessionError("No se pudo verificar la sesión. Recarga la página para reintentar.");
           return;
         }
         const data = await response.json() as { user: TokenPayload };
         setPayload(data.user);
       })
-      .catch(() => {});
+      .catch(() => { if (!controller.signal.aborted) setSessionError("No se pudo verificar la sesión. Recarga la página para reintentar."); });
     return () => controller.abort();
   }, [router]);
 
@@ -134,6 +140,7 @@ export default function HomePage() {
           status?: "ok" | "error";
           abierta?: boolean;
           puedeCerrar?: boolean;
+          caja?: { usuario?: { nombre?: string; apellido?: string } } | null;
           saldoDisponible?: number | null;
           message?: string;
         };
@@ -145,6 +152,7 @@ export default function HomePage() {
 
         setIsCashRegisterOpen(Boolean(data.abierta));
         setCanCloseCashRegister(Boolean(data.puedeCerrar));
+        setCashRegisterOpener([data.caja?.usuario?.nombre, data.caja?.usuario?.apellido].filter(Boolean).join(" "));
         setAvailableOpeningBalance(data.saldoDisponible ?? null);
       } catch {
         setCashMessage("No se pudo conectar con el servidor de caja.");
@@ -177,15 +185,15 @@ export default function HomePage() {
         const response = await fetch("/api/caja", { cache: "no-store" });
         const data = await response.json() as { abierta?: boolean; puedeCerrar?: boolean; ventasPendientes?: number; message?: string };
         if (!response.ok || !data.abierta || !data.puedeCerrar) {
-          window.alert(data.message ?? "No puedes cerrar esta caja.");
+          await showDialog({ title: "No se puede cerrar la caja", message: data.message ?? "No puedes cerrar esta caja.", tone: "warning" });
           return;
         }
         if (data.ventasPendientes) {
-          window.alert(`Hay ${data.ventasPendientes} ${data.ventasPendientes === 1 ? "venta pendiente" : "ventas pendientes"}. Termínalas o elimínalas antes de cerrar la caja.`);
+          await showDialog({ title: "Ventas pendientes", message: `Hay ${data.ventasPendientes} ${data.ventasPendientes === 1 ? "venta pendiente" : "ventas pendientes"}. Finalízalas o cancélalas antes de cerrar la caja.`, tone: "warning" });
           return;
         }
       } catch {
-        window.alert("No se pudo verificar el estado de la caja.");
+        await showDialog({ title: "Error al consultar la caja", message: "No se pudo verificar el estado de la caja.", tone: "error" });
         return;
       }
       router.push("/cierreCaja");
@@ -244,7 +252,7 @@ export default function HomePage() {
   }
 
   if (!payload) {
-    return null;
+    return <main className="home-shell">{sessionError ? <p role="alert">{sessionError}</p> : <CartLoader screen label="Cargando inicio..." />}</main>;
   }
 
   return (
@@ -259,11 +267,12 @@ export default function HomePage() {
         <p>
           Bienvenido, {payload.nombre} {payload.apellido}
         </p>
-        <span className="home-subtitle">Que tengas un gran dia. Hagamos crecer tu negocio.</span>
+        <span className="home-subtitle">Que tengas un gran día. Hagamos crecer tu negocio.</span>
 
         <nav className="home-actions" aria-label="Acciones principales">
           {cashMessage && !isOpenCashModalVisible ? <p className="cash-modal-message" role="alert">{cashMessage}</p> : null}
-          {isCashRegisterOpen ? (
+          {isCashRegisterOpen === null && !cashMessage ? <CartLoader compact label="Consultando la caja..." /> : null}
+          {isCashRegisterOpen === null && !cashMessage ? null : isCashRegisterOpen ? (
             homeActions.filter((action) => can(action.action === "sale" ? "ventas_crear" : action.action === "close" ? "caja_abrir_cerrar" : "caja_ingreso_egreso")).map((action) => (
               <button
                 type="button"
@@ -300,6 +309,9 @@ export default function HomePage() {
                 <path d="M9 5l7 7-7 7" />
               </svg>
             </button>
+          ) : null}
+          {isCashRegisterOpen && !canCloseCashRegister && can("caja_abrir_cerrar") ? (
+            <p role="status">Solo quien abrió la caja puede cerrarla{cashRegisterOpener ? `: ${cashRegisterOpener}` : ""}.</p>
           ) : null}
         </nav>
       </section>
@@ -343,12 +355,12 @@ export default function HomePage() {
       ) : null}
 
       <aside className="home-note home-note-left" aria-hidden="true">
-        <strong>Pequenas ventas grandes historias</strong>
+        <strong>Pequeñas ventas, grandes historias</strong>
         <span />
-        <p>Tu esfuerzo tambien hace comunidad</p>
+        <p>Tu esfuerzo también hace comunidad</p>
       </aside>
       <aside className="home-note home-note-right" aria-hidden="true">
-        <strong>Buenas ventas!</strong>
+        <strong>¡Buenas ventas!</strong>
         <span />
       </aside>
     </main>

@@ -37,6 +37,7 @@ export const GET = withAuth(async (request) => {
         contenido: true,
         marca: { select: { nombre: true } },
         categoria: { select: { nombreCategoria: true } },
+        proveedores: { select: { nombre: true } },
         empaque_productos_empaqueToempaque: {
           select: { nombre_empaque: true },
         },

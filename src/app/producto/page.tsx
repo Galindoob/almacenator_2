@@ -167,7 +167,7 @@ function getProductContentLabel(producto: Producto) {
     return `${producto.contenido.toLocaleString("es-CL")} ${measure}`;
   }
 
-  return producto.descripcion || "Sin descripcion";
+  return producto.descripcion || "Sin descripción";
 }
 
 function getMovementReason(tipo: number) {
@@ -198,7 +198,7 @@ function getMovementReason(tipo: number) {
   }
 
   return {
-    label: "Eliminacion de stock",
+    label: "Eliminación de stock",
     icon: (
       <svg aria-hidden="true" viewBox="0 0 24 24">
         <path d="M4 7h16" />
@@ -882,19 +882,19 @@ export default function ProductoPage() {
     }
 
     if (usesNewBrand && brandAlreadyExists) {
-      setCreateMessage("La marca ingresada ya existe. Seleccionala desde la lista.");
+      setCreateMessage("La marca ingresada ya existe. Selecciónala desde la lista.");
       setCreateMessageType("error");
       return;
     }
 
     if (usesNewCategory && categoryAlreadyExists) {
-      setCreateMessage("La categoria ingresada ya existe. Seleccionala desde la lista.");
+      setCreateMessage("La categoría ingresada ya existe. Selecciónala desde la lista.");
       setCreateMessageType("error");
       return;
     }
 
     if (usesNewPackaging && packagingAlreadyExists) {
-      setCreateMessage("El empaque ingresado ya existe. Seleccionalo desde la lista.");
+      setCreateMessage("El empaque ingresado ya existe. Selecciónalo desde la lista.");
       setCreateMessageType("error");
       return;
     }
@@ -1522,7 +1522,7 @@ export default function ProductoPage() {
                             <span>Marca: {producto.marca.nombre}</span>
                             <span>{getProductContentLabel(producto)}</span>
                             <span>Tipo de venta: {producto.unidad.unidad}</span>
-                            <span>Categoria: {producto.categoria.nombreCategoria}</span>
+                            <span>Categoría: {producto.categoria.nombreCategoria}</span>
                             <span>
                               Tipo de empaque:{" "}
                               {producto.empaque_productos_empaqueToempaque
@@ -1586,7 +1586,7 @@ export default function ProductoPage() {
               <path d="M24 40H40" stroke="currentColor" strokeWidth="4" strokeLinecap="round" />
               <circle cx="53" cy="53" r="9" fill="currentColor" opacity="0.22" />
             </svg>
-            <p>Haz click en un producto o promo para revisar detalles</p>
+            <p>Selecciona un producto para revisar sus detalles.</p>
           </aside>
         )}
       </section>
@@ -1739,7 +1739,7 @@ function ExpiringProductsTable({
                         <span>Marca: {producto.marca.nombre}</span>
                         <span>{getProductContentLabel(producto)}</span>
                         <span>Tipo de venta: {producto.unidad.unidad}</span>
-                        <span>Categoria: {producto.categoria.nombreCategoria}</span>
+                        <span>Categoría: {producto.categoria.nombreCategoria}</span>
                         <span>
                           Tipo de empaque:{" "}
                           {producto.empaque_productos_empaqueToempaque
@@ -2090,7 +2090,7 @@ function ProductCreatePanel({
         </label>
 
         <label>
-          Descripcion
+          Descripción
           <textarea
             value={form.descripcion}
             onChange={(event) => onChange("descripcion", event.target.value)}
@@ -2126,7 +2126,7 @@ function ProductCreatePanel({
         ) : null}
 
         <label>
-          Codigo de barra
+          Código de barras
           <input
             type="text"
             value={form.codigoBarra}
@@ -2147,17 +2147,17 @@ function ProductCreatePanel({
         </label>
 
         <label className={isMissing("categoriaId") ? "is-invalid" : ""}>
-          Categoria <span className="required-mark">*</span>
+          Categoría <span className="required-mark">*</span>
           <SearchableSelect
             value={form.categoriaId}
-            placeholder="Selecciona una categoria"
-            searchPlaceholder="Buscar categoria"
+            placeholder="Selecciona una categoría"
+            searchPlaceholder="Buscar categoría"
             options={[
               ...options.categorias.map((categoria) => ({
                 value: categoria.id,
                 label: categoria.nombreCategoria ?? "",
               })),
-              { value: "new", label: "Agregar categoria" },
+              { value: "new", label: "Agregar categoría" },
             ]}
             onChange={(nextValue) => onChange("categoriaId", nextValue)}
           />
@@ -2165,7 +2165,7 @@ function ProductCreatePanel({
 
         {usesNewCategory ? (
           <label className={isMissing("categoriaNombre") ? "is-invalid" : ""}>
-            Nombre de categoria <span className="required-mark">*</span>
+            Nombre de categoría <span className="required-mark">*</span>
             <input
               type="text"
               value={form.categoriaNombre}
@@ -2220,11 +2220,11 @@ function ProductCreatePanel({
         </label>
 
         <label className={isMissing("unidadId") ? "is-invalid" : ""}>
-          Como se vende? <span className="required-mark">*</span>
+          ¿Cómo se vende? <span className="required-mark">*</span>
           <SearchableSelect
             value={form.unidadId}
-            placeholder="Selecciona una opcion"
-            searchPlaceholder="Buscar opcion"
+            placeholder="Selecciona una opción"
+            searchPlaceholder="Buscar opción"
             options={options.unidades.map((unidad) => ({
               value: unidad.id,
               label: unidad.unidad ?? "",
@@ -2418,7 +2418,7 @@ function ProductEditModal({
           </label>
 
           <label>
-            Descripcion
+            Descripción
             <textarea
               value={form.descripcion}
               onChange={(event) => onChange("descripcion", event.target.value)}
@@ -2440,7 +2440,7 @@ function ProductEditModal({
           </label>
 
           <label>
-            Codigo de barra
+            Código de barras
             <input
               type="text"
               value={form.codigoBarra}
@@ -2476,11 +2476,11 @@ function ProductEditModal({
           </div>
 
           <label className={isMissing("categoriaId") ? "is-invalid" : ""}>
-            Categoria <span className="required-mark">*</span>
+            Categoría <span className="required-mark">*</span>
             <SearchableSelect
               value={form.categoriaId}
-              placeholder="Selecciona una categoria"
-              searchPlaceholder="Buscar categoria"
+              placeholder="Selecciona una categoría"
+              searchPlaceholder="Buscar categoría"
               options={options.categorias.map((categoria) => ({
                 value: categoria.id,
                 label: categoria.nombreCategoria ?? "",
@@ -2521,11 +2521,11 @@ function ProductEditModal({
           </label>
 
           <label className={isMissing("unidadId") ? "is-invalid" : ""}>
-            Como se vende? <span className="required-mark">*</span>
+            ¿Cómo se vende? <span className="required-mark">*</span>
             <SearchableSelect
               value={form.unidadId}
-              placeholder="Selecciona una opcion"
-              searchPlaceholder="Buscar opcion"
+              placeholder="Selecciona una opción"
+              searchPlaceholder="Buscar opción"
               options={options.unidades.map((unidad) => ({
                 value: unidad.id,
                 label: unidad.unidad ?? "",
@@ -2673,9 +2673,9 @@ function ProductDetail({
               </svg>
             </button>
           </div>
-          <p>{product.descripcion || "Sin descripcion"}</p>
+          <p>{product.descripcion || "Sin descripción"}</p>
           <span>Marca: {product.marca.nombre}</span>
-          <span>Categoria: {product.categoria.nombreCategoria}</span>
+          <span>Categoría: {product.categoria.nombreCategoria}</span>
           <span>
             Tipo de empaque:{" "}
             {product.empaque_productos_empaqueToempaque?.nombre_empaque ??
@@ -3030,7 +3030,7 @@ function StockModalView({
           <>
             <h2>Agregar stock de {product.nombre}</h2>
             <p className="stock-lot-alert">
-              se asume que la cantidad ingresada es un lote y comparte fecha de
+              Se asume que la cantidad ingresada es un lote y comparte fecha de
               vencimiento
             </p>
             <label>
@@ -3113,7 +3113,7 @@ function StockModalView({
         {modal === "movements" ? (
           <>
             <h2>Movimiento de stock de {product.nombre}</h2>
-            {isLoadingMovements ? <p>Cargando movimientos...</p> : null}
+            {isLoadingMovements ? <CartLoader compact label="Cargando movimientos..." /> : null}
             {message ? <p className="stock-modal-message">{message}</p> : null}
             {!isLoadingMovements ? (
               <div className="stock-movements-wrap">

@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { FormEvent, useEffect, useState } from "react";
+import { CartLoader } from "../components/CartLoader";
 import {
   MIN_PASSWORD_LENGTH,
   passwordCharacterCount, registrationPasswordSchema,
@@ -28,7 +29,7 @@ export default function ResetPasswordPage() {
         setVerified(result.verified);
         setLoading(false);
       })
-      .catch(() => { if (!controller.signal.aborted) setError("No se pudo cargar la recuperación."); });
+      .catch(() => { if (!controller.signal.aborted) { setError("No se pudo cargar la recuperación."); setLoading(false); } });
     return () => controller.abort();
   }, [router]);
 
@@ -85,9 +86,9 @@ export default function ResetPasswordPage() {
   return (
     <section className="auth-shell">
       <div className="auth-panel">
-        <p className="auth-kicker">Mini Gest</p>
+        <p className="auth-kicker">MiniGest</p>
         <h1>Restablecer contraseña</h1>
-        {loading ? <p>Verificando solicitud...</p> : (
+        {loading ? <CartLoader compact label="Verificando solicitud..." /> : !maskedEmail && error ? null : (
           <>
             <p className="auth-reset-intro">Si existe una cuenta, enviamos un código a <strong>{maskedEmail}</strong>. Revisa tu correo; vence en 10 minutos.</p>
             {!verified ? (

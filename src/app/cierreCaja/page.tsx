@@ -2,8 +2,9 @@
 
 import { hasSessionHint } from "@/lib/client-session";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { CartLoader } from "../components/CartLoader";
+import { useAppDialog } from "../components/AppDialogProvider";
 import { useSyncRevision } from "../components/SyncProvider";
 
 type CashRegister = {
@@ -57,6 +58,7 @@ function chileDate(value: string) {
 }
 
 export default function CierreCajaPage() {
+  const showDialog = useAppDialog();
   const syncRevision = useSyncRevision();
   const router = useRouter();
   const [cashRegister, setCashRegister] = useState<CashRegister | null>(null);
@@ -68,6 +70,8 @@ export default function CierreCajaPage() {
   const [previewing, setPreviewing] = useState(false);
   const [voucher, setVoucher] = useState<Voucher | null>(null);
   const [cashUnavailable, setCashUnavailable] = useState(false);
+  const [cashUnavailableReason, setCashUnavailableReason] = useState("");
+  const pendingNoticeShown = useRef(false);
   const cashId = cashRegister?.id_apertura;
 
   useEffect(() => {
@@ -78,10 +82,10 @@ export default function CierreCajaPage() {
         const data = await response.json() as { abierta?: boolean; caja?: CashRegister; puedeCerrar?: boolean; ventasPendientes?: number; message?: string };
         if (!response.ok) throw new Error(data.message ?? "No se pudo cargar la caja.");
         if (!data.abierta || !data.caja) { router.replace("/home"); return; }
-        if (!data.puedeCerrar) { window.alert("Solo quien abrió la caja puede cerrarla."); router.replace("/home"); return; }
+        if (!data.puedeCerrar) { await showDialog({ title: "No se puede cerrar la caja", message: "Solo quien abrió la caja puede cerrarla.", tone: "warning" }); if (!controller.signal.aborted) router.replace("/home"); return; }
         if (data.ventasPendientes) {
-          window.alert(`Hay ${data.ventasPendientes} ${data.ventasPendientes === 1 ? "venta pendiente" : "ventas pendientes"}. Termínalas o elimínalas antes de cerrar la caja.`);
-          router.replace("/home");
+          await showDialog({ title: "Ventas pendientes", message: `Hay ${data.ventasPendientes} ${data.ventasPendientes === 1 ? "venta pendiente" : "ventas pendientes"}. Finalízalas o cancélalas antes de cerrar la caja.`, tone: "warning" });
+          if (!controller.signal.aborted) router.replace("/home");
           return;
         }
         setCashRegister(data.caja);
@@ -89,7 +93,7 @@ export default function CierreCajaPage() {
       .catch((error) => { if (!controller.signal.aborted) setMessage(error instanceof Error ? error.message : "No se pudo cargar la caja."); })
       .finally(() => { if (!controller.signal.aborted) setLoading(false); });
     return () => controller.abort();
-  }, [router]);
+  }, [router, showDialog]);
 
   useEffect(() => {
     if (!syncRevision || !cashId || closing) return;
@@ -100,16 +104,19 @@ export default function CierreCajaPage() {
         if (!data || controller.signal.aborted) return;
         if (!data.abierta || !data.caja || data.caja.id_apertura !== cashId || !data.puedeCerrar) {
           setCashUnavailable(true);
-          setMessage("La caja ya no está disponible para cerrar. Vuelve al inicio para consultar su estado.");
+          setCashUnavailableReason("La caja ya no está disponible para cerrar. Vuelve al inicio para consultar su estado.");
         } else {
           setCashRegister(data.caja);
           setCashUnavailable(Boolean(data.ventasPendientes));
-          if (data.ventasPendientes) setMessage("Hay ventas pendientes. Termínalas o elimínalas antes de cerrar la caja.");
-          else setMessage((current) => current.startsWith("Hay ventas pendientes.") ? "" : current);
+          setCashUnavailableReason(data.ventasPendientes ? "Hay ventas pendientes. Termínalas o elimínalas antes de cerrar la caja." : "");
+          if (data.ventasPendientes && !pendingNoticeShown.current) {
+            pendingNoticeShown.current = true;
+            void showDialog({ title: "Ventas pendientes", message: "No es posible cerrar la caja porque existen ventas pendientes. Finalízalas o cancélalas antes de continuar.", tone: "warning" });
+          } else if (!data.ventasPendientes) pendingNoticeShown.current = false;
         }
       }).catch(() => {});
     return () => controller.abort();
-  }, [syncRevision, cashId, closing]);
+  }, [syncRevision, cashId, closing, showDialog]);
 
   useEffect(() => {
     if (!voucher) return;
@@ -200,6 +207,7 @@ export default function CierreCajaPage() {
             }} />
           </label>
           {message ? <p role="alert">{message}</p> : null}
+          {cashUnavailableReason ? <p role="alert">{cashUnavailableReason}</p> : null}
           <div className="cash-close-buttons">
             <button type="button" disabled={cashOnHand === "" || previewing || closing || cashUnavailable} onClick={previewVoucher}>{previewing ? "Preparando..." : "Ver detalle voucher"}</button>
             <button type="button" disabled={cashOnHand === "" || closing || cashUnavailable} onClick={closeCashRegister}>{closing ? "Cerrando..." : "Cerrar caja"}</button>

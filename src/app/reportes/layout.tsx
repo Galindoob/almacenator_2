@@ -4,6 +4,7 @@ import { endSession, hasSessionHint } from "@/lib/client-session";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, type ReactNode } from "react";
 import { Navbar } from "../components/Navbar";
+import { CartLoader } from "../components/CartLoader";
 
 export default function ReportesLayout({ children }: { children: ReactNode }) {
   const router = useRouter();
@@ -55,7 +56,7 @@ export default function ReportesLayout({ children }: { children: ReactNode }) {
   if (!isSessionVerified) {
     return (
       <main className="reports-shell">
-        <p className="reports-verifying" role="status">Verificando sesión...</p>
+        <CartLoader screen label="Verificando sesión..." />
       </main>
     );
   }

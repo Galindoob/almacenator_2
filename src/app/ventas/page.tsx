@@ -8,6 +8,7 @@ import { ArrowLeft, ArrowLeftRight, Banknote, CreditCard, Wallet, Plus, Trash2, 
 import type { SaleCommand } from "@/lib/sales";
 import { Navbar } from "../components/Navbar";
 import { CartLoader } from "../components/CartLoader";
+import { useAppDialog } from "../components/AppDialogProvider";
 import { useAppearance } from "../components/AppearanceProvider";
 import { isSafeAppInput } from "@/lib/input-validation";
 import { roundCashAmount } from "@/lib/cash-rounding";
@@ -220,7 +221,7 @@ function ProductDetails({ product }: { product: Producto }) {
         </div>
       ) : null}
       <div>
-        <dt>Categoria</dt>
+        <dt>Categoría</dt>
         <dd>{product.categoria.nombreCategoria}</dd>
       </div>
     </dl>
@@ -228,6 +229,7 @@ function ProductDetails({ product }: { product: Producto }) {
 }
 
 export default function SalesPage() {
+  const showDialog = useAppDialog();
   const syncRevision = useSyncRevision();
   const router = useRouter();
   const { storeName } = useAppearance();
@@ -477,7 +479,7 @@ export default function SalesPage() {
       // A failed catalogue refresh must not turn a successful payment into a retry.
       await refreshInventory().catch(() => undefined);
     } catch (err) {
-      setOperationError(err instanceof Error ? err.message : "No se pudo conectar. Reintenta la operacion.");
+      setOperationError(err instanceof Error ? err.message : "No se pudo conectar. Reintenta la operación.");
     } finally {
       busyRef.current = false;
       setBusy(false);
@@ -494,9 +496,9 @@ export default function SalesPage() {
     }
   }
 
-  function cancelSale() {
+  async function cancelSale() {
     if (!activeSale || locked || busyRef.current) return;
-    if (window.confirm(`¿Eliminar la venta ${activeSale.num_venta}? Se liberara todo su stock reservado.`)) {
+    if (await showDialog({ title: "Eliminar venta", message: `¿Eliminar la venta ${activeSale.num_venta}? Se liberará todo su stock reservado.`, tone: "warning", confirm: true, confirmLabel: "Eliminar venta" })) {
       void mutate({ action: "cancel", saleId: activeSale.id_venta, revision: activeSale.revision });
     }
   }
@@ -824,7 +826,7 @@ export default function SalesPage() {
               <h1>{completedSale ? "Venta completada" : "Carrito"}</h1>
             </div>
             <button className="sales-action" type="button" disabled={busy || isLoading || sales.length >= 5 || !activeSale}
-              onClick={() => selectSale(null)} title={sales.length >= 5 ? "Limite de cinco ventas pendientes" : "Nueva venta"}>
+              onClick={() => selectSale(null)} title={sales.length >= 5 ? "Límite de cinco ventas pendientes" : "Nueva venta"}>
               <Plus aria-hidden="true" /> Nueva venta
             </button>
             <button className="sales-action sales-delete" type="button" onClick={cancelSale} disabled={busy || locked || !activeSale}
@@ -899,7 +901,7 @@ export default function SalesPage() {
               <span className="sales-complete-icon"><CheckCircle aria-hidden="true" /></span>
               <div className="sales-complete-message">
                 <h2>¡Cobro exitoso!</h2>
-                <p>Sólo puedes emitir un Recibo No válido como Boleta</p>
+                <p>Solo puedes emitir un recibo no válido como boleta.</p>
               </div>
               <div className="sales-complete-actions">
                 <button type="button" className="is-primary" onClick={printCompletedReceipt} disabled={!completedSale.recibo}>
@@ -914,7 +916,7 @@ export default function SalesPage() {
           ) : showPaymentDetails ? (
             <>
               <header className="sales-payment-heading">
-                <button type="button" disabled={busy} onClick={() => selectedMethod ? setSelectedPaymentMethodId(null) : setRightPanel("catalog")} aria-label={selectedMethod ? "Cambiar metodo de pago" : "Volver a productos"} title="Volver">
+                <button type="button" disabled={busy} onClick={() => selectedMethod ? setSelectedPaymentMethodId(null) : setRightPanel("catalog")} aria-label={selectedMethod ? "Cambiar método de pago" : "Volver a productos"} title="Volver">
                   <ArrowLeft aria-hidden="true" />
                 </button>
                 <h2>{selectedMethod ? "Cambiar método de pago" : "Detalle del carrito"}</h2>
@@ -958,7 +960,7 @@ export default function SalesPage() {
                   <h3>Método de pago</h3>
                 </div>
                 {paymentMethodsLoading ? (
-                  <p className="sales-payment-status" role="status">Cargando métodos de pago...</p>
+                  <CartLoader compact label="Cargando métodos de pago..." />
                 ) : paymentMethodsError ? (
                   <p className="sales-payment-status is-error" role="alert">{paymentMethodsError}</p>
                 ) : paymentMethods.length === 0 ? (
@@ -1027,7 +1029,7 @@ export default function SalesPage() {
                       className={`sales-view-card${cartQuantity !== null ? " is-in-cart" : ""}`}
                       onClick={() => addToCart(product)}
                       disabled={isMaxed || busy || locked || isLoading || (!activeSale && sales.length >= 5)}
-                      title={isMaxed ? "Stock maximo agregado al carrito" : "Agregar al carrito"}
+                      title={isMaxed ? "Stock máximo agregado al carrito" : "Agregar al carrito"}
                     >
                       <span className="sales-view-card-image">
                         {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -1127,7 +1129,7 @@ function CartRow({
                 onClick={onIncrement}
                 disabled={disabled || item.quantity >= product.stock}
                 aria-label="Aumentar cantidad"
-                title={item.quantity >= product.stock ? "Stock maximo alcanzado" : "Aumentar cantidad"}
+                title={item.quantity >= product.stock ? "Stock máximo alcanzado" : "Aumentar cantidad"}
               >
                 +
               </button>

@@ -1,4 +1,5 @@
 "use client";
+import { CartLoader } from "./CartLoader";
 
 import { Fragment, useCallback, useEffect, useRef, useState, type FormEvent } from "react";
 import { useSyncRevision } from "./SyncProvider";
@@ -55,7 +56,7 @@ export function FinanceSettings() {
     <header className="settings-heading"><h1>Finanzas</h1><p>Consulta el capital, las aperturas y las ventas realizadas.</p></header>
     {error && <p className="finance-error" role="alert">{error}</p>}
     {notice && <p className="finance-notice" role="status">{notice}</p>}
-    {!data ? !error && <p role="status">Cargando finanzas...</p> : <>
+    {!data ? !error && <CartLoader compact label="Cargando finanzas..." /> : <>
       <div className="finance-summary"><article><span>Aperturas de caja</span><strong>{data.cajas.length}</strong></article><article><span>Valor real de la última caja</span><strong>{data.cajas.length ? money(data.cajas[0].valor_real) : "—"}</strong><small>{data.abierta ? "Caja abierta: el saldo esperado refleja los movimientos de la sesión." : "Caja cerrada"}</small></article></div>
       <section className="finance-panel"><h2>Administrar capital de caja</h2>
         {!data.puedeEditar ? <p>No tienes permiso para modificar el capital.</p> : data.abierta ? <p>Cierra la caja para ingresar o retirar capital.</p> : !data.cajas.length ? <p>Debe existir una caja cerrada para registrar movimientos.</p> : <form className="finance-form" onSubmit={submit}>

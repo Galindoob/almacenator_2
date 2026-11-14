@@ -1,4 +1,5 @@
 "use client";
+import { CartLoader } from "../components/CartLoader";
 
 import Link from "next/link";
 import { Suspense, useEffect, useMemo, useState } from "react";
@@ -196,12 +197,13 @@ function CreatePromotionForm() {
   return (
     <section className="promotion-create-content">
       <header className="promotion-create-heading"><Link href="/promociones" aria-label="Volver a promociones">←</Link><h1>{editId ? "Editar promoción" : "Nueva promoción"}</h1></header>
+      {loading ? <CartLoader compact label="Cargando promoción..." /> : null}
       <form className="promotion-create-form" onSubmit={createPromotion}>
         <h2>{editId ? "Editar promoción" : "Crear una promoción"}</h2>
         <fieldset className="promotion-kind-picker"><legend>¿Qué tipo de promo deseas crear?</legend>
           {(["descuento", "yapa", "combo"] as const).map((option) => <button key={option} type="button" className={kind === option ? "is-selected" : ""} aria-pressed={kind === option} onClick={() => selectKind(option)}>{option === "yapa" ? "Yapa (compra y recibe gratis)" : option.charAt(0).toUpperCase() + option.slice(1)}</button>)}
         </fieldset>
-        <div className="promotion-product-select"><div><strong>{kind === "combo" || editId ? "Selecciona un producto" : "Selecciona el o los productos"}</strong><span>{selectedProducts.length ? selectedProducts.map((product) => product.nombre).join(", ") : "Ningún producto seleccionado"}</span></div><button type="button" onClick={() => setModalOpen(true)}>{kind === "combo" || editId ? "Elegir producto" : "Elegir productos"}</button></div>
+        <div className="promotion-product-select"><div><strong>{kind === "combo" || editId ? "Selecciona un producto" : "Selecciona el o los productos"}</strong><span>{selectedProducts.length ? selectedProducts.map((product) => product.nombre).join(", ") : "Ningún producto seleccionado"}</span></div><button type="button" disabled={loading} onClick={() => setModalOpen(true)}>{kind === "combo" || editId ? "Elegir producto" : "Elegir productos"}</button></div>
         <div className="promotion-parameters">
           {kind === "descuento" ? <label>Porcentaje de descuento<input type="number" min="1" max="100" value={discount} onChange={(event) => updateNumber(setDiscount, event.target.value)} required/><span>%</span></label> : null}
           {kind === "yapa" ? <><label>Unidades que lleva<input type="number" min="1" value={take} onChange={(event) => updateNumber(setTake, event.target.value)} required/></label><span className="promotion-times">+</span><label>Unidades de regalo<input type="number" min="1" value={gift} onChange={(event) => updateNumber(setGift, event.target.value)} required/></label></> : null}
@@ -247,5 +249,5 @@ function CreatePromotionForm() {
 }
 
 export default function CreatePromotionPage() {
-  return <Suspense fallback={<section className="promotion-create-content"><p role="status">Cargando formulario...</p></section>}><CreatePromotionForm /></Suspense>;
+  return <Suspense fallback={<section className="promotion-create-content"><CartLoader label="Cargando formulario..." /></section>}><CreatePromotionForm /></Suspense>;
 }

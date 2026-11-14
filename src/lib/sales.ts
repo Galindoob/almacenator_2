@@ -40,7 +40,7 @@ async function readSale(tx: Tx, id: string) {
 
 function validMoney(value: number) {
   if (!Number.isSafeInteger(value) || value < 0 || value > 2147483647) {
-    throw new SaleError("El monto supera el limite permitido.", 400);
+    throw new SaleError("El monto supera el límite permitido.", 400);
   }
   return value;
 }
@@ -51,9 +51,9 @@ export function calculatePayment(total: number, alreadyPaid: number, amount: num
   const due = rounded.total;
   if (!Number.isSafeInteger(amount) || originalDue < 0 || amount < 0 ||
       (amount === 0 && due > 0) || (!cash && amount !== due)) {
-    throw new SaleError("El monto del cobro no es valido.", 400);
+    throw new SaleError("El monto del cobro no es válido.", 400);
   }
-  if (cash && amount % 10 !== 0) throw new SaleError("Monto ingresado debe terminar en 0.", 400);
+  if (cash && amount % 10 !== 0) throw new SaleError("El monto ingresado debe terminar en 0.", 400);
   if (amount > due && (!cash || !onlyCash)) {
     throw new SaleError("Esta venta no admite un pago mayor al saldo pendiente.", 400);
   }
@@ -131,7 +131,7 @@ export async function executeSaleCommand(tx: Tx, userId: string, command: SaleCo
   if (command.action === "create") {
     const replay = await tx.venta.findUnique({ where: { clave_cliente: command.key } });
     if (replay) {
-      if (replay.id_vendedor !== userId) throw new SaleError("Operacion no disponible.");
+      if (replay.id_vendedor !== userId) throw new SaleError("Operación no disponible.");
       return readSale(tx, replay.id_venta);
     }
     if (await tx.venta.count({ where: { id_vendedor: userId, id_apertura_caja: openCashRegister.id_apertura, estado: "pendiente" } }) >= 5) {
@@ -152,12 +152,12 @@ export async function executeSaleCommand(tx: Tx, userId: string, command: SaleCo
     const replay = await tx.pagos.findUnique({ where: { clave_operacion: command.key } });
     if (replay) {
       if (replay.id_venta !== sale.id_venta || replay.id_medio_pago !== command.methodId ||
-          (command.amount !== undefined && replay.pago !== command.amount)) throw new SaleError("Operacion duplicada con datos diferentes.");
+          (command.amount !== undefined && replay.pago !== command.amount)) throw new SaleError("Operación duplicada con datos diferentes.");
       return readSale(tx, sale.id_venta);
     }
   }
-  if (sale.estado !== "pendiente") throw new SaleError("La venta ya esta cerrada.");
-  if (sale.revision !== command.revision) throw new SaleError("La venta cambio en otra ventana. Se actualizaran sus datos; revisalos antes de continuar.");
+  if (sale.estado !== "pendiente") throw new SaleError("La venta ya está cerrada.");
+  if (sale.revision !== command.revision) throw new SaleError("La venta cambió en otra ventana. Se actualizarán sus datos; revísalos antes de continuar.");
   if (command.action !== "pay" && sale.pagos.length) throw new SaleError("No puedes modificar ni eliminar una venta con pagos registrados.");
 
   if (command.action === "item") {
@@ -176,7 +176,7 @@ export async function executeSaleCommand(tx: Tx, userId: string, command: SaleCo
   }
 
   const method = await tx.medio_pago.findUnique({ where: { id_medio: command.methodId } });
-  if (!method) throw new SaleError("Metodo de pago no encontrado.", 400);
+  if (!method) throw new SaleError("Método de pago no encontrado.", 400);
   const total = validMoney(sale.detalles.reduce((sum, d) => sum + d.subtotal_venta, 0));
   const paid = sale.pagos.reduce((sum, p) => sum + p.pago, 0);
   const cash = method.medio_de_pago.toLowerCase().trim() === "efectivo";

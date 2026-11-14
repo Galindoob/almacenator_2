@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState, type FormEvent } from "react";
 import { Check, KeyRound, Maximize2, Minimize2, Moon, Settings2, Sun, UserRound, X } from "lucide-react";
 import { Navbar } from "../components/Navbar";
+import { CartLoader } from "../components/CartLoader";
 import { usePermissions } from "../components/usePermissions";
 import { useSyncRevision } from "../components/SyncProvider";
 import { FinanceSettings } from "../components/FinanceSettings";
@@ -179,9 +180,7 @@ export default function ConfiguracionPage() {
   if (!isSessionVerified) {
     return (
       <main className="settings-shell">
-        <p className="price-lookup-feedback" role="status" aria-live="polite">
-          Verificando sesión...
-        </p>
+        <CartLoader screen label="Verificando sesión..." />
       </main>
     );
   }
@@ -519,7 +518,7 @@ function ProfileSettings() {
         <p>Datos y actividad de tu cuenta.</p>
       </header>
       {error ? <p className="settings-save-error" role="alert">{error}</p> : null}
-      {!profile && !error ? <p role="status">Cargando perfil...</p> : null}
+      {!profile && !error ? <CartLoader compact label="Cargando perfil..." /> : null}
       {profile ? (
         <form className="settings-profile" aria-label="Datos del usuario conectado" onSubmit={saveProfile}>
           <div className="settings-profile-header">
@@ -648,6 +647,7 @@ function StoreSettings() {
         <p>Selecciona un rol para consultar sus permisos guardados.</p>
         {error ? <p className="settings-save-error" role="alert">{error}</p> : null}
         {success ? <p className="settings-save-success" role="status">{success}</p> : null}
+        {!roles && !error ? <CartLoader compact label="Cargando roles y permisos..." /> : null}
         <label className="settings-permissions-role">Rol
           <select value={selectedRoleId} onChange={(event) => { setSelectedPermissions(savedPermissions); setSelectedRoleId(event.target.value); setError(""); setSuccess(""); }} disabled={!roles || saving}>
             <option value="">Selecciona un rol</option>
@@ -770,7 +770,7 @@ function UsersSettings() {
       </header>
       {error ? <p className="settings-save-error" role="alert">{error}</p> : null}
       {success ? <p className="settings-save-success" role="status">{success}</p> : null}
-      {!users && !error ? <p role="status">Cargando usuarios...</p> : null}
+      {!users && !error ? <CartLoader compact label="Cargando usuarios..." /> : null}
       {users ? (
         <>
           <div className="settings-users-summary">
@@ -982,7 +982,7 @@ function CompanySettings({ onSaved }: { onSaved: (name: string) => void }) {
           </div>
         </form>
       ) : !error ? (
-        <p className="settings-company-loading" role="status">Cargando datos de empresa...</p>
+        <CartLoader compact label="Cargando datos de empresa..." />
       ) : null}
       {error ? <p className="settings-save-error" role="alert">{error}</p> : null}
       {success ? <p className="settings-save-success" role="status">{success}</p> : null}

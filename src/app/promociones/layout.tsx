@@ -4,6 +4,7 @@ import { endSession, hasSessionHint } from "@/lib/client-session";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, type ReactNode } from "react";
 import { Navbar } from "../components/Navbar";
+import { CartLoader } from "../components/CartLoader";
 
 export default function PromotionsLayout({ children }: { children: ReactNode }) {
   const router = useRouter();
@@ -73,6 +74,6 @@ export default function PromotionsLayout({ children }: { children: ReactNode }) 
     router.replace("/login");
   }
 
-  if (!verified) return <main className="promotions-shell"><p role="status">{verificationError ? "No se pudo verificar la sesión. Recarga la página para reintentar." : "Verificando sesión..."}</p></main>;
+  if (!verified) return <main className="promotions-shell">{verificationError ? <p role="alert">No se pudo verificar la sesión. Recarga la página para reintentar.</p> : <CartLoader screen label="Verificando sesión..." />}</main>;
   return <main className="promotions-shell"><Navbar onLogout={logout} compact showProductTabs activeProductTab="promociones" showExpiringAlert={showExpiringAlert} showLogout={false} />{children}</main>;
 }

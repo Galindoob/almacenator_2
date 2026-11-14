@@ -172,7 +172,7 @@ export function Navbar({
         <button
           type="button"
           className="hamburger-button"
-          aria-label="Abrir menu lateral"
+          aria-label="Abrir menú lateral"
           aria-controls={menuId}
           aria-expanded={isMenuOpen}
           onClick={() => setIsMenuOpen(true)}
@@ -188,12 +188,12 @@ export function Navbar({
           </span>
           <span>
             <strong>{storeName || "nombre_tienda"}</strong>
-            <small>Tu negocio, mas simple</small>
+            <small>Tu negocio, más simple</small>
           </span>
         </button>
 
         {showProductTabs ? (
-          <nav className="navbar-product-tabs" aria-label="Gestion de producto">
+          <nav className="navbar-product-tabs" aria-label="Gestión de productos">
             <button
               type="button"
               className={activeProductTab === "productos" ? "is-active" : ""}
@@ -271,7 +271,7 @@ export function Navbar({
         {showLogout && onLogout ? (
           <button type="button" className="navbar-logout" onClick={handleLogout}>
             <LogoutIcon />
-            Cerrar sesion
+            Cerrar sesión
           </button>
         ) : null}
       </header>
@@ -281,7 +281,7 @@ export function Navbar({
           <button
             type="button"
             className="side-menu-backdrop"
-            aria-label="Cerrar menu lateral"
+            aria-label="Cerrar menú lateral"
             onClick={() => setIsMenuOpen(false)}
           />
 
@@ -289,15 +289,15 @@ export function Navbar({
             id={menuId}
             className="side-menu"
             role="dialog"
-            aria-label="Menu lateral"
+            aria-label="Menú lateral"
             aria-modal="true"
           >
             <div className="side-menu-header">
-              <strong>Mini Gest</strong>
+              <strong>MiniGest</strong>
               <button
                 type="button"
                 className="side-menu-close"
-                aria-label="Cerrar menu lateral"
+                aria-label="Cerrar menú lateral"
                 onClick={() => setIsMenuOpen(false)}
               >
                 x
@@ -314,7 +314,7 @@ export function Navbar({
                 aria-expanded={isProductsOpen}
                 onClick={() => setIsProductsOpen((value) => !value)}
               >
-                Gestion de producto
+                Gestión de productos
               </button> : null}
 
               {isProductsOpen ? (

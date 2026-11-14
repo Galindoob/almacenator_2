@@ -209,7 +209,7 @@ export function AuthForm({ mode }: AuthFormProps) {
   return (
     <section className="auth-shell">
       <div className="auth-panel">
-        <p className="auth-kicker">Mini Gest</p>
+        <p className="auth-kicker">MiniGest</p>
         <h1>{isRegister ? "Registro" : "Iniciar sesión"}</h1>
 
         {isRegister ? (

@@ -211,7 +211,7 @@ export default function TransaccionesPage() {
   if (!isSessionVerified) {
     return (
       <main className="transactions-shell">
-        <p className="transactions-verifying" role="status">Verificando sesión...</p>
+        <CartLoader screen label="Verificando sesión..." />
       </main>
     );
   }

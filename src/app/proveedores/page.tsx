@@ -298,7 +298,7 @@ export default function ProvidersPage() {
     }
 
     if (email && !emailPattern.test(email)) {
-      setCreateMessage("Ingresa un correo con formato valido.");
+      setCreateMessage("Ingresa un correo con formato válido.");
       return;
     }
 
@@ -585,7 +585,7 @@ export default function ProvidersPage() {
     }
 
     if (email && !emailPattern.test(email)) {
-      setMessage("Ingresa un correo con formato valido.");
+      setMessage("Ingresa un correo con formato válido.");
       return;
     }
 
@@ -890,7 +890,7 @@ export default function ProvidersPage() {
               <label>
                 <span className="provider-field-label">
                   <FieldIcon name="phone" />
-                  Telefono
+                  Teléfono
                 </span>
                 <input
                   type="text"
@@ -916,7 +916,7 @@ export default function ProvidersPage() {
                   }
                 />
                 {submitted && emailIsInvalid ? (
-                  <small>Ingresa un correo con formato valido.</small>
+                  <small>Ingresa un correo con formato válido.</small>
                 ) : null}
               </label>
 
@@ -1016,7 +1016,7 @@ export default function ProvidersPage() {
               <label>
                 <span className="provider-field-label">
                   <FieldIcon name="phone" />
-                  Telefono
+                  Teléfono
                 </span>
                 <input
                   type="text"
@@ -1046,7 +1046,7 @@ export default function ProvidersPage() {
                   }
                 />
                 {createSubmitted && createEmailIsInvalid ? (
-                  <small>Ingresa un correo con formato valido.</small>
+                  <small>Ingresa un correo con formato válido.</small>
                 ) : null}
               </label>
 
@@ -1222,7 +1222,7 @@ export default function ProvidersPage() {
                     </div>
                   ))}
                   {managedProducts.assigned.length === 0 ? (
-                    <p>Suelta productos aqui.</p>
+                    <p>Suelta productos aquí.</p>
                   ) : null}
                 </div>
               </section>

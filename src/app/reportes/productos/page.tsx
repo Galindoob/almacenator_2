@@ -103,6 +103,7 @@ export default function ReporteProductosPage() {
         </aside>
         <div className="product-report-main">
           {loading && !report ? <div className="product-report-panel product-report-wait"><CartLoader label="Cargando datos de ventas..." /></div> : null}
+          {loading && report ? <CartLoader compact label="Actualizando reporte..." /> : null}
           {!loading && !selected ? <div className="product-report-panel product-report-wait">Agrega un producto para comenzar a analizar ventas.</div> : null}
           {selected ? <>
             <div className="product-report-selected"><div><span>Producto seleccionado</span><h2>{selected.nombre}</h2><p>{selected.marca.nombre} · {selected.categoria.nombreCategoria} · {selected.unidad.unidad}{selected.contenido && selected.unidad_medida_productos_unidad_medidaTounidad_medida ? ` · ${selected.contenido} ${selected.unidad_medida_productos_unidad_medidaTounidad_medida.nombre}` : ""}</p></div><span className="product-report-period">{monthName(month)} {month.slice(0, 4)}</span></div>

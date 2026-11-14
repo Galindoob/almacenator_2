@@ -7,8 +7,6 @@ export function CashRoundingNotice({ adjustment }: { adjustment: number }) {
   const dialog = useRef<HTMLDialogElement>(null);
   const label = `Redondeo aplicado: $${adjustment > 0 ? "+" : ""}${adjustment}`;
 
-  if (adjustment === 0) return null;
-
   return (
     <>
       <div className="sales-rounding-notice">

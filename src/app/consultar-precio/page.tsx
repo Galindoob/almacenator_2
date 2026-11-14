@@ -4,6 +4,7 @@ import { endSession, hasSessionHint } from "@/lib/client-session";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Navbar } from "../components/Navbar";
+import { CartLoader } from "../components/CartLoader";
 import { useBarcodeScanner } from "../components/useBarcodeScanner";
 import { useSyncRevision } from "../components/SyncProvider";
 import { isSafeAppInput } from "@/lib/input-validation";
@@ -18,6 +19,7 @@ type PriceProduct = {
   contenido: number | null;
   marca: { nombre: string };
   categoria: { nombreCategoria: string };
+  proveedores: { nombre: string } | null;
   empaque_productos_empaqueToempaque: { nombre_empaque: string } | null;
   unidad_medida_productos_unidad_medidaTounidad_medida: { nombre: string } | null;
 };
@@ -120,6 +122,7 @@ export default function ConsultarPrecioPage() {
           productos?: PriceProduct[];
         };
 
+        if (controller.signal.aborted) return;
         if (!response.ok || data.status !== "ok") {
           if (response.status === 401) {
             void endSession();
@@ -165,9 +168,7 @@ export default function ConsultarPrecioPage() {
   if (!isSessionVerified) {
     return (
       <main className="price-lookup-shell">
-        <p className="price-lookup-feedback" role="status" aria-live="polite">
-          Verificando sesión...
-        </p>
+        <CartLoader screen label="Verificando sesión..." />
       </main>
     );
   }
@@ -219,7 +220,7 @@ export default function ConsultarPrecioPage() {
           </button>
         </form>
 
-        {isLoading ? <p className="price-lookup-feedback">Buscando productos...</p> : null}
+        {isLoading ? <CartLoader compact label="Buscando productos..." /> : null}
         {error ? <p className="price-lookup-error">{error}</p> : null}
         {!isLoading && !error && query && products.length === 0 ? (
           <p className="price-lookup-feedback">No se encontraron productos.</p>
@@ -266,6 +267,9 @@ export default function ConsultarPrecioPage() {
                 ]
                   .filter(Boolean)
                   .join(" | ")}
+              </p>
+              <p className="price-lookup-product-data">
+                Proveedor: {selectedProduct.proveedores?.nombre ?? "Sin proveedor asignado"}
               </p>
               {selectedProduct.codigoBarra ? (
                 <span className="price-lookup-barcode">
