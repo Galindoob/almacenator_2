@@ -101,6 +101,7 @@ export const UserScalarFieldEnum = {
   nombre: 'nombre',
   apellido: 'apellido',
   contrasena: 'contrasena',
+  activo: 'activo',
   roleid: 'roleid',
   correo: 'correo',
   fono: 'fono',
@@ -135,7 +136,10 @@ export const EmpresaScalarFieldEnum = {
   email: 'email',
   telefono: 'telefono',
   direccion: 'direccion',
-  comuna: 'comuna'
+  comuna: 'comuna',
+  atajoBuscar: 'atajoBuscar',
+  atajoEfectivo: 'atajoEfectivo',
+  atajoDebito: 'atajoDebito'
 } as const
 
 export type EmpresaScalarFieldEnum = (typeof EmpresaScalarFieldEnum)[keyof typeof EmpresaScalarFieldEnum]

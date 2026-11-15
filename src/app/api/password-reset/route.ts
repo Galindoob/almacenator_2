@@ -56,7 +56,7 @@ export async function POST(request: NextRequest) {
       return error("El envío de correos aún no está configurado.", 503);
     }
     const email = parsed.data.email;
-    const user = await prisma.user.findUnique({ where: { correo: email }, select: { id: true } });
+    const user = await prisma.user.findFirst({ where: { correo: email, activo: true }, select: { id: true } });
     let id: string = randomUUID();
     if (user) {
       const hourAgo = new Date(Date.now() - 60 * 60 * 1000);
@@ -94,8 +94,8 @@ export async function POST(request: NextRequest) {
 
   const intent = intentFrom(request);
   if (!intent) return error("La solicitud de recuperación expiró. Vuelve al inicio de sesión.", 401);
-  const reset = await prisma.passwordReset.findUnique({ where: { id: intent.id }, include: { user: { select: { correo: true } } } });
-  if (!reset || reset.user.correo !== intent.email || reset.usedAt || reset.expiresAt <= new Date()) {
+  const reset = await prisma.passwordReset.findUnique({ where: { id: intent.id }, include: { user: { select: { correo: true, activo: true } } } });
+  if (!reset || !reset.user.activo || reset.user.correo !== intent.email || reset.usedAt || reset.expiresAt <= new Date()) {
     return error("El código expiró o no es válido.", 400);
   }
 

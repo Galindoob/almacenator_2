@@ -18,6 +18,10 @@ import { isSafeAppInput } from "@/lib/input-validation";
 import { formatRut, rutSchema } from "@/lib/rut";
 import { accountChangeSchema } from "@/lib/account-validation";
 import { MIN_PASSWORD_LENGTH, passwordCharacterCount } from "@/lib/auth-validation";
+import { saleShortcutsSchema, shortcutKeys, type SaleShortcuts } from "@/lib/sale-shortcuts";
+import { readApiJson } from "@/lib/api-response";
+import { useAppDialog } from "../components/AppDialogProvider";
+import { canDeactivateAccount } from "@/lib/user-management";
 
 const themes: { id: ColorTheme; label: string; color: string }[] = [
   { id: "green", label: "Verde", color: "#008b76" },
@@ -269,6 +273,7 @@ export default function ConfiguracionPage() {
                 <h1>Preferencias</h1>
               </header>
               <AccountSettings />
+              <SaleShortcutSettings />
               <AppearanceSettings
                 key={`${colorTheme}-${fontScale}-${interfaceScale}-${highContrast}-${darkMode}`}
                 preferences={{ colorTheme, fontScale, interfaceScale, storeName, highContrast, darkMode }}
@@ -282,6 +287,58 @@ export default function ConfiguracionPage() {
       </section>
     </main>
   );
+}
+
+function SaleShortcutSettings() {
+  const syncRevision = useSyncRevision();
+  const [saved, setSaved] = useState<SaleShortcuts | null>(null);
+  const [draft, setDraft] = useState<SaleShortcuts | null>(null);
+  const [canEdit, setCanEdit] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+  const dirty = JSON.stringify(draft) !== JSON.stringify(saved);
+  const duplicate = draft !== null && !saleShortcutsSchema.safeParse(draft).success;
+
+  useEffect(() => {
+    if (dirty || saving) return;
+    const controller = new AbortController();
+    fetch("/api/configuracion/atajos", { cache: "no-store", signal: controller.signal })
+      .then(async (response) => {
+        const data = await readApiJson(response) as { shortcuts?: SaleShortcuts; canEdit?: boolean; message?: string };
+        if (!response.ok || !data.shortcuts) throw new Error(data.message ?? "No se pudieron cargar los atajos.");
+        if (controller.signal.aborted) return;
+        setSaved(data.shortcuts); setDraft(data.shortcuts); setCanEdit(Boolean(data.canEdit)); setError("");
+      })
+      .catch((reason: unknown) => { if (!controller.signal.aborted) setError(reason instanceof Error ? reason.message : "No se pudieron cargar los atajos."); });
+    return () => controller.abort();
+  }, [syncRevision, dirty, saving]);
+
+  async function save() {
+    if (!draft || !canEdit || saving || duplicate) return;
+    setSaving(true); setError(""); setSuccess("");
+    try {
+      const response = await fetch("/api/configuracion/atajos", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify(draft) });
+      const data = await readApiJson(response) as { shortcuts?: SaleShortcuts; message?: string };
+      if (!response.ok || !data.shortcuts) throw new Error(data.message ?? "No se pudieron guardar los atajos.");
+      setSaved(data.shortcuts); setDraft(data.shortcuts); setSuccess(data.message ?? "Atajos guardados correctamente.");
+    } catch (reason) { setError(reason instanceof Error ? reason.message : "No se pudieron guardar los atajos."); }
+    finally { setSaving(false); }
+  }
+
+  const fields = [{ key: "buscar", label: "Buscar producto" }, { key: "efectivo", label: "Cobro en efectivo" }, { key: "debito", label: "Cobro con débito" }] as const;
+  return <section className="settings-section sale-shortcuts" aria-labelledby="sale-shortcuts-title">
+    <div className="settings-section-heading"><div><h2 id="sale-shortcuts-title">Teclas de acceso rápido para ventas</h2><p>Estas teclas se comparten con todos los usuarios de la tienda.</p></div></div>
+    {!draft && !error ? <CartLoader compact label="Cargando atajos..." /> : null}
+    {draft ? <><div className="sale-shortcuts-grid">{fields.map(({ key, label }) => <label key={key}>{label}<select value={draft[key]} disabled={!canEdit || saving} onChange={(event) => { setDraft({ ...draft, [key]: event.target.value as SaleShortcuts[typeof key] }); setSuccess(""); setError(""); }}>
+      {shortcutKeys.map((shortcut) => <option key={shortcut} value={shortcut}>{shortcut}</option>)}
+    </select></label>)}</div>
+    <p className="sale-shortcuts-note">{canEdit ? "Elige una tecla diferente para cada acción. Los cambios se aplican a toda la tienda." : "Solo admin y master pueden cambiar estos atajos."}</p>
+    {duplicate ? <p className="settings-save-error" role="alert">Cada acción debe tener una tecla diferente.</p> : null}
+    {canEdit ? <div className="settings-company-actions"><button type="button" disabled={!dirty || saving} onClick={() => { setDraft(saved); setError(""); setSuccess(""); }}>Cancelar</button><button type="button" className="settings-save-button" disabled={!dirty || saving || duplicate} onClick={() => void save()}>{saving ? "Guardando..." : "Guardar atajos"}</button></div> : null}</> : null}
+    {error ? <p className="settings-save-error" role="alert">{error}</p> : null}
+    {success ? <p className="settings-save-success" role="status">{success}</p> : null}
+  </section>;
 }
 
 function AccountSettings() {
@@ -303,7 +360,7 @@ function AccountSettings() {
     const controller = new AbortController();
     fetch("/api/configuracion/cuenta", { cache: "no-store", signal: controller.signal })
       .then(async (response) => {
-        const data = await response.json() as { user?: { nombre: string }; message?: string };
+        const data = await readApiJson(response) as { user?: { nombre: string }; message?: string };
         if (!response.ok || !data.user) throw new Error(data.message ?? "No se pudo cargar tu cuenta.");
         setSavedName(data.user.nombre);
         setName(data.user.nombre);
@@ -370,7 +427,7 @@ function AccountSettings() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(parsed.data),
       });
-      const data = await response.json() as { message?: string; user?: { nombre: string } };
+      const data = await readApiJson(response) as { message?: string; user?: { nombre: string } };
       if (!response.ok || !data.user) throw new Error(data.message ?? "No se pudo actualizar la cuenta.");
       setSavedName(data.user.nombre);
       setName(data.user.nombre);
@@ -461,7 +518,7 @@ function ProfileSettings() {
 
     fetch("/api/configuracion/perfil", { cache: "no-store", signal: controller.signal })
       .then(async (response) => {
-        const result = (await response.json()) as { perfil?: ProfileData; message?: string };
+        const result = (await readApiJson(response)) as { perfil?: ProfileData; message?: string };
         if (!response.ok || !result.perfil) {
           throw new Error(result.message ?? "No se pudo cargar el perfil.");
         }
@@ -495,7 +552,7 @@ function ProfileSettings() {
       if (imageFile) formData.set("imagen", imageFile);
       if (removeImage) formData.set("removeImage", "true");
       const response = await fetch("/api/configuracion/perfil", { method: "PUT", body: formData });
-      const result = (await response.json()) as { message?: string; fono?: string | null; direccion?: string | null; urlImagen?: string | null };
+      const result = (await readApiJson(response)) as { message?: string; fono?: string | null; direccion?: string | null; urlImagen?: string | null };
       if (!response.ok) throw new Error(result.message ?? "No se pudo guardar el perfil.");
       setProfile({ ...profile, fono: result.fono ?? null, direccion: result.direccion ?? null, urlImagen: result.urlImagen ?? null });
       setImageFile(null);
@@ -586,7 +643,7 @@ function StoreSettings() {
     const controller = new AbortController();
     fetch("/api/configuracion/permisos", { cache: "no-store", signal: controller.signal })
       .then(async (response) => {
-        const data = await response.json() as { roles?: (RoleOption & { permisos: string[] })[]; puedeEditar?: boolean; permisosPropios?: string[]; esMaster?: boolean; message?: string };
+        const data = await readApiJson(response) as { roles?: (RoleOption & { permisos: string[] })[]; puedeEditar?: boolean; permisosPropios?: string[]; esMaster?: boolean; message?: string };
         if (!response.ok || !data.roles) throw new Error(data.message ?? "No se pudieron cargar los roles.");
         const order: Record<string, number> = { master: 0, admin: 1, cajero: 2, usuario: 3 };
         setRoles([...data.roles].sort((a, b) => (order[a.nombre.toLowerCase()] ?? 99) - (order[b.nombre.toLowerCase()] ?? 99)));
@@ -611,7 +668,7 @@ function StoreSettings() {
     setSaving(true); setError(""); setSuccess("");
     try {
       const response = await fetch("/api/configuracion/permisos", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ roleId: selectedRoleId, permisos: checked }) });
-      const data = await response.json() as { message?: string };
+      const data = await readApiJson(response) as { message?: string };
       if (!response.ok) throw new Error(data.message ?? "No se pudieron guardar los permisos.");
       setSavedPermissions((current) => ({ ...current, [selectedRoleId]: checked }));
       setSuccess(data.message ?? "Permisos guardados correctamente.");
@@ -687,19 +744,22 @@ function StoreSettings() {
 }
 
 function UsersSettings() {
+  const showDialog = useAppDialog();
   const syncRevision = useSyncRevision();
   const [users, setUsers] = useState<AccountUser[] | null>(null);
   const [roles, setRoles] = useState<RoleOption[]>([]);
   const [canManageRoles, setCanManageRoles] = useState(false);
   const [actorRole, setActorRole] = useState<string | null>(null);
+  const [actorId, setActorId] = useState<string | null>(null);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [savingRole, setSavingRole] = useState(false);
+  const [deletingUser, setDeletingUser] = useState(false);
   const [roleDraft, setRoleDraft] = useState<{ userId: string; roleId: string } | null>(null);
 
   useEffect(() => {
-    if (roleDraft || savingRole) return;
+    if (roleDraft || savingRole || deletingUser) return;
     const controller = new AbortController();
 
     fetch("/api/configuracion/usuarios", {
@@ -708,7 +768,7 @@ function UsersSettings() {
       signal: controller.signal,
     })
       .then(async (response) => {
-        const result = (await response.json()) as { users?: AccountUser[]; roles?: RoleOption[]; canManageRoles?: boolean; actorRole?: string | null; message?: string };
+        const result = (await readApiJson(response)) as { users?: AccountUser[]; roles?: RoleOption[]; canManageRoles?: boolean; actorRole?: string | null; actorId?: string | null; message?: string };
         if (!response.ok || !result.users) {
           throw new Error(result.message ?? "No se pudieron cargar los usuarios.");
         }
@@ -716,6 +776,7 @@ function UsersSettings() {
         setRoles(result.roles ?? []);
         setCanManageRoles(Boolean(result.canManageRoles));
         setActorRole(result.actorRole ?? null);
+        setActorId(result.actorId ?? null);
         setSelectedId((current) => result.users?.some((user) => user.id === current) ? current : result.users?.[0]?.id ?? null);
       })
       .catch((loadError) => {
@@ -725,12 +786,13 @@ function UsersSettings() {
       });
 
     return () => controller.abort();
-  }, [syncRevision, roleDraft, savingRole]);
+  }, [syncRevision, roleDraft, savingRole, deletingUser]);
 
   const selectedUser = users?.find((user) => user.id === selectedId);
   const hierarchy: Record<string, number> = { usuario: 0, cajero: 1, admin: 2, master: 3 };
   const actorLevel = hierarchy[actorRole ?? ""] ?? -1;
   const canEditSelectedRole = Boolean(canManageRoles && selectedUser && (hierarchy[selectedUser.rol] ?? -1) >= 0 && actorLevel > (hierarchy[selectedUser.rol] ?? -1));
+  const canDeleteSelected = Boolean(selectedUser && actorId && actorRole && canDeactivateAccount(actorId, actorRole, selectedUser.id, selectedUser.rol));
   const availableRoles = roles.filter((role) => {
     if (!canEditSelectedRole) return role.id === selectedUser?.roleId;
     return (hierarchy[role.nombre] ?? -1) >= 0 && (hierarchy[role.nombre] ?? -1) < actorLevel;
@@ -751,7 +813,7 @@ function UsersSettings() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ userId, roleId }),
       });
-      const data = await response.json() as { message?: string; roleId?: string; rol?: string };
+      const data = await readApiJson(response) as { message?: string; roleId?: string; rol?: string };
       if (!response.ok || !data.roleId || !data.rol) throw new Error(data.message ?? "No se pudo cambiar el rol.");
       setUsers((current) => current?.map((user) => user.id === userId ? { ...user, roleId: data.roleId!, rol: data.rol! } : user) ?? null);
       setRoleDraft(null);
@@ -761,6 +823,21 @@ function UsersSettings() {
     } finally {
       setSavingRole(false);
     }
+  }
+
+  async function deleteUser(user: AccountUser) {
+    if (!canDeleteSelected || savingRole || deletingUser) return;
+    const confirmed = await showDialog({ title: "Eliminar cuenta", message: `¿Eliminar la cuenta de ${user.nombre} ${user.apellido}? Ya no podrá iniciar sesión; su historial de ventas y caja se conservará.`, tone: "warning", confirm: true, confirmLabel: "Eliminar cuenta" });
+    if (!confirmed) return;
+    setDeletingUser(true); setError(""); setSuccess("");
+    try {
+      const response = await fetch("/api/configuracion/usuarios", { method: "DELETE", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ userId: user.id }) });
+      const result = await readApiJson(response) as { message?: string };
+      if (!response.ok) throw new Error(result.message ?? "No se pudo eliminar la cuenta.");
+      setUsers((current) => current?.filter((item) => item.id !== user.id) ?? null);
+      setSelectedId(null); setRoleDraft(null); setSuccess(result.message ?? "Cuenta eliminada correctamente.");
+    } catch (reason) { setError(reason instanceof Error ? reason.message : "No se pudo eliminar la cuenta."); }
+    finally { setDeletingUser(false); }
   }
 
   return (
@@ -789,6 +866,7 @@ function UsersSettings() {
                     className={selectedId === user.id ? "is-selected" : ""}
                     key={user.id}
                     type="button"
+                    disabled={deletingUser}
                     aria-pressed={selectedId === user.id}
                     onClick={() => { setSelectedId(user.id); setRoleDraft(null); setSuccess(""); setError(""); }}
                   >
@@ -821,14 +899,14 @@ function UsersSettings() {
                         className="settings-user-role-select"
                         aria-label={`Rol de ${selectedUser.nombre} ${selectedUser.apellido}`}
                         value={roleDraft?.userId === selectedUser.id ? roleDraft.roleId : selectedUser.roleId}
-                        disabled={!canEditSelectedRole || savingRole}
+                        disabled={!canEditSelectedRole || savingRole || deletingUser}
                         onChange={(event) => { setRoleDraft({ userId: selectedUser.id, roleId: event.target.value }); setSuccess(""); setError(""); }}
                       >
                         {availableRoles.map((role) => <option key={role.id} value={role.id}>{role.nombre}</option>)}
                       </select>
                     </dd></div>
                   </dl>
-                  {canEditSelectedRole ? <div className="settings-company-actions"><button type="button" className="settings-save-button" disabled={savingRole || roleDraft?.userId !== selectedUser.id || roleDraft.roleId === selectedUser.roleId} onClick={() => { if (roleDraft?.userId === selectedUser.id) void changeRole(selectedUser.id, roleDraft.roleId); }}>{savingRole ? "Guardando..." : "Guardar rol"}</button></div> : null}
+                  {canEditSelectedRole || canDeleteSelected ? <div className="settings-company-actions">{canEditSelectedRole ? <button type="button" className="settings-save-button" disabled={savingRole || deletingUser || roleDraft?.userId !== selectedUser.id || roleDraft.roleId === selectedUser.roleId} onClick={() => { if (roleDraft?.userId === selectedUser.id) void changeRole(selectedUser.id, roleDraft.roleId); }}>{savingRole ? "Guardando..." : "Guardar rol"}</button> : null}{canDeleteSelected ? <button type="button" className="settings-delete-user-button" disabled={savingRole || deletingUser} onClick={() => void deleteUser(selectedUser)}>{deletingUser ? "Eliminando..." : "Eliminar cuenta"}</button> : null}</div> : null}
                   {!canManageRoles ? <p className="settings-role-notice">No tienes permiso para cambiar roles.</p> : null}
                   {canManageRoles && selectedUser.rol === "master" ? <p className="settings-role-notice">El rol master es único y no se puede cambiar.</p> : null}
                   {actorRole === "admin" && !canEditSelectedRole && selectedUser.rol !== "master" ? <p className="settings-role-notice">Admin solo puede alternar entre usuario y cajero.</p> : null}
@@ -860,7 +938,7 @@ function CompanySettings({ onSaved }: { onSaved: (name: string) => void }) {
       signal: controller.signal,
     })
       .then(async (response) => {
-        const result = (await response.json()) as { company?: CompanyData; message?: string };
+        const result = (await readApiJson(response)) as { company?: CompanyData; message?: string };
         if (!response.ok || !result.company) {
           throw new Error(result.message ?? "No se pudieron cargar los datos de empresa.");
         }
@@ -912,7 +990,7 @@ function CompanySettings({ onSaved }: { onSaved: (name: string) => void }) {
         },
         body: JSON.stringify(normalized),
       });
-      const result = (await response.json()) as { company?: CompanyData; message?: string };
+      const result = (await readApiJson(response)) as { company?: CompanyData; message?: string };
       if (!response.ok || !result.company) {
         throw new Error(result.message ?? "No se pudieron guardar los datos de empresa.");
       }

@@ -14,6 +14,7 @@ import { isSafeAppInput } from "@/lib/input-validation";
 import { roundCashAmount } from "@/lib/cash-rounding";
 import { CashRoundingNotice } from "../components/CashRoundingNotice";
 import { calculatePromotion, promotionCondition, type PromotionRule } from "@/lib/promotion-pricing";
+import { saleShortcutsSchema, type SaleShortcuts } from "@/lib/sale-shortcuts";
 
 type Producto = {
   id: string;
@@ -258,7 +259,12 @@ export default function SalesPage() {
   const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
   const [paymentMethodsLoading, setPaymentMethodsLoading] = useState(false);
   const [paymentMethodsError, setPaymentMethodsError] = useState("");
+  const [paymentMethodsRetry, setPaymentMethodsRetry] = useState(0);
   const [selectedPaymentMethodId, setSelectedPaymentMethodId] = useState<string | null>(null);
+  const [shortcuts, setShortcuts] = useState<SaleShortcuts | null>(null);
+  const [shortcutError, setShortcutError] = useState("");
+  const requestedShortcutPayment = useRef<"efectivo" | "debito" | null>(null);
+  const focusSearchAfterRender = useRef(false);
   const weightInputs = useRef(new Map<string, HTMLInputElement>());
   const currentSaleId = activeSale?.id_venta;
   const currentSaleRevision = activeSale?.revision;
@@ -320,7 +326,21 @@ export default function SalesPage() {
   }, [router]);
 
   useEffect(() => {
-    if (rightPanel !== "payment") return;
+    const controller = new AbortController();
+    fetch("/api/configuracion/atajos", { cache: "no-store", signal: controller.signal })
+      .then(async (response) => {
+        const data = await response.json() as { shortcuts?: unknown; message?: string };
+        if (!response.ok) throw new Error(data.message ?? "No se pudieron cargar los atajos de venta.");
+        const parsed = saleShortcutsSchema.safeParse(data.shortcuts);
+        if (!parsed.success) throw new Error("La configuración de atajos no es válida.");
+        if (!controller.signal.aborted) { setShortcuts(parsed.data); setShortcutError(""); }
+      })
+      .catch((reason: unknown) => { if (!controller.signal.aborted) { setShortcuts(null); setShortcutError(reason instanceof Error ? reason.message : "No se pudieron cargar los atajos de venta."); } });
+    return () => controller.abort();
+  }, [syncRevision]);
+
+  useEffect(() => {
+    if (rightPanel !== "payment") { requestedShortcutPayment.current = null; return; }
 
     const token = hasSessionHint();
     if (!token) return;
@@ -336,10 +356,19 @@ export default function SalesPage() {
         return response.json() as Promise<{ paymentMethods: PaymentMethod[] }>;
       })
       .then((data) => {
+        if (controller.signal.aborted) return;
         setPaymentMethods([...data.paymentMethods].sort((a, b) =>
           paymentMethodRank(a.medio_de_pago) - paymentMethodRank(b.medio_de_pago) ||
           a.medio_de_pago.localeCompare(b.medio_de_pago, "es-CL"),
         ));
+        if (requestedShortcutPayment.current) {
+          const target = requestedShortcutPayment.current;
+          const method = data.paymentMethods.find((item) => item.medio_de_pago.trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "") === target);
+          if (method) { setSelectedPaymentMethodId(method.id_medio); setCashAmount(""); }
+          else setPaymentMethodsError(`El método de pago ${target === "debito" ? "débito" : "efectivo"} no está disponible.`);
+          requestedShortcutPayment.current = null;
+          if (!method) return;
+        }
         setPaymentMethodsError("");
       })
       .catch(() => {
@@ -350,7 +379,7 @@ export default function SalesPage() {
       });
 
     return () => controller.abort();
-  }, [rightPanel]);
+  }, [rightPanel, paymentMethodsRetry]);
 
   const availableProducts = useMemo(() => {
     const normalizedSearch = search.trim().toLowerCase();
@@ -388,6 +417,7 @@ export default function SalesPage() {
 
   function selectSale(sale: Sale | null) {
     if (busyRef.current) return;
+    requestedShortcutPayment.current = null;
     setActiveSale(sale);
     setCart(sale ? saleCart(sale).map((item) => {
       const available = productos.find((product) => product.id === item.product.id);
@@ -524,6 +554,49 @@ export default function SalesPage() {
     setPaymentMethodsError("");
     setRightPanel("payment");
   }
+
+  useEffect(() => {
+    if (rightPanel === "catalog" && focusSearchAfterRender.current) {
+      focusSearchAfterRender.current = false;
+      searchInputRef.current?.focus();
+    }
+  }, [rightPanel]);
+
+  useEffect(() => {
+    function handleShortcut(event: KeyboardEvent) {
+      if (!shortcuts || event.repeat || event.isComposing || event.ctrlKey || event.altKey || event.metaKey || event.shiftKey ||
+          ![shortcuts.buscar, shortcuts.efectivo, shortcuts.debito].includes(event.key as SaleShortcuts["buscar"]) ||
+          document.querySelector('dialog[open], [role="dialog"][aria-modal="true"], [role="alertdialog"][aria-modal="true"]')) return;
+      const target = event.target;
+      if (target instanceof HTMLElement && target !== searchInputRef.current && (target.isContentEditable || target.closest("input, textarea, select, [contenteditable='true']"))) return;
+      if (busyRef.current || isLoading || completedSale) return;
+      event.preventDefault();
+      if (event.key === shortcuts.buscar) {
+        if (scannerTimer.current) clearTimeout(scannerTimer.current);
+        if (searchScannerTimer.current) clearTimeout(searchScannerTimer.current);
+        scannerBuffer.current = { value: "", lastKeyAt: 0, fastKeys: 0 };
+        searchScannerBuffer.current = { value: "", lastKeyAt: 0, fastKeys: 0 };
+        requestedShortcutPayment.current = null;
+        setSearch(""); setScanMessage("");
+        if (rightPanel === "catalog") searchInputRef.current?.focus();
+        else { focusSearchAfterRender.current = true; setRightPanel("catalog"); }
+        return;
+      }
+      if (!activeSale || !cart.length || cartTotal <= 0) return;
+      const targetMethod = event.key === shortcuts.efectivo ? "efectivo" : "debito";
+      if (rightPanel === "payment" && !paymentMethodsLoading && !paymentMethodsError) {
+        const method = paymentMethods.find((item) => item.medio_de_pago.trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "") === targetMethod);
+        if (method) { setSelectedPaymentMethodId(method.id_medio); setCashAmount(""); }
+        else setPaymentMethodsError(`El método de pago ${targetMethod === "debito" ? "débito" : "efectivo"} no está disponible.`);
+      } else {
+        requestedShortcutPayment.current = targetMethod;
+        if (rightPanel !== "payment") { setPaymentMethodsLoading(true); setPaymentMethodsError(""); setRightPanel("payment"); }
+        else if (paymentMethodsError) { setPaymentMethodsLoading(true); setPaymentMethodsError(""); setPaymentMethodsRetry((value) => value + 1); }
+      }
+    }
+    window.addEventListener("keydown", handleShortcut);
+    return () => window.removeEventListener("keydown", handleShortcut);
+  }, [shortcuts, activeSale, cart.length, cartTotal, isLoading, completedSale, rightPanel, paymentMethods, paymentMethodsLoading, paymentMethodsError]);
 
   function finishCompletedSale() {
     selectSale(null);
@@ -812,6 +885,7 @@ export default function SalesPage() {
       <Navbar compact showLogout={false} />
       {busy && <CartLoader screen label="Procesando venta..." />}
       {operationError && <p className="sales-operation-error" role="alert">{operationError}</p>}
+      {shortcutError && <p className="sales-operation-error" role="alert">{shortcutError}</p>}
       <section className="sales-view-layout sales-with-tabs" aria-busy={busy}>
         <nav className="sales-tabs" aria-label="Ventas pendientes">
           {sales.map((sale) => (

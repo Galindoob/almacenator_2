@@ -35,6 +35,9 @@ export type EmpresaMinAggregateOutputType = {
   telefono: string | null
   direccion: string | null
   comuna: string | null
+  atajoBuscar: string | null
+  atajoEfectivo: string | null
+  atajoDebito: string | null
 }
 
 export type EmpresaMaxAggregateOutputType = {
@@ -48,6 +51,9 @@ export type EmpresaMaxAggregateOutputType = {
   telefono: string | null
   direccion: string | null
   comuna: string | null
+  atajoBuscar: string | null
+  atajoEfectivo: string | null
+  atajoDebito: string | null
 }
 
 export type EmpresaCountAggregateOutputType = {
@@ -61,6 +67,9 @@ export type EmpresaCountAggregateOutputType = {
   telefono: number
   direccion: number
   comuna: number
+  atajoBuscar: number
+  atajoEfectivo: number
+  atajoDebito: number
   _all: number
 }
 
@@ -76,6 +85,9 @@ export type EmpresaMinAggregateInputType = {
   telefono?: true
   direccion?: true
   comuna?: true
+  atajoBuscar?: true
+  atajoEfectivo?: true
+  atajoDebito?: true
 }
 
 export type EmpresaMaxAggregateInputType = {
@@ -89,6 +101,9 @@ export type EmpresaMaxAggregateInputType = {
   telefono?: true
   direccion?: true
   comuna?: true
+  atajoBuscar?: true
+  atajoEfectivo?: true
+  atajoDebito?: true
 }
 
 export type EmpresaCountAggregateInputType = {
@@ -102,6 +117,9 @@ export type EmpresaCountAggregateInputType = {
   telefono?: true
   direccion?: true
   comuna?: true
+  atajoBuscar?: true
+  atajoEfectivo?: true
+  atajoDebito?: true
   _all?: true
 }
 
@@ -188,6 +206,9 @@ export type EmpresaGroupByOutputType = {
   telefono: string | null
   direccion: string | null
   comuna: string | null
+  atajoBuscar: string
+  atajoEfectivo: string
+  atajoDebito: string
   _count: EmpresaCountAggregateOutputType | null
   _min: EmpresaMinAggregateOutputType | null
   _max: EmpresaMaxAggregateOutputType | null
@@ -222,6 +243,9 @@ export type EmpresaWhereInput = {
   telefono?: Prisma.StringNullableFilter<"Empresa"> | string | null
   direccion?: Prisma.StringNullableFilter<"Empresa"> | string | null
   comuna?: Prisma.StringNullableFilter<"Empresa"> | string | null
+  atajoBuscar?: Prisma.StringFilter<"Empresa"> | string
+  atajoEfectivo?: Prisma.StringFilter<"Empresa"> | string
+  atajoDebito?: Prisma.StringFilter<"Empresa"> | string
   configuraciones?: Prisma.ConfiguracionUsuarioListRelationFilter
 }
 
@@ -236,6 +260,9 @@ export type EmpresaOrderByWithRelationInput = {
   telefono?: Prisma.SortOrderInput | Prisma.SortOrder
   direccion?: Prisma.SortOrderInput | Prisma.SortOrder
   comuna?: Prisma.SortOrderInput | Prisma.SortOrder
+  atajoBuscar?: Prisma.SortOrder
+  atajoEfectivo?: Prisma.SortOrder
+  atajoDebito?: Prisma.SortOrder
   configuraciones?: Prisma.ConfiguracionUsuarioOrderByRelationAggregateInput
 }
 
@@ -253,6 +280,9 @@ export type EmpresaWhereUniqueInput = Prisma.AtLeast<{
   telefono?: Prisma.StringNullableFilter<"Empresa"> | string | null
   direccion?: Prisma.StringNullableFilter<"Empresa"> | string | null
   comuna?: Prisma.StringNullableFilter<"Empresa"> | string | null
+  atajoBuscar?: Prisma.StringFilter<"Empresa"> | string
+  atajoEfectivo?: Prisma.StringFilter<"Empresa"> | string
+  atajoDebito?: Prisma.StringFilter<"Empresa"> | string
   configuraciones?: Prisma.ConfiguracionUsuarioListRelationFilter
 }, "idEmpresa" | "rut">
 
@@ -267,6 +297,9 @@ export type EmpresaOrderByWithAggregationInput = {
   telefono?: Prisma.SortOrderInput | Prisma.SortOrder
   direccion?: Prisma.SortOrderInput | Prisma.SortOrder
   comuna?: Prisma.SortOrderInput | Prisma.SortOrder
+  atajoBuscar?: Prisma.SortOrder
+  atajoEfectivo?: Prisma.SortOrder
+  atajoDebito?: Prisma.SortOrder
   _count?: Prisma.EmpresaCountOrderByAggregateInput
   _max?: Prisma.EmpresaMaxOrderByAggregateInput
   _min?: Prisma.EmpresaMinOrderByAggregateInput
@@ -286,6 +319,9 @@ export type EmpresaScalarWhereWithAggregatesInput = {
   telefono?: Prisma.StringNullableWithAggregatesFilter<"Empresa"> | string | null
   direccion?: Prisma.StringNullableWithAggregatesFilter<"Empresa"> | string | null
   comuna?: Prisma.StringNullableWithAggregatesFilter<"Empresa"> | string | null
+  atajoBuscar?: Prisma.StringWithAggregatesFilter<"Empresa"> | string
+  atajoEfectivo?: Prisma.StringWithAggregatesFilter<"Empresa"> | string
+  atajoDebito?: Prisma.StringWithAggregatesFilter<"Empresa"> | string
 }
 
 export type EmpresaCreateInput = {
@@ -299,6 +335,9 @@ export type EmpresaCreateInput = {
   telefono?: string | null
   direccion?: string | null
   comuna?: string | null
+  atajoBuscar?: string
+  atajoEfectivo?: string
+  atajoDebito?: string
   configuraciones?: Prisma.ConfiguracionUsuarioCreateNestedManyWithoutDatosEmpresaInput
 }
 
@@ -313,6 +352,9 @@ export type EmpresaUncheckedCreateInput = {
   telefono?: string | null
   direccion?: string | null
   comuna?: string | null
+  atajoBuscar?: string
+  atajoEfectivo?: string
+  atajoDebito?: string
   configuraciones?: Prisma.ConfiguracionUsuarioUncheckedCreateNestedManyWithoutDatosEmpresaInput
 }
 
@@ -327,6 +369,9 @@ export type EmpresaUpdateInput = {
   telefono?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   direccion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   comuna?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  atajoBuscar?: Prisma.StringFieldUpdateOperationsInput | string
+  atajoEfectivo?: Prisma.StringFieldUpdateOperationsInput | string
+  atajoDebito?: Prisma.StringFieldUpdateOperationsInput | string
   configuraciones?: Prisma.ConfiguracionUsuarioUpdateManyWithoutDatosEmpresaNestedInput
 }
 
@@ -341,6 +386,9 @@ export type EmpresaUncheckedUpdateInput = {
   telefono?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   direccion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   comuna?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  atajoBuscar?: Prisma.StringFieldUpdateOperationsInput | string
+  atajoEfectivo?: Prisma.StringFieldUpdateOperationsInput | string
+  atajoDebito?: Prisma.StringFieldUpdateOperationsInput | string
   configuraciones?: Prisma.ConfiguracionUsuarioUncheckedUpdateManyWithoutDatosEmpresaNestedInput
 }
 
@@ -355,6 +403,9 @@ export type EmpresaCreateManyInput = {
   telefono?: string | null
   direccion?: string | null
   comuna?: string | null
+  atajoBuscar?: string
+  atajoEfectivo?: string
+  atajoDebito?: string
 }
 
 export type EmpresaUpdateManyMutationInput = {
@@ -368,6 +419,9 @@ export type EmpresaUpdateManyMutationInput = {
   telefono?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   direccion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   comuna?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  atajoBuscar?: Prisma.StringFieldUpdateOperationsInput | string
+  atajoEfectivo?: Prisma.StringFieldUpdateOperationsInput | string
+  atajoDebito?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 export type EmpresaUncheckedUpdateManyInput = {
@@ -381,6 +435,9 @@ export type EmpresaUncheckedUpdateManyInput = {
   telefono?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   direccion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   comuna?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  atajoBuscar?: Prisma.StringFieldUpdateOperationsInput | string
+  atajoEfectivo?: Prisma.StringFieldUpdateOperationsInput | string
+  atajoDebito?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 export type EmpresaCountOrderByAggregateInput = {
@@ -394,6 +451,9 @@ export type EmpresaCountOrderByAggregateInput = {
   telefono?: Prisma.SortOrder
   direccion?: Prisma.SortOrder
   comuna?: Prisma.SortOrder
+  atajoBuscar?: Prisma.SortOrder
+  atajoEfectivo?: Prisma.SortOrder
+  atajoDebito?: Prisma.SortOrder
 }
 
 export type EmpresaMaxOrderByAggregateInput = {
@@ -407,6 +467,9 @@ export type EmpresaMaxOrderByAggregateInput = {
   telefono?: Prisma.SortOrder
   direccion?: Prisma.SortOrder
   comuna?: Prisma.SortOrder
+  atajoBuscar?: Prisma.SortOrder
+  atajoEfectivo?: Prisma.SortOrder
+  atajoDebito?: Prisma.SortOrder
 }
 
 export type EmpresaMinOrderByAggregateInput = {
@@ -420,6 +483,9 @@ export type EmpresaMinOrderByAggregateInput = {
   telefono?: Prisma.SortOrder
   direccion?: Prisma.SortOrder
   comuna?: Prisma.SortOrder
+  atajoBuscar?: Prisma.SortOrder
+  atajoEfectivo?: Prisma.SortOrder
+  atajoDebito?: Prisma.SortOrder
 }
 
 export type EmpresaScalarRelationFilter = {
@@ -452,6 +518,9 @@ export type EmpresaCreateWithoutConfiguracionesInput = {
   telefono?: string | null
   direccion?: string | null
   comuna?: string | null
+  atajoBuscar?: string
+  atajoEfectivo?: string
+  atajoDebito?: string
 }
 
 export type EmpresaUncheckedCreateWithoutConfiguracionesInput = {
@@ -465,6 +534,9 @@ export type EmpresaUncheckedCreateWithoutConfiguracionesInput = {
   telefono?: string | null
   direccion?: string | null
   comuna?: string | null
+  atajoBuscar?: string
+  atajoEfectivo?: string
+  atajoDebito?: string
 }
 
 export type EmpresaCreateOrConnectWithoutConfiguracionesInput = {
@@ -494,6 +566,9 @@ export type EmpresaUpdateWithoutConfiguracionesInput = {
   telefono?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   direccion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   comuna?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  atajoBuscar?: Prisma.StringFieldUpdateOperationsInput | string
+  atajoEfectivo?: Prisma.StringFieldUpdateOperationsInput | string
+  atajoDebito?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 export type EmpresaUncheckedUpdateWithoutConfiguracionesInput = {
@@ -507,6 +582,9 @@ export type EmpresaUncheckedUpdateWithoutConfiguracionesInput = {
   telefono?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   direccion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   comuna?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  atajoBuscar?: Prisma.StringFieldUpdateOperationsInput | string
+  atajoEfectivo?: Prisma.StringFieldUpdateOperationsInput | string
+  atajoDebito?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 
@@ -551,6 +629,9 @@ export type EmpresaSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   telefono?: boolean
   direccion?: boolean
   comuna?: boolean
+  atajoBuscar?: boolean
+  atajoEfectivo?: boolean
+  atajoDebito?: boolean
   configuraciones?: boolean | Prisma.Empresa$configuracionesArgs<ExtArgs>
   _count?: boolean | Prisma.EmpresaCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["empresa"]>
@@ -566,6 +647,9 @@ export type EmpresaSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   telefono?: boolean
   direccion?: boolean
   comuna?: boolean
+  atajoBuscar?: boolean
+  atajoEfectivo?: boolean
+  atajoDebito?: boolean
 }, ExtArgs["result"]["empresa"]>
 
 export type EmpresaSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -579,6 +663,9 @@ export type EmpresaSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   telefono?: boolean
   direccion?: boolean
   comuna?: boolean
+  atajoBuscar?: boolean
+  atajoEfectivo?: boolean
+  atajoDebito?: boolean
 }, ExtArgs["result"]["empresa"]>
 
 export type EmpresaSelectScalar = {
@@ -592,9 +679,12 @@ export type EmpresaSelectScalar = {
   telefono?: boolean
   direccion?: boolean
   comuna?: boolean
+  atajoBuscar?: boolean
+  atajoEfectivo?: boolean
+  atajoDebito?: boolean
 }
 
-export type EmpresaOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"idEmpresa" | "nombreFantasia" | "rut" | "nombre" | "giro" | "actividad" | "email" | "telefono" | "direccion" | "comuna", ExtArgs["result"]["empresa"]>
+export type EmpresaOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"idEmpresa" | "nombreFantasia" | "rut" | "nombre" | "giro" | "actividad" | "email" | "telefono" | "direccion" | "comuna" | "atajoBuscar" | "atajoEfectivo" | "atajoDebito", ExtArgs["result"]["empresa"]>
 export type EmpresaInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   configuraciones?: boolean | Prisma.Empresa$configuracionesArgs<ExtArgs>
   _count?: boolean | Prisma.EmpresaCountOutputTypeDefaultArgs<ExtArgs>
@@ -618,6 +708,9 @@ export type $EmpresaPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     telefono: string | null
     direccion: string | null
     comuna: string | null
+    atajoBuscar: string
+    atajoEfectivo: string
+    atajoDebito: string
   }, ExtArgs["result"]["empresa"]>
   composites: {}
 }
@@ -1052,6 +1145,9 @@ export interface EmpresaFieldRefs {
   readonly telefono: Prisma.FieldRef<"Empresa", 'String'>
   readonly direccion: Prisma.FieldRef<"Empresa", 'String'>
   readonly comuna: Prisma.FieldRef<"Empresa", 'String'>
+  readonly atajoBuscar: Prisma.FieldRef<"Empresa", 'String'>
+  readonly atajoEfectivo: Prisma.FieldRef<"Empresa", 'String'>
+  readonly atajoDebito: Prisma.FieldRef<"Empresa", 'String'>
 }
     
 

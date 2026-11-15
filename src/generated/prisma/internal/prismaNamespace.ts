@@ -2485,6 +2485,7 @@ export const UserScalarFieldEnum = {
   nombre: 'nombre',
   apellido: 'apellido',
   contrasena: 'contrasena',
+  activo: 'activo',
   roleid: 'roleid',
   correo: 'correo',
   fono: 'fono',
@@ -2519,7 +2520,10 @@ export const EmpresaScalarFieldEnum = {
   email: 'email',
   telefono: 'telefono',
   direccion: 'direccion',
-  comuna: 'comuna'
+  comuna: 'comuna',
+  atajoBuscar: 'atajoBuscar',
+  atajoEfectivo: 'atajoEfectivo',
+  atajoDebito: 'atajoDebito'
 } as const
 
 export type EmpresaScalarFieldEnum = (typeof EmpresaScalarFieldEnum)[keyof typeof EmpresaScalarFieldEnum]
@@ -2858,6 +2862,13 @@ export type ListStringFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaMod
 
 
 /**
+ * Reference to a field of type 'Boolean'
+ */
+export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
+    
+
+
+/**
  * Reference to a field of type 'DateTime'
  */
 export type DateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DateTime'>
@@ -2882,13 +2893,6 @@ export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'In
  * Reference to a field of type 'Int[]'
  */
 export type ListIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int[]'>
-    
-
-
-/**
- * Reference to a field of type 'Boolean'
- */
-export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
     
 
 

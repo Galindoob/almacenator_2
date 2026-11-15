@@ -3,6 +3,7 @@ import { CartLoader } from "./CartLoader";
 
 import { Fragment, useCallback, useEffect, useRef, useState, type FormEvent } from "react";
 import { useSyncRevision } from "./SyncProvider";
+import { readApiJson } from "@/lib/api-response";
 
 type Caja = { id_apertura: string; horario_apertura: string; horario_cierre: string | null; saldo_apertura: number; saldo_cierre: number | null; diferencia: number | null; valor_real: number; users: { nombre: string; apellido: string }; usuario_cierre: { nombre: string; apellido: string } | null };
 type Movimiento = { id: string; id_apertura_caja: string; tipo: string; monto: number; fecha: string; usuario: { nombre: string; apellido: string } };
@@ -23,7 +24,7 @@ export function FinanceSettings() {
   const key = useRef<string | null>(null);
   const load = useCallback(async () => {
     const response = await fetch("/api/configuracion/finanzas", { cache: "no-store" });
-    const result = await response.json();
+    const result = await readApiJson(response) as Data & { message?: string };
     if (!response.ok) throw new Error(result.message || "No se pudieron cargar las finanzas.");
     setData(result as Data);
   }, []);
@@ -31,7 +32,7 @@ export function FinanceSettings() {
     const controller = new AbortController();
     fetch("/api/configuracion/finanzas", { cache: "no-store", signal: controller.signal })
       .then(async (response) => {
-        const result = await response.json();
+        const result = await readApiJson(response) as Data & { message?: string };
         if (!response.ok) throw new Error(result.message || "No se pudieron cargar las finanzas.");
         setData(result as Data);
       }).catch((e: Error) => { if (!controller.signal.aborted) setError(e.message); });
@@ -43,7 +44,7 @@ export function FinanceSettings() {
     setSaving(true); setError(""); setNotice(""); key.current ??= crypto.randomUUID();
     try {
       const response = await fetch("/api/configuracion/finanzas", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id: key.current, tipo, monto: Number(monto) }) });
-      const result = await response.json();
+      const result = await readApiJson(response) as { message?: string };
       if (!response.ok) throw new Error(result.message || "No se pudo registrar el movimiento.");
       key.current = null; setMonto(""); setNotice("Movimiento registrado correctamente.");
       await load();

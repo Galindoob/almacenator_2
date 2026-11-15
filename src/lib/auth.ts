@@ -78,19 +78,19 @@ export function withAuth(
     else if (path === "/api/movimiento-caja") required = ["caja_ingreso_egreso"];
     else if (path === "/api/configuracion/finanzas") required = ["caja_sacar_dinero"];
     else if (path === "/api/configuracion/empresa" || (path === "/api/configuracion/usuarios" && method === "GET")) required = ["empresa_usuarios_ver"];
-    if (required.length) {
-      try {
-        const { getUserPermissions } = await import("@/lib/permissions");
-        const access = await getUserPermissions(payload.correo);
-        if (!access) return NextResponse.json({ message: "Usuario no encontrado." }, { status: 401 });
+    try {
+      const { getUserPermissions } = await import("@/lib/permissions");
+      const access = await getUserPermissions(payload.correo);
+      if (!access) return NextResponse.json({ message: "La cuenta no está disponible o la sesión expiró." }, { status: 401 });
+      if (required.length) {
         if (path === "/api/producto" && method === "DELETE" && access.role !== "master") return NextResponse.json({ message: "No tienes permiso para eliminar productos." }, { status: 403 });
         const privilegedCashClose = hasCashClosingPrivilege(access.role) && ((path === "/api/caja" && method === "PATCH") || (path === "/api/caja/voucher" && method === "POST"));
         if (!privilegedCashClose && !required.some((permission) => access.has(permission))) return NextResponse.json({ message: "No tienes permiso para realizar esta acción." }, { status: 403 });
         if (path === "/api/producto-vencimiento" && method !== "GET" && !access.has("vencimiento_ver")) return NextResponse.json({ message: "No tienes permiso para ver productos por vencer." }, { status: 403 });
-      } catch (error) {
-        console.error("Error verificando permisos:", error);
-        return NextResponse.json({ message: "No se pudieron verificar los permisos." }, { status: 503 });
       }
+    } catch (error) {
+      console.error("Error verificando permisos:", error);
+      return NextResponse.json({ message: "No se pudieron verificar los permisos." }, { status: 503 });
     }
 
     return handler(authenticatedRequest);

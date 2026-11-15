@@ -12,6 +12,7 @@ model User {
   nombre              String                @db.VarChar(100)
   apellido            String                @db.VarChar(100)
   contrasena          String
+  activo              Boolean               @default(true)
   roleid              String                @default(dbgenerated("'28ad34ff-cf2e-4851-a7e7-fffa5d5b53cd'::uuid")) @db.Uuid
   correo              String?               @unique @db.VarChar(255)
   fono                String?               @db.VarChar(60)
@@ -55,6 +56,9 @@ model Empresa {
   telefono        String?                @db.VarChar(50)
   direccion       String?                @db.VarChar(200)
   comuna          String?                @db.VarChar(100)
+  atajoBuscar     String                 @default("F2") @map("atajo_buscar") @db.VarChar(4)
+  atajoEfectivo   String                 @default("F4") @map("atajo_efectivo") @db.VarChar(4)
+  atajoDebito     String                 @default("F8") @map("atajo_debito") @db.VarChar(4)
   configuraciones ConfiguracionUsuario[]
 
   @@map("empresa")

@@ -75,11 +75,11 @@ export async function POST(request: NextRequest) {
       include: { role: true },
     });
 
-    const isPasswordValid = user
+    const isPasswordValid = user?.activo
       ? await bcrypt.compare(contrasena, user.contrasena)
       : false;
 
-    if (!user || !isPasswordValid) {
+    if (!user || !user.activo || !isPasswordValid) {
       return NextResponse.json(
         {
           status: "error",

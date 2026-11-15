@@ -1,4 +1,5 @@
 "use client";
+import { readApiJson } from "@/lib/api-response";
 
 import {
   createContext,
@@ -137,7 +138,7 @@ export function AppearanceProvider({ children }: { children: ReactNode }) {
           return;
         }
 
-        const result = (await response.json()) as { preferences: AppearancePreferences };
+        const result = (await readApiJson(response)) as { preferences: AppearancePreferences };
         writePreferences(result.preferences);
       } catch {
         // Keep the current user's cached preferences while the API is unreachable.
@@ -173,7 +174,7 @@ export function AppearanceProvider({ children }: { children: ReactNode }) {
       },
       body: JSON.stringify(nextPreferences),
     });
-    const result = (await response.json()) as {
+    const result = (await readApiJson(response)) as {
       message?: string;
       preferences?: AppearancePreferences;
     };

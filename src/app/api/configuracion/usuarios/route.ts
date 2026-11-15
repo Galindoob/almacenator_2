@@ -3,6 +3,7 @@ import { withAuth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { z } from "zod";
 import { getUserPermissions, roleLevel } from "@/lib/permissions";
+import { deactivateUser } from "@/lib/deactivate-user";
 
 const roleChangeSchema = z.object({
   userId: z.uuid(),
@@ -14,6 +15,7 @@ export const GET = withAuth(async (request) => {
   try {
     const [users, roles, currentUser] = await Promise.all([
       prisma.user.findMany({
+      where: { activo: true },
       select: {
         id: true,
         nombre: true,
@@ -32,6 +34,7 @@ export const GET = withAuth(async (request) => {
       roles: roles.map((role) => ({ id: role.id, nombre: role.role })),
       canManageRoles: currentUser?.has("roles_cambiar") ?? false,
       actorRole: currentUser?.role ?? null,
+      actorId: currentUser?.user.id ?? null,
       users: users.map((user) => ({
         id: user.id,
         nombre: user.nombre,
@@ -44,6 +47,18 @@ export const GET = withAuth(async (request) => {
   } catch (error) {
     console.error("Error al consultar usuarios:", error);
     return NextResponse.json({ message: "No se pudieron cargar los usuarios." }, { status: 500 });
+  }
+});
+
+export const DELETE = withAuth(async (request) => {
+  const parsed = z.object({ userId: z.uuid() }).safeParse(await request.json().catch(() => null));
+  if (!parsed.success) return NextResponse.json({ message: "Selecciona una cuenta válida." }, { status: 400 });
+  try {
+    const result = await prisma.$transaction((tx) => deactivateUser(tx, request.correo, parsed.data.userId));
+    return NextResponse.json({ message: result.message }, { status: result.status });
+  } catch (error) {
+    console.error("Error eliminando cuenta:", error);
+    return NextResponse.json({ message: "No se pudo eliminar la cuenta." }, { status: 500 });
   }
 });
 
@@ -60,7 +75,7 @@ export const PATCH = withAuth(async (request) => {
     if (!actor || !actor.has("roles_cambiar")) {
       return NextResponse.json({ message: "No tienes permisos para cambiar roles." }, { status: 403 });
     }
-    if (!target || !nextRole) return NextResponse.json({ message: "Usuario o rol no encontrado." }, { status: 404 });
+    if (!target?.activo || !nextRole) return NextResponse.json({ message: "Usuario o rol no encontrado." }, { status: 404 });
     if (target.role.role === "master" || nextRole.role === "master") {
       return NextResponse.json({ message: "El rol master es único y no se puede mover ni asignar desde esta vista." }, { status: 403 });
     }
@@ -70,7 +85,7 @@ export const PATCH = withAuth(async (request) => {
     if (target.roleid === nextRole.id) return NextResponse.json({ message: "El usuario ya tiene ese rol." }, { status: 400 });
 
     const updated = await prisma.user.updateMany({
-      where: { id: target.id, roleid: target.roleid },
+      where: { id: target.id, roleid: target.roleid, activo: true },
       data: { roleid: nextRole.id },
     });
     if (updated.count !== 1) {

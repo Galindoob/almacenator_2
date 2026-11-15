@@ -6,13 +6,24 @@ import { hasCashClosingPrivilege } from "@/lib/cash-authorization";
 export async function proxy(request: NextRequest) {
   const path = request.nextUrl.pathname;
   const token = request.cookies.get("minigest_login")?.value;
-  const valid = token ? Boolean(validateJwtToken(token)) : false;
+  const payload = token ? validateJwtToken(token) : null;
 
   if (path === "/reestablecer_contrasena") {
     return readResetIntent(request.cookies.get(RESET_COOKIE)?.value)
       ? NextResponse.next()
       : NextResponse.redirect(new URL("/login", request.url));
   }
+
+  let access: Awaited<ReturnType<typeof import("@/lib/permissions").getUserPermissions>> = null;
+  if (payload) {
+    try {
+      const { getUserPermissions } = await import("@/lib/permissions");
+      access = await getUserPermissions(payload.correo);
+    } catch {
+      return new NextResponse("No se pudo verificar la sesión.", { status: 503 });
+    }
+  }
+  const valid = Boolean(payload && access);
 
   if (path === "/login" || path === "/register") {
     if (!valid) return NextResponse.next();
@@ -41,9 +52,6 @@ export async function proxy(request: NextRequest) {
     : null;
   if (required && token) {
     try {
-      const payload = validateJwtToken(token);
-      const { getUserPermissions } = await import("@/lib/permissions");
-      const access = payload ? await getUserPermissions(payload.correo) : null;
       const privilegedCashClose = path.startsWith("/cierreCaja") && access && hasCashClosingPrivilege(access.role);
       if ((!access?.has(required) && !privilegedCashClose) || (path === "/producto" && request.nextUrl.searchParams.get("tab") === "vencimiento" && !access?.has("vencimiento_ver"))) return NextResponse.redirect(new URL("/home", request.url));
     } catch {

@@ -365,10 +365,6 @@ export type RolPermisoUncheckedUpdateManyWithoutPermisoNestedInput = {
   deleteMany?: Prisma.RolPermisoScalarWhereInput | Prisma.RolPermisoScalarWhereInput[]
 }
 
-export type BoolFieldUpdateOperationsInput = {
-  set?: boolean
-}
-
 export type RolPermisoCreateWithoutRoleInput = {
   habilitado?: boolean
   permiso: Prisma.PermisoCreateNestedOneWithoutRolesInput

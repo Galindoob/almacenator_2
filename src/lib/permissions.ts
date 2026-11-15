@@ -6,7 +6,7 @@ export function roleLevel(role: string) { return levels[role.toLowerCase()] ?? -
 
 export async function getUserPermissions(correo: string) {
   const user = await prisma.user.findUnique({ where: { correo }, include: { role: { include: { permisos: { where: { habilitado: true }, select: { permisoId: true } } } } } });
-  if (!user) return null;
+  if (!user || !user.activo) return null;
   const role = user.role.role.toLowerCase();
   const permissions = new Set(user.role.permisos.map((permission) => permission.permisoId));
   return { user, role, permissions, has: (permission: string) => role === "master" || (permissions.has(permission) && (!prerequisites[permission] || permissions.has(prerequisites[permission]))) };
