@@ -793,7 +793,7 @@ export default function ProductoPage() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          ...selectedProduct,
+          id: selectedProduct.id,
           costo: roundCurrency(priceState.costoSinIva),
           precioVenta: roundCurrency(priceState.precioConIva),
         }),

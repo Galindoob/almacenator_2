@@ -737,8 +737,12 @@ export const PUT = withAuth(async (request) => {
         select: productSelect,
       });
     });
-    await setProductPackaging(updatedProductBase.id, product.empaque ?? null);
-    await setProductProvider(updatedProductBase.id, product.id_proveedor ?? null);
+    if (product.empaque !== undefined) {
+      await setProductPackaging(updatedProductBase.id, product.empaque);
+    }
+    if (product.id_proveedor !== undefined) {
+      await setProductProvider(updatedProductBase.id, product.id_proveedor);
+    }
     const updatedProduct =
       (await getProductWithPackaging(updatedProductBase.id)) ?? updatedProductBase;
 
