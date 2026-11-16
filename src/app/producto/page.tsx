@@ -1033,7 +1033,7 @@ export default function ProductoPage() {
   function requestAddedStockConfirmation() {
     if (
       !isPositiveIntegerText(stockQuantity) ||
-      !isFutureExpirationDate(stockExpirationDate, chileToday)
+      (Boolean(stockExpirationDate) && !isFutureExpirationDate(stockExpirationDate, chileToday))
     ) {
       return;
     }
@@ -1140,7 +1140,7 @@ export default function ProductoPage() {
       !selectedProduct ||
       !selectedProduct.controlaStock ||
       !isPositiveIntegerText(stockQuantity) ||
-      !isFutureExpirationDate(stockExpirationDate, chileToday)
+      (Boolean(stockExpirationDate) && !isFutureExpirationDate(stockExpirationDate, chileToday))
     ) {
       return;
     }
@@ -1982,7 +1982,7 @@ function SearchableSelect({
                 <button
                   type="button"
                   key={option.value}
-                  className={option.value === value ? "is-selected" : ""}
+                  className={[option.value === value ? "is-selected" : "", option.value === "new" ? "is-add-option" : ""].filter(Boolean).join(" ")}
                   onMouseDown={(event) => event.preventDefault()}
                   onClick={() => {
                     onChange(option.value);
@@ -2928,7 +2928,7 @@ function ExpirationDateInput({ value, min, disabled, onChange }: {
     if (part === "day") setDay(digits);
     if (part === "month") setMonth(digits);
     if (part === "year") setYear(digits);
-    onChange(toExpirationDate(nextDay, nextMonth, nextYear));
+    onChange(toExpirationDate(nextDay, nextMonth, nextYear) || (nextDay || nextMonth || nextYear ? "incompleta" : ""));
     if (part === "day" && digits.length === 2) monthRef.current?.focus();
     if (part === "month" && digits.length === 2) yearRef.current?.focus();
   }
@@ -2950,7 +2950,7 @@ function ExpirationDateInput({ value, min, disabled, onChange }: {
           onClick={() => { try { calendarRef.current?.showPicker(); } catch { calendarRef.current?.focus(); } }}>
           <CalendarDays aria-hidden="true" />
         </button>
-        <input ref={calendarRef} className="expiration-calendar-native" type="date" tabIndex={-1} aria-hidden="true" min={min} value={value} disabled={disabled}
+        <input ref={calendarRef} className="expiration-calendar-native" type="date" tabIndex={-1} aria-hidden="true" min={min} value={value === "incompleta" ? "" : value} disabled={disabled}
           onChange={(event) => {
             const selected = event.target.value;
             if (!selected) return;
@@ -2998,7 +2998,7 @@ function StockModalView({
   const addedStock = product.stock + parsedQuantity;
   const remainingStock = product.stock - parsedQuantity;
   const canConfirmAdd =
-    parsedQuantity > 0 && isFutureExpirationDate(expirationDate, chileToday) && !isSaving;
+    parsedQuantity > 0 && (!expirationDate || isFutureExpirationDate(expirationDate, chileToday)) && !isSaving;
   const canConfirmWaste = parsedQuantity > 0 && remainingStock >= 0 && !isSaving;
   const expirationSummary = getExpirationSummary(expirationDate, chileToday);
   const minExpirationDate = getTomorrowDateInputValue(chileToday);
@@ -3030,8 +3030,7 @@ function StockModalView({
           <>
             <h2>Agregar stock de {product.nombre}</h2>
             <p className="stock-lot-alert">
-              Se asume que la cantidad ingresada es un lote y comparte fecha de
-              vencimiento
+              La cantidad ingresada corresponde a un lote. Puedes indicar su fecha de vencimiento si corresponde.
             </p>
             <label>
               Cantidad
@@ -3044,12 +3043,12 @@ function StockModalView({
               />
             </label>
             <div className="stock-modal-field">
-              <span>Fecha de vencimiento</span>
+              <span>Fecha de vencimiento (opcional)</span>
               <ExpirationDateInput value={expirationDate} min={minExpirationDate} disabled={!chileToday} onChange={onExpirationDateChange} />
               {timeError ? <span className="date-error">{timeError}</span> : null}
               {hasInvalidExpirationDate ? (
                 <span className="date-error">
-                  Debe ser una fecha posterior a hoy.
+                  Ingresa una fecha completa y posterior a hoy, o deja el campo vacío.
                 </span>
               ) : null}
             </div>
@@ -3212,8 +3211,8 @@ function StockModalView({
               onClick={onBackFromExpirationConfirm}
             />
             <section className="comment-modal" role="dialog" aria-modal="true">
-              <h3>El producto vencerá en:</h3>
-              <p>{expirationSummary}</p>
+              <h3>{expirationDate ? "El producto vencerá en:" : "Lote sin fecha de vencimiento"}</h3>
+              {expirationDate ? <p>{expirationSummary}</p> : <p>El stock se registrará sin fecha de vencimiento.</p>}
               <div className="stock-modal-actions">
                 <button type="button" onClick={onBackFromExpirationConfirm}>
                   Volver

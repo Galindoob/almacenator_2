@@ -113,7 +113,7 @@ export const GET = withAuth(async () => {
   try {
     const [productos, groupedLots] = await Promise.all([
       prisma.producto.findMany({
-        where: { stock: { gt: 0 }, controlaStock: true },
+        where: { stock: { gt: 0 }, controlaStock: true, instancia_producto: { some: { id_detalle_reserva: null, fecha_vencimiento: { not: null } } } },
         orderBy: { nombre: "asc" },
         select: expiringProductSelect,
       }),
@@ -121,6 +121,7 @@ export const GET = withAuth(async () => {
         by: ["id_producto", "fecha_vencimiento"],
         where: {
           id_detalle_reserva: null,
+          fecha_vencimiento: { not: null },
           productos: {
             stock: { gt: 0 },
             controlaStock: true,
@@ -139,6 +140,7 @@ export const GET = withAuth(async () => {
     >();
 
     for (const lot of groupedLots) {
+      if (!lot.fecha_vencimiento) continue;
       const currentLots = lotsByProduct.get(lot.id_producto) ?? [];
       currentLots.push({
         fecha_vencimiento: lot.fecha_vencimiento,

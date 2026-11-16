@@ -144,7 +144,7 @@ export type instancia_productoGroupByArgs<ExtArgs extends runtime.Types.Extensio
 export type Instancia_productoGroupByOutputType = {
   id_instancia: string
   id_producto: string
-  fecha_vencimiento: Date
+  fecha_vencimiento: Date | null
   id_detalle_reserva: string | null
   _count: Instancia_productoCountAggregateOutputType | null
   _min: Instancia_productoMinAggregateOutputType | null
@@ -172,7 +172,7 @@ export type instancia_productoWhereInput = {
   NOT?: Prisma.instancia_productoWhereInput | Prisma.instancia_productoWhereInput[]
   id_instancia?: Prisma.UuidFilter<"instancia_producto"> | string
   id_producto?: Prisma.UuidFilter<"instancia_producto"> | string
-  fecha_vencimiento?: Prisma.DateTimeFilter<"instancia_producto"> | Date | string
+  fecha_vencimiento?: Prisma.DateTimeNullableFilter<"instancia_producto"> | Date | string | null
   id_detalle_reserva?: Prisma.UuidNullableFilter<"instancia_producto"> | string | null
   reserva?: Prisma.XOR<Prisma.DetalleNullableScalarRelationFilter, Prisma.detalleWhereInput> | null
   productos?: Prisma.XOR<Prisma.ProductoScalarRelationFilter, Prisma.ProductoWhereInput>
@@ -181,7 +181,7 @@ export type instancia_productoWhereInput = {
 export type instancia_productoOrderByWithRelationInput = {
   id_instancia?: Prisma.SortOrder
   id_producto?: Prisma.SortOrder
-  fecha_vencimiento?: Prisma.SortOrder
+  fecha_vencimiento?: Prisma.SortOrderInput | Prisma.SortOrder
   id_detalle_reserva?: Prisma.SortOrderInput | Prisma.SortOrder
   reserva?: Prisma.detalleOrderByWithRelationInput
   productos?: Prisma.ProductoOrderByWithRelationInput
@@ -193,7 +193,7 @@ export type instancia_productoWhereUniqueInput = Prisma.AtLeast<{
   OR?: Prisma.instancia_productoWhereInput[]
   NOT?: Prisma.instancia_productoWhereInput | Prisma.instancia_productoWhereInput[]
   id_producto?: Prisma.UuidFilter<"instancia_producto"> | string
-  fecha_vencimiento?: Prisma.DateTimeFilter<"instancia_producto"> | Date | string
+  fecha_vencimiento?: Prisma.DateTimeNullableFilter<"instancia_producto"> | Date | string | null
   id_detalle_reserva?: Prisma.UuidNullableFilter<"instancia_producto"> | string | null
   reserva?: Prisma.XOR<Prisma.DetalleNullableScalarRelationFilter, Prisma.detalleWhereInput> | null
   productos?: Prisma.XOR<Prisma.ProductoScalarRelationFilter, Prisma.ProductoWhereInput>
@@ -202,7 +202,7 @@ export type instancia_productoWhereUniqueInput = Prisma.AtLeast<{
 export type instancia_productoOrderByWithAggregationInput = {
   id_instancia?: Prisma.SortOrder
   id_producto?: Prisma.SortOrder
-  fecha_vencimiento?: Prisma.SortOrder
+  fecha_vencimiento?: Prisma.SortOrderInput | Prisma.SortOrder
   id_detalle_reserva?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.instancia_productoCountOrderByAggregateInput
   _max?: Prisma.instancia_productoMaxOrderByAggregateInput
@@ -215,13 +215,13 @@ export type instancia_productoScalarWhereWithAggregatesInput = {
   NOT?: Prisma.instancia_productoScalarWhereWithAggregatesInput | Prisma.instancia_productoScalarWhereWithAggregatesInput[]
   id_instancia?: Prisma.UuidWithAggregatesFilter<"instancia_producto"> | string
   id_producto?: Prisma.UuidWithAggregatesFilter<"instancia_producto"> | string
-  fecha_vencimiento?: Prisma.DateTimeWithAggregatesFilter<"instancia_producto"> | Date | string
+  fecha_vencimiento?: Prisma.DateTimeNullableWithAggregatesFilter<"instancia_producto"> | Date | string | null
   id_detalle_reserva?: Prisma.UuidNullableWithAggregatesFilter<"instancia_producto"> | string | null
 }
 
 export type instancia_productoCreateInput = {
   id_instancia?: string
-  fecha_vencimiento: Date | string
+  fecha_vencimiento?: Date | string | null
   reserva?: Prisma.detalleCreateNestedOneWithoutInstancias_reservadasInput
   productos: Prisma.ProductoCreateNestedOneWithoutInstancia_productoInput
 }
@@ -229,13 +229,13 @@ export type instancia_productoCreateInput = {
 export type instancia_productoUncheckedCreateInput = {
   id_instancia?: string
   id_producto: string
-  fecha_vencimiento: Date | string
+  fecha_vencimiento?: Date | string | null
   id_detalle_reserva?: string | null
 }
 
 export type instancia_productoUpdateInput = {
   id_instancia?: Prisma.StringFieldUpdateOperationsInput | string
-  fecha_vencimiento?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  fecha_vencimiento?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   reserva?: Prisma.detalleUpdateOneWithoutInstancias_reservadasNestedInput
   productos?: Prisma.ProductoUpdateOneRequiredWithoutInstancia_productoNestedInput
 }
@@ -243,26 +243,26 @@ export type instancia_productoUpdateInput = {
 export type instancia_productoUncheckedUpdateInput = {
   id_instancia?: Prisma.StringFieldUpdateOperationsInput | string
   id_producto?: Prisma.StringFieldUpdateOperationsInput | string
-  fecha_vencimiento?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  fecha_vencimiento?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   id_detalle_reserva?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type instancia_productoCreateManyInput = {
   id_instancia?: string
   id_producto: string
-  fecha_vencimiento: Date | string
+  fecha_vencimiento?: Date | string | null
   id_detalle_reserva?: string | null
 }
 
 export type instancia_productoUpdateManyMutationInput = {
   id_instancia?: Prisma.StringFieldUpdateOperationsInput | string
-  fecha_vencimiento?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  fecha_vencimiento?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type instancia_productoUncheckedUpdateManyInput = {
   id_instancia?: Prisma.StringFieldUpdateOperationsInput | string
   id_producto?: Prisma.StringFieldUpdateOperationsInput | string
-  fecha_vencimiento?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  fecha_vencimiento?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   id_detalle_reserva?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
@@ -383,13 +383,13 @@ export type instancia_productoUncheckedUpdateManyWithoutReservaNestedInput = {
 
 export type instancia_productoCreateWithoutProductosInput = {
   id_instancia?: string
-  fecha_vencimiento: Date | string
+  fecha_vencimiento?: Date | string | null
   reserva?: Prisma.detalleCreateNestedOneWithoutInstancias_reservadasInput
 }
 
 export type instancia_productoUncheckedCreateWithoutProductosInput = {
   id_instancia?: string
-  fecha_vencimiento: Date | string
+  fecha_vencimiento?: Date | string | null
   id_detalle_reserva?: string | null
 }
 
@@ -425,20 +425,20 @@ export type instancia_productoScalarWhereInput = {
   NOT?: Prisma.instancia_productoScalarWhereInput | Prisma.instancia_productoScalarWhereInput[]
   id_instancia?: Prisma.UuidFilter<"instancia_producto"> | string
   id_producto?: Prisma.UuidFilter<"instancia_producto"> | string
-  fecha_vencimiento?: Prisma.DateTimeFilter<"instancia_producto"> | Date | string
+  fecha_vencimiento?: Prisma.DateTimeNullableFilter<"instancia_producto"> | Date | string | null
   id_detalle_reserva?: Prisma.UuidNullableFilter<"instancia_producto"> | string | null
 }
 
 export type instancia_productoCreateWithoutReservaInput = {
   id_instancia?: string
-  fecha_vencimiento: Date | string
+  fecha_vencimiento?: Date | string | null
   productos: Prisma.ProductoCreateNestedOneWithoutInstancia_productoInput
 }
 
 export type instancia_productoUncheckedCreateWithoutReservaInput = {
   id_instancia?: string
   id_producto: string
-  fecha_vencimiento: Date | string
+  fecha_vencimiento?: Date | string | null
 }
 
 export type instancia_productoCreateOrConnectWithoutReservaInput = {
@@ -469,50 +469,50 @@ export type instancia_productoUpdateManyWithWhereWithoutReservaInput = {
 
 export type instancia_productoCreateManyProductosInput = {
   id_instancia?: string
-  fecha_vencimiento: Date | string
+  fecha_vencimiento?: Date | string | null
   id_detalle_reserva?: string | null
 }
 
 export type instancia_productoUpdateWithoutProductosInput = {
   id_instancia?: Prisma.StringFieldUpdateOperationsInput | string
-  fecha_vencimiento?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  fecha_vencimiento?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   reserva?: Prisma.detalleUpdateOneWithoutInstancias_reservadasNestedInput
 }
 
 export type instancia_productoUncheckedUpdateWithoutProductosInput = {
   id_instancia?: Prisma.StringFieldUpdateOperationsInput | string
-  fecha_vencimiento?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  fecha_vencimiento?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   id_detalle_reserva?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type instancia_productoUncheckedUpdateManyWithoutProductosInput = {
   id_instancia?: Prisma.StringFieldUpdateOperationsInput | string
-  fecha_vencimiento?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  fecha_vencimiento?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   id_detalle_reserva?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type instancia_productoCreateManyReservaInput = {
   id_instancia?: string
   id_producto: string
-  fecha_vencimiento: Date | string
+  fecha_vencimiento?: Date | string | null
 }
 
 export type instancia_productoUpdateWithoutReservaInput = {
   id_instancia?: Prisma.StringFieldUpdateOperationsInput | string
-  fecha_vencimiento?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  fecha_vencimiento?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   productos?: Prisma.ProductoUpdateOneRequiredWithoutInstancia_productoNestedInput
 }
 
 export type instancia_productoUncheckedUpdateWithoutReservaInput = {
   id_instancia?: Prisma.StringFieldUpdateOperationsInput | string
   id_producto?: Prisma.StringFieldUpdateOperationsInput | string
-  fecha_vencimiento?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  fecha_vencimiento?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type instancia_productoUncheckedUpdateManyWithoutReservaInput = {
   id_instancia?: Prisma.StringFieldUpdateOperationsInput | string
   id_producto?: Prisma.StringFieldUpdateOperationsInput | string
-  fecha_vencimiento?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  fecha_vencimiento?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 
@@ -574,7 +574,7 @@ export type $instancia_productoPayload<ExtArgs extends runtime.Types.Extensions.
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id_instancia: string
     id_producto: string
-    fecha_vencimiento: Date
+    fecha_vencimiento: Date | null
     id_detalle_reserva: string | null
   }, ExtArgs["result"]["instancia_producto"]>
   composites: {}

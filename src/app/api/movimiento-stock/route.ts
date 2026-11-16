@@ -30,8 +30,9 @@ function parseExpirationDate(value: unknown) {
     return null;
   }
 
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return null;
   const date = new Date(`${value}T00:00:00.000Z`);
-  return Number.isNaN(date.getTime()) ? null : date;
+  return Number.isNaN(date.getTime()) || date.toISOString().slice(0, 10) !== value ? null : date;
 }
 
 function isFutureDate(date: Date, chileToday: string) {
@@ -121,7 +122,7 @@ export const POST = withAuth(async (request: AuthenticatedRequest) => {
     }
 
     let chileToday: string | null = null;
-    if (tipo === 2) {
+    if (tipo === 2 && payload.fecha_vencimiento) {
       try {
         chileToday = await getChileCurrentDate();
       } catch {
@@ -133,7 +134,7 @@ export const POST = withAuth(async (request: AuthenticatedRequest) => {
     }
 
     if (
-      tipo === 2 &&
+      tipo === 2 && Boolean(payload.fecha_vencimiento) &&
       (!expirationDate || !chileToday || !isFutureDate(expirationDate, chileToday))
     ) {
       return NextResponse.json(
@@ -191,7 +192,7 @@ export const POST = withAuth(async (request: AuthenticatedRequest) => {
         });
       }
 
-      if (tipo === 2 && expirationDate) {
+      if (tipo === 2) {
         await tx.instancia_producto.createMany({
           data: Array.from({ length: cantidad }, () => ({
             id_producto: payload.producto ?? "",

@@ -170,7 +170,7 @@ model unidad_medida {
 model instancia_producto {
   id_instancia       String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   id_producto        String   @db.Uuid
-  fecha_vencimiento  DateTime @db.Timestamp(6)
+  fecha_vencimiento  DateTime? @db.Timestamp(6)
   id_detalle_reserva String?  @db.Uuid
   reserva            detalle? @relation(fields: [id_detalle_reserva], references: [id_detalle], onDelete: Restrict)
   productos          Producto @relation(fields: [id_producto], references: [id], map: "fk_instancia_producto_producto")

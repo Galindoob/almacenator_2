@@ -7057,3 +7057,23 @@ html[data-high-contrast="true"] :is(.academy-video-card, .academy-search, .acade
 .settings-company-actions .settings-delete-user-button:hover:not(:disabled) { background: #b91c1c; color: #fff; }
 html[data-appearance-mode="dark"] .settings-company-actions .settings-delete-user-button { color: #ff9b9b; border-color: #ff9b9b; }
 html[data-appearance-mode="dark"] .settings-company-actions .settings-delete-user-button:hover:not(:disabled) { color: #fff; background: #a51c1c; }
+
+.searchable-select-options button.is-add-option {
+  background: #4b5563;
+  color: #fff;
+  font-weight: 700;
+  margin-top: 4px;
+}
+
+.searchable-select-options button.is-add-option:hover,
+.searchable-select-options button.is-add-option:focus-visible,
+html[data-appearance-mode="dark"] .searchable-select-options button.is-add-option:hover,
+html[data-appearance-mode="dark"] .searchable-select-options button.is-add-option:focus-visible {
+  background: #374151;
+  color: #fff;
+}
+
+html[data-appearance-mode="dark"] .searchable-select-options button.is-add-option {
+  background: #596a70;
+  color: #fff;
+}

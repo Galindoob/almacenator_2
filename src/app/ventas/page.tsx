@@ -386,7 +386,6 @@ export default function SalesPage() {
 
     return productos.filter(
       (product) =>
-        (!product.controlaStock || product.stock >= 1) &&
         (!normalizedSearch ||
           product.nombre.toLowerCase().includes(normalizedSearch) ||
           product.marca.nombre.toLowerCase().includes(normalizedSearch) ||
@@ -1085,7 +1084,7 @@ export default function SalesPage() {
           {scanMessage && <p className="sales-scan-message" role="alert">{scanMessage}</p>}
 
           <div className="sales-view-catalog-heading">
-            <h2>Productos disponibles</h2>
+            <h2>Productos</h2>
             <span>{availableProducts.length}</span>
           </div>
 
@@ -1109,7 +1108,7 @@ export default function SalesPage() {
                       className={`sales-view-card${cartQuantity !== null ? " is-in-cart" : ""}`}
                       onClick={() => addToCart(product)}
                       disabled={isMaxed || busy || locked || isLoading || (!activeSale && sales.length >= 5)}
-                      title={isMaxed ? "Stock máximo agregado al carrito" : "Agregar al carrito"}
+                      title={isMaxed ? "Sin stock disponible" : "Agregar al carrito"}
                     >
                       <span className="sales-view-card-image">
                         {/* eslint-disable-next-line @next/next/no-img-element */}
