@@ -12,6 +12,11 @@ export const academyVideos: AcademyVideo[] = [
   { title: "Cómo crear una promoción por descuento", description: "Aprende a crear una promoción con descuento porcentual.", url: "https://www.youtube.com/watch?v=UtQMVf6Qog0" },
   { title: "Cómo crear una promoción de yapa", description: "Aprende a crear una promoción que incluye unidades de regalo.", url: "https://www.youtube.com/watch?v=iWX8HST04b8" },
   { title: "Cómo crear una promoción de combo", description: "Aprende a crear una promoción con precio especial por cantidad.", url: "https://www.youtube.com/watch?v=8gxuqkc9T34" },
+  { title: "Cómo realizar una venta de principio a fin", description: "Aprende los pasos para realizar una venta completa en MiniGest.", url: "https://www.youtube.com/watch?v=MFHOC9QDnx8" },
+  { title: "Cómo cobrar una venta en efectivo", description: "Aprende a registrar un cobro en efectivo y entregar el vuelto.", url: "https://www.youtube.com/watch?v=Z3ufe9KaUyY" },
+  { title: "Cómo consultar el precio de un producto", description: "Aprende a buscar un producto y consultar su precio.", url: "https://www.youtube.com/watch?v=r03mUMJN5-Y" },
+  { title: "Cómo retomar una venta pendiente", description: "Aprende a continuar una venta que quedó pendiente.", url: "https://www.youtube.com/watch?v=OGp0okZ-Bjc" },
+  { title: "Cómo cerrar caja correctamente", description: "Aprende a revisar los montos y registrar el cierre de caja.", url: "https://www.youtube.com/watch?v=it1Zz41Iy8c" },
 ];
 
 export function youtubeVideoId(value: string): string | null {
