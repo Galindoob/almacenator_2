@@ -12,6 +12,7 @@ const existing = { saleId: z.uuid(), revision: z.number().int().nonnegative() };
 export const saleCommandSchema = z.discriminatedUnion("action", [
   z.object({ action: z.literal("create"), key: z.uuid(), productId: z.uuid(), quantity: quantity.refine((v) => v > 0) }),
   z.object({ action: z.literal("item"), ...existing, productId: z.uuid(), quantity }),
+  z.object({ action: z.literal("price"), ...existing, productId: z.uuid(), price: money.positive(), permanent: z.boolean() }),
   z.object({ action: z.literal("cancel"), ...existing }),
   z.object({ action: z.literal("pay"), ...existing, key: z.uuid(), methodId: z.uuid(), amount: money.optional() }),
 ]);
@@ -159,6 +160,25 @@ export async function executeSaleCommand(tx: Tx, userId: string, command: SaleCo
   if (sale.estado !== "pendiente") throw new SaleError("La venta ya está cerrada.");
   if (sale.revision !== command.revision) throw new SaleError("La venta cambió en otra ventana. Se actualizarán sus datos; revísalos antes de continuar.");
   if (command.action !== "pay" && sale.pagos.length) throw new SaleError("No puedes modificar ni eliminar una venta con pagos registrados.");
+
+  if (command.action === "price") {
+    await lockProducts(tx, [command.productId]);
+    const detail = sale.detalles.find((entry) => entry.id_producto === command.productId);
+    if (!detail) throw new SaleError("El producto no está en esta venta.", 404);
+    const promotion = await tx.promociones.findUnique({ where: { id_productos: command.productId } });
+    if (promotion) throw new SaleError("Este producto tiene una promoción. No se puede cambiar su precio desde la venta.");
+    if (command.permanent) {
+      const actor = await tx.user.findUnique({ where: { id: userId }, include: { role: { include: { permisos: { where: { habilitado: true }, select: { permisoId: true } } } } } });
+      const granted = new Set(actor?.role.permisos.map((permission) => permission.permisoId) ?? []);
+      if (!actor?.activo || (actor.role.role.toLowerCase() !== "master" && !(granted.has("productos_ver") && granted.has("productos_editar")))) throw new SaleError("No tienes permiso para editar productos de forma permanente.", 403);
+      await tx.producto.update({ where: { id: command.productId }, data: { precioVenta: command.price } });
+    }
+    const subtotal = validMoney(Math.round(command.price * Number(detail.cantidad)));
+    await tx.detalle.update({ where: { id_detalle: detail.id_detalle }, data: { precio_actual: command.price, subtotal_venta: subtotal } });
+    const sum = await tx.detalle.aggregate({ where: { id_venta: sale.id_venta }, _sum: { subtotal_venta: true } });
+    await tx.venta.update({ where: { id_venta: sale.id_venta }, data: { valor_total: validMoney(sum._sum.subtotal_venta ?? 0), revision: { increment: 1 } } });
+    return readSale(tx, sale.id_venta);
+  }
 
   if (command.action === "item") {
     await setItem(tx, sale.id_venta, command.productId, command.quantity);

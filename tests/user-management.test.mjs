@@ -21,12 +21,12 @@ test("protege master, roles iguales o superiores y la propia cuenta", () => {
 });
 
 function mockTransaction({ actorRole = "admin", targetRole = "cajero", pending = 0, open = false } = {}) {
-  const state = { active: true, resetDeleted: false };
+  const state = { active: true, email: "target@example.com", resetDeleted: false };
   const actor = { id: "actor", activo: true, role: { role: actorRole } };
   const target = { id: "target", roleid: "role", activo: true, role: { role: targetRole } };
   return { state, tx: {
     $queryRaw: async () => [],
-    user: { findUnique: async ({ where }) => where.correo ? actor : target, updateMany: async () => { state.active = false; return { count: 1 }; } },
+    user: { findUnique: async ({ where }) => where.correo ? actor : target, updateMany: async ({ data }) => { state.active = data.activo; state.email = data.correo; return { count: 1 }; } },
     venta: { count: async () => pending },
     apertura_caja: { findFirst: async () => open ? { id_apertura: "open" } : null },
     passwordReset: { deleteMany: async () => { state.resetDeleted = true; } },
@@ -37,6 +37,7 @@ test("desactiva una cuenta autorizada y anula sus solicitudes de recuperación",
   const { tx, state } = mockTransaction();
   assert.equal((await deactivateUser(tx, "actor@example.com", "target")).status, 200);
   assert.equal(state.active, false);
+  assert.equal(state.email, null);
   assert.equal(state.resetDeleted, true);
 });
 

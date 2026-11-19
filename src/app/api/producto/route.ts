@@ -41,6 +41,7 @@ const productSelect = {
   descripcion: true,
   marcaId: true,
   codigoBarra: true,
+  codigoInterno: true,
   categoriaId: true,
   unidadId: true,
   contenido: true,

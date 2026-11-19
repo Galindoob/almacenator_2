@@ -9,7 +9,7 @@ import { isSafeAppInput, isSafeDescriptionInput } from "@/lib/input-validation";
 import { useBarcodeScanner } from "../components/useBarcodeScanner";
 import { useSyncRevision } from "../components/SyncProvider";
 
-type Product = { id: string; nombre: string; codigoBarra: string | null; precioVenta: number; costo: number; stock: number; urlImagen: string | null; categoriaId: string; marca: { nombre: string }; categoria: { nombreCategoria: string } };
+type Product = { id: string; nombre: string; codigoBarra: string | null; codigoInterno: string | null; precioVenta: number; costo: number; stock: number; urlImagen: string | null; categoriaId: string; marca: { nombre: string }; categoria: { nombreCategoria: string } };
 type PromoKind = "descuento" | "yapa" | "combo";
 type EditablePromotion = {
   id_promocion: string;
@@ -109,7 +109,7 @@ function CreatePromotionForm() {
     .sort((a, b) => a[1].localeCompare(b[1], "es-CL")), [products]);
   const visibleProducts = useMemo(() => products.filter((product) =>
     (!categoryId || product.categoriaId === categoryId) &&
-    `${product.nombre} ${product.marca.nombre} ${product.categoria.nombreCategoria} ${product.codigoBarra ?? ""}`
+    `${product.nombre} ${product.marca.nombre} ${product.categoria.nombreCategoria} ${product.codigoBarra ?? ""} ${product.codigoInterno ?? ""}`
       .toLocaleLowerCase("es-CL").includes(search.toLocaleLowerCase("es-CL"))), [products, search, categoryId]);
   const count = Number(kind === "combo" ? comboCount : take);
   const guidePrice = kind === "combo" && selectedProducts.length === 1 && Number.isInteger(count) && count > 0
@@ -134,7 +134,7 @@ function CreatePromotionForm() {
     if (!normalized || !isSafeAppInput(normalized)) return;
     setSearch(normalized);
     setCategoryId("");
-    const product = products.find((item) => item.codigoBarra?.trim() === normalized);
+    const product = products.find((item) => (item.codigoBarra?.trim() === normalized || item.codigoInterno?.trim() === normalized));
     if (!product || productPromotions.some((promotion) => promotion.id_productos === product.id && promotion.id_promocion !== editId)) return;
     if (kind === "combo" || editId) {
       setSelectedIds([product.id]);

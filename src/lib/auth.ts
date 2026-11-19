@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { hasCashClosingPrivilege } from "@/lib/cash-authorization";
 
 export type JwtPayload = {
+  sub: string;
   nombre: string;
   apellido: string;
   correo: string;
@@ -19,7 +20,9 @@ export function validateJwtToken(token: string): JwtPayload | null {
   }
 
   try {
-    return jwt.verify(token, secretKey) as JwtPayload;
+    const payload = jwt.verify(token, secretKey);
+    if (typeof payload === "string" || typeof payload.sub !== "string" || !payload.sub || typeof payload.correo !== "string") return null;
+    return payload as JwtPayload;
   } catch {
     return null;
   }
@@ -81,7 +84,7 @@ export function withAuth(
     try {
       const { getUserPermissions } = await import("@/lib/permissions");
       const access = await getUserPermissions(payload.correo);
-      if (!access) return NextResponse.json({ message: "La cuenta no está disponible o la sesión expiró." }, { status: 401 });
+      if (!access || access.user.id !== payload.sub) return NextResponse.json({ message: "La cuenta no está disponible o la sesión expiró." }, { status: 401 });
       if (required.length) {
         if (path === "/api/producto" && method === "DELETE" && access.role !== "master") return NextResponse.json({ message: "No tienes permiso para eliminar productos." }, { status: 403 });
         const privilegedCashClose = hasCashClosingPrivilege(access.role) && ((path === "/api/caja" && method === "PATCH") || (path === "/api/caja/voucher" && method === "POST"));

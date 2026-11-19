@@ -13,7 +13,7 @@ export async function deactivateUser(tx: Prisma.TransactionClient, actorEmail: s
     tx.apertura_caja.findFirst({ where: { id_usuario_apertura: target.id, horario_cierre: null }, select: { id_apertura: true } }),
   ]);
   if (pending || openCash) return { status: 409, message: "La cuenta tiene ventas pendientes o una caja abierta. Resuélvelas antes de eliminarla." };
-  const updated = await tx.user.updateMany({ where: { id: target.id, roleid: target.roleid, activo: true }, data: { activo: false } });
+  const updated = await tx.user.updateMany({ where: { id: target.id, roleid: target.roleid, activo: true }, data: { activo: false, correo: null } });
   if (updated.count !== 1) return { status: 409, message: "La cuenta cambió. Actualiza la lista e inténtalo nuevamente." };
   await tx.passwordReset.deleteMany({ where: { userId: target.id } });
   return { status: 200, message: "Cuenta eliminada correctamente. Se conservó su historial." };

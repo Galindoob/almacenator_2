@@ -93,7 +93,8 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    if (await prisma.user.findUnique({ where: { correo: validatedEmail.data }, select: { id: true } })) {
+    const existing = await prisma.user.findUnique({ where: { correo: validatedEmail.data }, select: { activo: true } });
+    if (existing?.activo) {
       return NextResponse.json({ status: "error", message: "El correo ya está registrado." }, { status: 409 });
     }
 
@@ -101,6 +102,7 @@ export async function POST(request: NextRequest) {
     const hashedPassword = await bcrypt.hash(contrasena, 10);
 
     await prisma.$transaction(async (transaction) => {
+      await transaction.user.updateMany({ where: { correo: validatedEmail.data, activo: false }, data: { correo: null } });
       const company = await transaction.empresa.findFirst({
         orderBy: { idEmpresa: "asc" },
         select: { idEmpresa: true },

@@ -50,7 +50,7 @@ export const PUT = withAuth(async (request) => {
       return NextResponse.json({ message: "La cuenta cambió mientras guardabas. Inténtalo de nuevo." }, { status: 409 });
     }
 
-    const token = jwt.sign({ nombre, apellido: user.apellido, correo: user.correo, rol: user.role.role }, secretKey, { expiresIn: "8h" });
+    const token = jwt.sign({ sub: user.id, nombre, apellido: user.apellido, correo: user.correo, rol: user.role.role }, secretKey, { expiresIn: "8h" });
     const response = NextResponse.json({ message: "Cuenta actualizada correctamente.", user: { nombre, apellido: user.apellido, correo: user.correo } });
     response.cookies.set("minigest_login", token, {
       httpOnly: true,

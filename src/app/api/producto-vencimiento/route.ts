@@ -14,6 +14,7 @@ const expiringProductSelect = {
   descripcion: true,
   marcaId: true,
   codigoBarra: true,
+  codigoInterno: true,
   categoriaId: true,
   unidadId: true,
   contenido: true,
@@ -173,8 +174,9 @@ export const DELETE = withAuth(async (request: AuthenticatedRequest) => {
     const payload = (await request.json()) as DeleteLotPayload;
     assertSafePayloadText(payload);
     const expirationDate = parseExpirationDate(payload.fecha_vencimiento);
+    const lotTimestamp = typeof payload.fecha_vencimiento === "string" ? new Date(payload.fecha_vencimiento) : null;
 
-    if (!payload.productoId || !expirationDate) {
+    if (!payload.productoId || !expirationDate || !lotTimestamp || Number.isNaN(lotTimestamp.getTime())) {
       return NextResponse.json(
         { status: "error", message: "Debe enviar el producto y la fecha del lote." },
         { status: 400 },
@@ -211,7 +213,7 @@ export const DELETE = withAuth(async (request: AuthenticatedRequest) => {
         tx.instancia_producto.count({
           where: {
             id_producto: payload.productoId,
-            fecha_vencimiento: expirationDate,
+            fecha_vencimiento: lotTimestamp,
             id_detalle_reserva: null,
           },
         }),
@@ -232,7 +234,7 @@ export const DELETE = withAuth(async (request: AuthenticatedRequest) => {
       await tx.instancia_producto.deleteMany({
         where: {
           id_producto: payload.productoId,
-          fecha_vencimiento: expirationDate,
+          fecha_vencimiento: lotTimestamp,
           id_detalle_reserva: null,
         },
       });

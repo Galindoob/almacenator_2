@@ -119,6 +119,7 @@ model Producto {
   descripcion                                          String?               @db.VarChar(500)
   marcaId                                              String                @map("id_marca") @db.Uuid
   codigoBarra                                          String?               @unique @map("codigo_barra") @db.VarChar(100)
+  codigoInterno                                        String?               @unique @map("codigo_interno") @db.VarChar(30)
   categoriaId                                          String                @map("id_categoria") @db.Uuid
   unidadId                                             String                @map("id_unidad") @db.Uuid
   precioVenta                                          Int                   @map("precio_venta")

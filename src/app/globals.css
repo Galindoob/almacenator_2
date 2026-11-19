@@ -5810,11 +5810,33 @@ html[data-high-contrast="true"] .sales-view-empty-icon {
   opacity: 0.4;
 }
 
-.sales-view-stepper span {
+.sales-view-stepper input {
   font-weight: 800;
-  min-width: 36px;
+  width: 55px;
+  height: 34px;
+  border: 0;
+  padding: 0 4px;
+  color: var(--foreground);
+  background: var(--background);
   text-align: center;
 }
+
+.sales-edit-price {
+  border: 0;
+  border-radius: 6px;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 700;
+}
+.sales-edit-price:disabled { cursor: not-allowed; opacity: .6; }
+.sales-edit-price:focus-visible { outline: 2px solid var(--accent-color); outline-offset: 2px; }
+
+.internal-code-panel { display: flex; flex-wrap: wrap; gap: 10px; align-items: end; margin: 16px 0; }
+.internal-code-panel label { display: grid; gap: 5px; font-weight: 700; }
+.internal-code-panel input { padding: 9px; border: 1px solid var(--grey-color); border-radius: 8px; max-width: 220px; }
+.internal-code-panel > button { padding: 9px 12px; border: 1px solid var(--grey-color); border-radius: 8px; cursor: pointer; color: var(--foreground); background: var(--background); }
+.internal-code-panel > button:disabled { opacity: .5; cursor: not-allowed; }
+.internal-code-panel > p { width: 100%; margin: 0; }
 
 .sales-view-weight-controls label {
   display: grid;

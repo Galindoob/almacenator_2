@@ -6,6 +6,7 @@ import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from "rea
 import { CalendarDays } from "lucide-react";
 import { Navbar } from "../components/Navbar";
 import { CartLoader } from "../components/CartLoader";
+import { ProductInternalCode } from "../components/ProductInternalCode";
 import { useBarcodeScanner } from "../components/useBarcodeScanner";
 import { usePermissions } from "../components/usePermissions";
 import { useSyncRevision } from "../components/SyncProvider";
@@ -17,6 +18,7 @@ type Producto = {
   descripcion: string | null;
   marcaId: string;
   codigoBarra: string | null;
+  codigoInterno: string | null;
   categoriaId: string;
   unidadId: string;
   empaque: string | null;
@@ -560,7 +562,7 @@ export default function ProductoPage() {
     }
 
     return productos.filter((producto) =>
-      producto.nombre.toLowerCase().includes(query) || producto.codigoBarra?.toLowerCase().includes(query),
+      producto.nombre.toLowerCase().includes(query) || producto.codigoBarra?.toLowerCase().includes(query) || producto.codigoInterno?.toLowerCase().includes(query),
     );
   }, [productos, search]);
 
@@ -572,7 +574,7 @@ export default function ProductoPage() {
     }
 
     return expiringProducts.filter((producto) =>
-      producto.nombre.toLowerCase().includes(query) || producto.codigoBarra?.toLowerCase().includes(query),
+      producto.nombre.toLowerCase().includes(query) || producto.codigoBarra?.toLowerCase().includes(query) || producto.codigoInterno?.toLowerCase().includes(query),
     );
   }, [expiringProducts, search]);
 
@@ -607,9 +609,9 @@ export default function ProductoPage() {
   const { onSearchKeyDown } = useBarcodeScanner((code) => {
     const normalized = code.trim();
     if (!normalized || !isSafeAppInput(normalized)) return;
-    const product = productos.find((item) => item.codigoBarra?.trim() === normalized);
+    const product = productos.find((item) => (item.codigoBarra?.trim() === normalized || item.codigoInterno?.trim() === normalized));
     if (activeProductTab === "vencimiento") {
-      const expiring = expiringProducts.find((item) => item.codigoBarra?.trim() === normalized);
+      const expiring = expiringProducts.find((item) => (item.codigoBarra?.trim() === normalized || item.codigoInterno?.trim() === normalized));
       if (expiring) {
         setSearch(normalized);
         setOpenExpiringProductId(expiring.id);
@@ -1570,6 +1572,7 @@ export default function ProductoPage() {
             onSave={saveProductPrices}
             onOpenStockModal={openStockModal}
             onEdit={openEditModal}
+            onCodeSaved={(code) => setProductos((current) => current.map((p) => p.id === selectedProduct.id ? { ...p, codigoInterno: code } : p))}
           />
         ) : (
           <aside className="product-detail-empty">
@@ -2617,6 +2620,7 @@ type ProductDetailProps = {
   onSave: () => void;
   onOpenStockModal: (type: StockModal) => void;
   onEdit: (product: Producto) => void;
+  onCodeSaved: (code: string | null) => void;
 };
 
 function ProductDetail({
@@ -2632,6 +2636,7 @@ function ProductDetail({
   onSave,
   onOpenStockModal,
   onEdit,
+  onCodeSaved,
 }: ProductDetailProps) {
   const can = usePermissions();
   const imageUrl = product.urlImagen || "/generic-product.svg";
@@ -2684,6 +2689,8 @@ function ProductDetail({
           <span>Tipo de venta: {product.unidad.unidad}</span>
         </div>
       </div>
+
+      {!product.codigoBarra?.trim() && <ProductInternalCode key={`${product.id}-${product.codigoInterno ?? ""}`} id={product.id} name={product.nombre} code={product.codigoInterno} canEdit={can("productos_editar")} onSaved={onCodeSaved} />}
 
       <div className="detail-accordion">
         <button

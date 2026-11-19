@@ -23,7 +23,7 @@ export async function proxy(request: NextRequest) {
       return new NextResponse("No se pudo verificar la sesión.", { status: 503 });
     }
   }
-  const valid = Boolean(payload && access);
+  const valid = Boolean(payload && access && payload.sub === access.user.id);
 
   if (path === "/login" || path === "/register") {
     if (!valid) return NextResponse.next();

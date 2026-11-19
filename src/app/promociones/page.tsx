@@ -18,7 +18,7 @@ type Promo = {
   combo: number | null;
   precio_combo: number | null;
   tipo_promocion: { tipo: string };
-  producto: { id: string; nombre: string; codigoBarra: string | null; costo: number; precioVenta: number; urlImagen: string | null; marca: { nombre: string } };
+  producto: { id: string; nombre: string; codigoBarra: string | null; codigoInterno: string | null; costo: number; precioVenta: number; urlImagen: string | null; marca: { nombre: string } };
 };
 
 function money(value: number) { return `$${Math.round(value).toLocaleString("es-CL")}`; }
@@ -38,7 +38,7 @@ export default function PromotionsPage() {
     const normalized = code.trim();
     if (!normalized) return;
     setSearch(normalized);
-    const promo = promotions.find((item) => item.producto.codigoBarra?.trim() === normalized);
+    const promo = promotions.find((item) => (item.producto.codigoBarra?.trim() === normalized || item.producto.codigoInterno?.trim() === normalized));
     if (promo) setSelectedId(promo.id_promocion);
   }, !loading);
 
@@ -65,7 +65,7 @@ export default function PromotionsPage() {
   }, [syncRevision]);
 
   const filtered = useMemo(() => promotions.filter((promo) =>
-    `${promo.nombre_promocion} ${promo.producto.nombre} ${promo.producto.codigoBarra ?? ""} ${promo.tipo_promocion.tipo}`.toLocaleLowerCase("es-CL").includes(search.toLocaleLowerCase("es-CL"))), [promotions, search]);
+    `${promo.nombre_promocion} ${promo.producto.nombre} ${promo.producto.codigoBarra ?? ""} ${promo.producto.codigoInterno ?? ""} ${promo.tipo_promocion.tipo}`.toLocaleLowerCase("es-CL").includes(search.toLocaleLowerCase("es-CL"))), [promotions, search]);
   const selected = promotions.find((promo) => promo.id_promocion === selectedId) ?? null;
   const priceMultiplier = includeVat ? 1 : 1 / 1.19;
   const costMultiplier = includeVat ? 1.19 : 1;

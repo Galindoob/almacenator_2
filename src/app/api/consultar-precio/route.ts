@@ -23,6 +23,7 @@ export const GET = withAuth(async (request) => {
           { nombre: { contains: query, mode: "insensitive" } },
           { codigoBarra: { equals: query } },
           { codigoBarra: { contains: query } },
+          { codigoInterno: { contains: query } },
         ],
       },
       orderBy: { nombre: "asc" },
@@ -32,6 +33,7 @@ export const GET = withAuth(async (request) => {
         nombre: true,
         descripcion: true,
         codigoBarra: true,
+        codigoInterno: true,
         precioVenta: true,
         urlImagen: true,
         contenido: true,
@@ -48,8 +50,8 @@ export const GET = withAuth(async (request) => {
     });
 
     productos.sort((first, second) => {
-      const firstExactBarcode = first.codigoBarra === query;
-      const secondExactBarcode = second.codigoBarra === query;
+      const firstExactBarcode = first.codigoBarra === query || first.codigoInterno === query;
+      const secondExactBarcode = second.codigoBarra === query || second.codigoInterno === query;
       if (firstExactBarcode !== secondExactBarcode) return firstExactBarcode ? -1 : 1;
       const firstExactName = first.nombre.toLocaleLowerCase("es-CL") === query.toLocaleLowerCase("es-CL");
       const secondExactName = second.nombre.toLocaleLowerCase("es-CL") === query.toLocaleLowerCase("es-CL");

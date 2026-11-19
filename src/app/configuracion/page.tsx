@@ -46,6 +46,7 @@ type AccountUser = {
   id: string;
   nombre: string;
   apellido: string;
+  correo?: string | null;
   urlImagen: string | null;
   roleId: string;
   rol: string;
@@ -894,6 +895,7 @@ function UsersSettings() {
                   <dl>
                     <div><dt>Nombre</dt><dd>{selectedUser.nombre}</dd></div>
                     <div><dt>Apellido</dt><dd>{selectedUser.apellido}</dd></div>
+                    {["admin", "master"].includes(actorRole ?? "") ? <div><dt>Correo</dt><dd style={{ overflowWrap: "anywhere" }}>{selectedUser.correo || "Sin correo registrado"}</dd></div> : null}
                     <div><dt>Rol</dt><dd>
                       <select
                         className="settings-user-role-select"

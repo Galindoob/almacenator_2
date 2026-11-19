@@ -8,6 +8,7 @@ import { ArrowLeft, ArrowLeftRight, Banknote, CreditCard, Wallet, Plus, Trash2, 
 import type { SaleCommand } from "@/lib/sales";
 import { Navbar } from "../components/Navbar";
 import { CartLoader } from "../components/CartLoader";
+import { usePermissions } from "../components/usePermissions";
 import { useAppDialog } from "../components/AppDialogProvider";
 import { useAppearance } from "../components/AppearanceProvider";
 import { isSafeAppInput } from "@/lib/input-validation";
@@ -20,6 +21,7 @@ type Producto = {
   id: string;
   nombre: string;
   codigoBarra: string | null;
+  codigoInterno: string | null;
   descripcion: string | null;
   contenido: number | null;
   stock: number;
@@ -230,6 +232,8 @@ function ProductDetails({ product }: { product: Producto }) {
 }
 
 export default function SalesPage() {
+  const can = usePermissions();
+  const [priceEdit, setPriceEdit] = useState<{ productId: string; name: string; value: string; hasPromotion: boolean } | null>(null);
   const showDialog = useAppDialog();
   const syncRevision = useSyncRevision();
   const router = useRouter();
@@ -389,7 +393,7 @@ export default function SalesPage() {
         (!normalizedSearch ||
           product.nombre.toLowerCase().includes(normalizedSearch) ||
           product.marca.nombre.toLowerCase().includes(normalizedSearch) ||
-          product.codigoBarra?.toLowerCase().includes(normalizedSearch)),
+          product.codigoBarra?.toLowerCase().includes(normalizedSearch) || product.codigoInterno?.toLowerCase().includes(normalizedSearch)),
     );
   }, [productos, search]);
 
@@ -680,7 +684,7 @@ export default function SalesPage() {
       pendingBarcodes.current.push(normalizedCode);
       return;
     }
-    const product = productos.find((item) => item.codigoBarra?.trim() === normalizedCode);
+    const product = productos.find((item) => (item.codigoBarra?.trim() === normalizedCode || item.codigoInterno?.trim() === normalizedCode));
     if (!product) {
       setScanMessage(`No se encontró un producto con el código ${normalizedCode}.`);
       return;
@@ -734,7 +738,7 @@ export default function SalesPage() {
         const code = scanned.value;
         scannerBuffer.current = { value: "", lastKeyAt: 0, fastKeys: 0 };
         if (scannerTimer.current) clearTimeout(scannerTimer.current);
-        if (code.length >= 4 && (scanned.fastKeys >= 4 || productos.some((product) => product.codigoBarra?.trim() === code))) {
+        if (code.length >= 4 && (scanned.fastKeys >= 4 || productos.some((product) => (product.codigoBarra?.trim() === code || product.codigoInterno?.trim() === code)))) {
           event.preventDefault();
           addBarcodeToCart(code);
         }
@@ -755,7 +759,7 @@ export default function SalesPage() {
       scannerTimer.current = setTimeout(() => {
         const scanned = scannerBuffer.current;
         scannerBuffer.current = { value: "", lastKeyAt: 0, fastKeys: 0 };
-        if ((scanned.value.length >= 4 && productos.some((product) => product.codigoBarra?.trim() === scanned.value)) || scanned.fastKeys >= 6) {
+        if ((scanned.value.length >= 4 && productos.some((product) => (product.codigoBarra?.trim() === scanned.value || product.codigoInterno?.trim() === scanned.value))) || scanned.fastKeys >= 6) {
           addBarcodeToCart(scanned.value);
         }
       }, 300);
@@ -772,7 +776,7 @@ export default function SalesPage() {
   function onSearchScannerKeyDown(event: ReactKeyboardEvent<HTMLInputElement>) {
     if (event.key === "Enter" || event.key === "Tab") {
       const code = event.currentTarget.value.trim();
-      const isBarcode = productos.some((product) => product.codigoBarra?.trim() === code);
+      const isBarcode = productos.some((product) => (product.codigoBarra?.trim() === code || product.codigoInterno?.trim() === code));
       if (isBarcode && (event.key === "Enter" || searchScannerBuffer.current.fastKeys >= 4)) {
         event.preventDefault();
         if (searchScannerTimer.current) clearTimeout(searchScannerTimer.current);
@@ -795,7 +799,7 @@ export default function SalesPage() {
       const scanned = searchScannerBuffer.current;
       searchScannerBuffer.current = { value: "", lastKeyAt: 0, fastKeys: 0 };
       const code = searchInputRef.current?.value.trim();
-      if (scanned.fastKeys >= 6 && code === scanned.value && productos.some((product) => product.codigoBarra?.trim() === code)) {
+      if (scanned.fastKeys >= 6 && code === scanned.value && productos.some((product) => (product.codigoBarra?.trim() === code || product.codigoInterno?.trim() === code))) {
         addBarcodeToCart(code);
       }
     }, 160);
@@ -944,6 +948,8 @@ export default function SalesPage() {
                       onWeightBlur={() => saveWeight(item)}
                       onIncrement={() => updateUnitQuantity(item.product.id, 1)}
                       onDecrement={() => updateUnitQuantity(item.product.id, -1)}
+                      onEditPrice={() => setPriceEdit({ productId: item.product.id, name: item.product.nombre, value: String(item.product.precioVenta), hasPromotion: item.promotionRules.length > 0 })}
+                      onUnitSave={(quantity) => saveQuantity(item.product.id, quantity)}
                       onRemove={() => removeFromCart(item.product.id)}
                       onPriceChange={(text) => updateWeightPrice(item.product.id, text)}
                       onQuantityChange={(text) => updateWeightQuantity(item.product.id, text)}
@@ -1139,6 +1145,24 @@ export default function SalesPage() {
           )}
         </section>
       </section>
+      {priceEdit && <div className="stock-modal-layer" role="presentation">
+        <button type="button" className="stock-modal-backdrop" aria-label="Cerrar" onClick={() => setPriceEdit(null)} />
+        <section className="stock-modal" role="dialog" aria-modal="true" aria-labelledby="sale-price-title">
+          <h2 id="sale-price-title">Cambiar precio de {priceEdit.name}</h2>
+          {priceEdit.hasPromotion ? <p>Este producto tiene una promoción. Modifica su precio desde Gestión de productos.</p> : <>
+            <label>Nuevo precio por unidad
+              <input type="text" inputMode="numeric" value={priceEdit.value} onChange={(event) => { if (/^\d*$/.test(event.target.value)) setPriceEdit({ ...priceEdit, value: event.target.value }); }} />
+            </label>
+            <p>¿Deseas cambiarlo solo para esta venta o de manera permanente?</p>
+            <div className="stock-modal-actions">
+              <button type="button" disabled={busy || !activeSale || !Number.isSafeInteger(Number(priceEdit.value)) || Number(priceEdit.value) < 1 || Number(priceEdit.value) > 2147483647} onClick={() => { if (activeSale) void mutate({ action: "price", saleId: activeSale.id_venta, revision: activeSale.revision, productId: priceEdit.productId, price: Number(priceEdit.value), permanent: false }); setPriceEdit(null); }}>Solo para esta venta</button>
+              <button type="button" title={!can("productos_editar") ? "Requiere permiso para editar productos" : undefined} disabled={busy || !activeSale || !can("productos_editar") || !Number.isSafeInteger(Number(priceEdit.value)) || Number(priceEdit.value) < 1 || Number(priceEdit.value) > 2147483647} onClick={() => { if (activeSale) void mutate({ action: "price", saleId: activeSale.id_venta, revision: activeSale.revision, productId: priceEdit.productId, price: Number(priceEdit.value), permanent: true }); setPriceEdit(null); }}>Permanente</button>
+            </div>
+            {!can("productos_editar") && <p>El cambio permanente requiere permiso para editar productos.</p>}
+          </>}
+          <div className="stock-modal-actions"><button type="button" onClick={() => setPriceEdit(null)}>Anular cambio</button></div>
+        </section>
+      </div>}
     </main>
   );
 }
@@ -1149,6 +1173,8 @@ type CartRowProps = {
   onWeightBlur: () => void;
   onIncrement: () => void;
   onDecrement: () => void;
+  onEditPrice: () => void;
+  onUnitSave: (quantity: number) => void;
   onRemove: () => void;
   onPriceChange: (text: string) => void;
   onQuantityChange: (text: string) => void;
@@ -1161,6 +1187,8 @@ function CartRow({
   onWeightBlur,
   onIncrement,
   onDecrement,
+  onEditPrice,
+  onUnitSave,
   onRemove,
   onPriceChange,
   onQuantityChange,
@@ -1168,6 +1196,7 @@ function CartRow({
 }: CartRowProps) {
   const { product } = item;
   const measure = getMeasureName(product) || "unidad";
+  const [quantityError, setQuantityError] = useState("");
 
   return (
     <tr>
@@ -1183,7 +1212,7 @@ function CartRow({
               <span key={`${promotion.name}-${index}`} className="sales-promotion-badge">Promo disponible: {promotion.name} · {promotion.condition}</span>
             ))}
             <ProductDetails product={product} />
-            <span className="sales-view-price">{getPriceLabel(product)}</span>
+            <button type="button" className="sales-view-price sales-edit-price" onClick={onEditPrice} disabled={disabled} aria-label={`Cambiar precio de ${product.nombre}`}>{getPriceLabel(product)} ✎</button>
           </div>
         </div>
       </td>
@@ -1202,7 +1231,29 @@ function CartRow({
               >
                 -
               </button>
-              <span aria-label="Cantidad">{item.quantity}</span>
+              <input
+                key={item.quantity}
+                type="text"
+                inputMode="numeric"
+                defaultValue={item.quantity}
+                disabled={disabled}
+                aria-label={`Cantidad de ${product.nombre}`}
+                onFocus={(event) => event.currentTarget.select()}
+                onChange={() => setQuantityError("")}
+                onKeyDown={(event) => { if (event.key === "Enter") { event.preventDefault(); event.currentTarget.blur(); } }}
+                onBlur={(event) => {
+                  const text = event.currentTarget.value.trim();
+                  const quantity = Number(text);
+                  if (!/^\d+$/.test(text) || !Number.isSafeInteger(quantity) || quantity < 1 || quantity > 999999) {
+                    setQuantityError("Ingresa una cantidad entera mayor que cero.");
+                  } else if (product.controlaStock && quantity > product.stock) {
+                    setQuantityError(`Stock disponible: ${product.stock}.`);
+                  } else if (quantity !== item.quantity) {
+                    onUnitSave(quantity);
+                  }
+                  event.currentTarget.value = String(item.quantity);
+                }}
+              />
               <button
                 type="button"
                 onClick={onIncrement}
@@ -1213,6 +1264,7 @@ function CartRow({
                 +
               </button>
             </div>
+            {quantityError ? <small role="alert">{quantityError}</small> : null}
             <small>
               {formatPrice(product.precioVenta)} por unidad · Subtotal {formatPrice(getLineTotal(item))}
             </small>
