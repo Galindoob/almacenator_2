@@ -7,6 +7,7 @@ import { CalendarDays } from "lucide-react";
 import { Navbar } from "../components/Navbar";
 import { CartLoader } from "../components/CartLoader";
 import { ProductInternalCode } from "../components/ProductInternalCode";
+import { QuickProviderModal } from "../components/QuickProviderModal";
 import { useBarcodeScanner } from "../components/useBarcodeScanner";
 import { usePermissions } from "../components/usePermissions";
 import { useSyncRevision } from "../components/SyncProvider";
@@ -1557,6 +1558,10 @@ export default function ProductoPage() {
             onSubmit={createProduct}
             image={createImage}
             onImageChange={setCreateImage}
+            onProviderCreated={(provider) => {
+              setOptions((current) => ({ ...current, proveedores: [...current.proveedores, { id: provider.id, id_proveedor: provider.id, nombre: provider.nombre }].sort((a, b) => (a.nombre ?? "").localeCompare(b.nombre ?? "", "es-CL")) }));
+              setCreateForm((current) => ({ ...current, proveedorId: provider.id }));
+            }}
           />
         ) : selectedProduct && priceState ? (
           <ProductDetail
@@ -2017,6 +2022,7 @@ type ProductCreatePanelProps = {
   onChange: (field: keyof CreateProductForm, value: string) => void;
   onImageChange: (value: File | null) => void;
   onSubmit: () => void;
+  onProviderCreated: (provider: { id: string; nombre: string }) => void;
 };
 
 function ProductCreatePanel({
@@ -2030,7 +2036,10 @@ function ProductCreatePanel({
   onChange,
   onImageChange,
   onSubmit,
+  onProviderCreated,
 }: ProductCreatePanelProps) {
+  const can = usePermissions();
+  const [showProviderModal, setShowProviderModal] = useState(false);
   const selectedUnit = options.unidades.find((unit) => unit.id === form.unidadId);
   const selectedMeasure = options.unidadesMedida.find(
     (measure) => measure.id === form.unidadMedidaId,
@@ -2217,8 +2226,9 @@ function ProductCreatePanel({
                 value: proveedor.id_proveedor ?? proveedor.id,
                 label: proveedor.nombre ?? "",
               })),
+              ...(can("proveedores_editar") ? [{ value: "new", label: "Agregar proveedor" }] : []),
             ]}
-            onChange={(nextValue) => onChange("proveedorId", nextValue)}
+            onChange={(nextValue) => { if (nextValue === "new") setShowProviderModal(true); else onChange("proveedorId", nextValue); }}
           />
         </label>
 
@@ -2321,6 +2331,7 @@ function ProductCreatePanel({
           {isCreating ? "Guardando..." : "Guardar producto"}
         </button>
       </div>
+      {showProviderModal && <QuickProviderModal onClose={() => setShowProviderModal(false)} onCreated={(provider) => { onProviderCreated(provider); setShowProviderModal(false); }} />}
     </aside>
   );
 }
