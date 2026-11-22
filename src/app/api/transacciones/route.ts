@@ -3,11 +3,13 @@ import { withAuth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { listTransactions, transactionQuerySchema } from "@/lib/transactions";
 import { ensureSaleReceipt } from "@/lib/sale-receipt";
+import { expirePendingSales } from "@/lib/expire-sales";
 
 export const GET = withAuth(async (request) => {
   const parsed = transactionQuerySchema.safeParse(Object.fromEntries(request.nextUrl.searchParams));
   if (!parsed.success) return NextResponse.json({ message: parsed.error.issues[0]?.message ?? "Filtros inválidos." }, { status: 400 });
   try {
+    await expirePendingSales();
     const missingReceipts = await prisma.venta.findMany({
       where: { estado: "completado", recibo: null },
       orderBy: { fecha_pago: "desc" },

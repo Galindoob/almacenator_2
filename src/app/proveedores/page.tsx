@@ -129,6 +129,9 @@ export default function ProvidersPage() {
   const [draggedProductId, setDraggedProductId] = useState<string | null>(null);
   const [productManagerMessage, setProductManagerMessage] = useState("");
   const [isSavingProducts, setIsSavingProducts] = useState(false);
+  const [deleteConfirmation, setDeleteConfirmation] = useState<{ id: string; nombre: string; productos: { id: string; nombre: string }[] } | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState("");
 
   const originalProvider = providers.find((provider) => provider.id_proveedor === selectedProviderId);
   const formIsDirty = Boolean(form && originalProvider && JSON.stringify(form) !== JSON.stringify(buildProviderForm(originalProvider)));
@@ -662,6 +665,24 @@ export default function ProvidersPage() {
       ? null
       : selectedProvider?.url_imagen;
 
+  async function confirmDeleteProvider() {
+    if (!deleteConfirmation || isDeleting) return;
+    setIsDeleting(true); setDeleteError("");
+    try {
+      const response = await fetch("/api/proveedores", { method: "DELETE", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id_proveedor: deleteConfirmation.id, productos: deleteConfirmation.productos.map((product) => product.id) }) });
+      const data = await response.json() as { message?: string; productos?: { id: string; nombre: string }[] };
+      if (!response.ok) {
+        if (response.status === 409 && data.productos) setDeleteConfirmation({ ...deleteConfirmation, productos: data.productos });
+        throw new Error(data.message ?? "No se pudo eliminar el proveedor.");
+      }
+      setProviders((current) => current.filter((provider) => provider.id_proveedor !== deleteConfirmation.id));
+      setCatalogProducts((current) => current.map((product) => product.id_proveedor === deleteConfirmation.id ? { ...product, id_proveedor: null } : product));
+      setSelectedProviderId(null); setOpenProviderId(null); setForm(null); setDeleteConfirmation(null);
+      setMessage(""); setError("");
+    } catch (e) { setDeleteError(e instanceof Error ? e.message : "No se pudo conectar con el servidor."); }
+    finally { setIsDeleting(false); }
+  }
+
   return (
     <main className="provider-view-shell">
       <Navbar onLogout={handleLogout} />
@@ -940,6 +961,7 @@ export default function ProvidersPage() {
               >
                 {isSaving ? "Guardando..." : "Guardar cambios"}
               </button>
+              <button type="button" className="provider-delete-button" disabled={!can("proveedores_editar") || isSaving || isDeleting} onClick={() => { setDeleteError(""); setDeleteConfirmation({ id: selectedProvider.id_proveedor, nombre: selectedProvider.nombre, productos: selectedProvider.productos.map(({ id, nombre }) => ({ id, nombre })) }); }}>Eliminar proveedor</button>
             </div>
           </aside>
         ) : (
@@ -1081,6 +1103,16 @@ export default function ProvidersPage() {
         </div>
       ) : null}
 
+      {deleteConfirmation && <div className="stock-modal-layer" role="presentation">
+        <button type="button" className="stock-modal-backdrop" aria-label="Cancelar" disabled={isDeleting} onClick={() => setDeleteConfirmation(null)} />
+        <section className="stock-modal" role="dialog" aria-modal="true" aria-labelledby="delete-provider-title">
+          <h2 id="delete-provider-title">Eliminar proveedor</h2>
+          <p>¿Deseas eliminar a {deleteConfirmation.nombre}?</p>
+          {deleteConfirmation.productos.length ? <><p>Este proveedor tiene {deleteConfirmation.productos.length} {deleteConfirmation.productos.length === 1 ? "producto asociado" : "productos asociados"}. Los productos se conservarán sin proveedor:</p><ul className="provider-delete-list">{deleteConfirmation.productos.map((product) => <li key={product.id}>{product.nombre}</li>)}</ul></> : <p>Este proveedor no tiene productos asociados.</p>}
+          {deleteError && <p className="stock-modal-message" role="alert">{deleteError}</p>}
+          <div className="stock-modal-actions"><button type="button" disabled={isDeleting} onClick={() => setDeleteConfirmation(null)}>Cancelar</button><button type="button" disabled={isDeleting} onClick={() => void confirmDeleteProvider()}>{isDeleting ? "Eliminando..." : "Borrar proveedor"}</button></div>
+        </section>
+      </div>}
       {isImageModalOpen && selectedProvider ? (
         <div className="stock-modal-layer" role="presentation">
           <button

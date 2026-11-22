@@ -119,6 +119,7 @@ async function setItem(tx: Tx, saleId: string, productId: string, amount: number
   const sum = await tx.detalle.aggregate({ where: { id_venta: saleId }, _sum: { subtotal_venta: true } });
   await tx.venta.update({ where: { id_venta: saleId }, data: {
     valor_total: validMoney(sum._sum.subtotal_venta ?? 0), revision: { increment: 1 },
+    ...(delta !== 0 ? { ultima_actividad: new Date() } : {}),
   } });
 }
 

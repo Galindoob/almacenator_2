@@ -13,6 +13,10 @@ RESEND_FROM="Mini Gest <seguridad@tu-dominio-verificado.cl>"
 
 El remitente debe pertenecer a un dominio verificado en Resend. Sin estas variables, la app no afirmará que se envió un código y mostrará un error de configuración. Los códigos vencen en 10 minutos y admiten hasta cinco intentos.
 
+### Expiración de ventas pendientes
+
+Las ventas pendientes sin pagos caducan tras una hora desde la última modificación de productos. La limpieza también se ejecuta al consultar ventas, transacciones o caja. Para ejecutar la limpieza sin usuarios conectados, configura un programador externo para enviar cada cinco minutos una solicitud GET a `/api/tareas/ventas-expiradas`, con el encabezado `Authorization: Bearer <CRON_SECRET>`. Configura `CRON_SECRET` como una clave larga y aleatoria en las variables de entorno del despliegue; sin ella, la ruta rechaza las solicitudes. No publiques la clave en el repositorio. El plan Hobby de Vercel no ofrece cron cada cinco minutos. La tarea procesa hasta 100 ventas por ejecución; ejecuciones posteriores procesan el resto. La migración debe aplicarse antes de desplegar el código.
+
 First, run the development server:
 
 ```bash

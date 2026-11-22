@@ -3,8 +3,10 @@ import { withAuth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { executeSaleCommand, saleCommandSchema, saleInclude, SaleError } from "@/lib/sales";
 import { ensureSaleReceipt } from "@/lib/sale-receipt";
+import { expirePendingSales } from "@/lib/expire-sales";
 
 export const GET = withAuth(async (request) => {
+  await expirePendingSales();
   const user = await prisma.user.findUnique({ where: { correo: request.correo }, select: { id: true } });
   if (!user) return NextResponse.json({ message: "Usuario no encontrado." }, { status: 401 });
   const openCashRegister = await prisma.apertura_caja.findFirst({ where: { horario_cierre: null }, select: { id_apertura: true } });
@@ -21,6 +23,7 @@ export const POST = withAuth(async (request) => {
     if (!parsed.success) return NextResponse.json({ message: parsed.error.issues[0]?.message ?? "Datos inválidos." }, { status: 400 });
     const user = await prisma.user.findUnique({ where: { correo: request.correo }, select: { id: true } });
     if (!user) return NextResponse.json({ message: "Usuario no encontrado." }, { status: 401 });
+    await expirePendingSales();
     const venta = await prisma.$transaction((tx) => executeSaleCommand(tx, user.id, parsed.data), { timeout: 30000 });
     if (venta?.estado === "completado" && !venta.recibo) {
       try {

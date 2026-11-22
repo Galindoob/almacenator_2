@@ -304,6 +304,7 @@ model venta {
   id_apertura_caja  String?   @db.Uuid
   valor_total       Int
   fecha_de_creacion DateTime  @default(now()) @db.Timestamptz(6)
+  ultima_actividad  DateTime  @default(now()) @db.Timestamptz(6)
   fecha_pago        DateTime? @db.Timestamptz(6)
   estado            String    @db.VarChar(30)
   vuelto            Int       @default(0)

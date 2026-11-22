@@ -25,6 +25,7 @@ try {
   prisma = new PrismaClient({ adapter: new PrismaPg({ connectionString: `postgresql://postgres:postgres@${server.getServerConn()}/postgres`, max: 1 }), errorFormat: "minimal" });
   const role = await prisma.role.create({ data: { role: "test" } });
   const user = await prisma.user.create({ data: { nombre: "Test", apellido: "Sales", contrasena: "not-a-login", roleid: role.id } });
+  await prisma.apertura_caja.create({ data: { id_usuario_apertura: user.id, saldo_apertura: 1000, saldo_esperado: 1000, valor_real: 1000 } });
   const other = await prisma.user.create({ data: { nombre: "Other", apellido: "Sales", contrasena: "not-a-login", roleid: role.id } });
   const marca = await prisma.marca.create({ data: { nombre: "Test" } });
   const categoria = await prisma.categoria.create({ data: { nombreCategoria: "Test" } });
@@ -199,7 +200,7 @@ try {
     assert.equal(result.change, 2000 - (1320 + digit + expected));
   }
   assert.throws(() => calculatePayment(1325, 0, 1325, true, true), /terminar en 0/);
-  assert.throws(() => calculatePayment(1325, 0, 0, true, true), /no es valido/);
+  assert.throws(() => calculatePayment(1325, 0, 0, true, true), /no es válido/);
   assert.deepEqual(calculatePayment(1325, 0, 1325, false, false), { completed: true, change: 0, adjustment: 0 });
   // Use another seller: the pagination fixtures deliberately contain many pending sales.
   const roundingSale = async (price) => {
@@ -233,6 +234,23 @@ try {
   assert.equal(roundedSale.redondeo, 0);
   assert.equal(roundedSale.pagos.reduce((sum, p) => sum + p.pago, 0), 1325);
   console.log("PASS cash rounding 0-9, zero balance, partial cash, cash/debit, change and stored adjustment");
+  process.env.DATABASE_URL ||= "postgresql://test:test@localhost:5432/test";
+  const { expireSalesInTransaction } = await jiti.import("../src/lib/expire-sales.ts");
+  const expiryUser = await prisma.user.create({ data: { nombre: "Expiry", apellido: "Test", contrasena: "test", roleid: role.id } });
+  const expiring = await run({ action: "create", key: randomUUID(), productId: product.id, quantity: 2 }, expiryUser.id);
+  const paidPending = await run({ action: "create", key: randomUUID(), productId: product.id, quantity: 1 }, expiryUser.id);
+  await run({ action: "pay", saleId: paidPending.id_venta, revision: paidPending.revision, key: randomUUID(), methodId: cash.id_medio, amount: 500 }, expiryUser.id);
+  const recent = await run({ action: "create", key: randomUUID(), productId: weight.id, quantity: 1 }, expiryUser.id);
+  const old = new Date(Date.now() - 7200000);
+  await prisma.venta.updateMany({ where: { id_venta: { in: [expiring.id_venta, paidPending.id_venta] } }, data: { ultima_actividad: old } });
+  const stockBeforeExpiry = await stock();
+  assert.equal(await prisma.$transaction(expireSalesInTransaction), 1);
+  assert.equal(await prisma.venta.findUnique({ where: { id_venta: expiring.id_venta } }), null);
+  assert.ok(await prisma.venta.findUnique({ where: { id_venta: paidPending.id_venta } }));
+  assert.ok(await prisma.venta.findUnique({ where: { id_venta: recent.id_venta } }));
+  assert.equal(await stock(), stockBeforeExpiry + 2);
+  assert.equal(await prisma.$transaction(expireSalesInTransaction), 0);
+  console.log("PASS expiration releases stock, preserves payments and recent sales, and is idempotent");
 } finally {
   if (prisma) await prisma.$disconnect();
   await server.stop();

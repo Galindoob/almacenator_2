@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { expireSalesInTransaction, expirePendingSales } from "@/lib/expire-sales";
 import { z } from "zod";
 import type { Prisma } from "@/generated/prisma/client";
 import { withAuth } from "@/lib/auth";
@@ -40,6 +41,7 @@ function serializeCashRegister(cashRegister: CashRecord) {
 
 export const GET = withAuth(async (request) => {
   try {
+    await expirePendingSales();
     const user = await prisma.user.findUnique({ where: { correo: request.correo }, select: { id: true, role: { select: { role: true } } } });
     if (!user) return NextResponse.json({ message: "Usuario no encontrado." }, { status: 404 });
 
@@ -114,6 +116,8 @@ export const PATCH = withAuth(async (request) => {
       if (!open) return { status: 404 as const, message: "No hay una caja abierta." };
       const currentUser = await tx.user.findUnique({ where: { id: user.id }, select: { role: { select: { role: true } } } });
       if (!currentUser || !canCloseCashRegister(user.id, currentUser.role.role, open.id_usuario_apertura)) return { status: 403 as const, message: "Solo quien abrió la caja, un administrador o master puede cerrarla." };
+
+      await expireSalesInTransaction(tx);
 
       const pending = await tx.venta.count({ where: { id_apertura_caja: open.id_apertura, estado: "pendiente" } });
       if (pending > 0) return { status: 409 as const, message: `Hay ${pending} ${pending === 1 ? "venta pendiente" : "ventas pendientes"}. Termínalas o elimínalas antes de cerrar la caja.` };

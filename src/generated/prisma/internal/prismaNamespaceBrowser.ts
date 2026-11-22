@@ -382,6 +382,7 @@ export const VentaScalarFieldEnum = {
   id_apertura_caja: 'id_apertura_caja',
   valor_total: 'valor_total',
   fecha_de_creacion: 'fecha_de_creacion',
+  ultima_actividad: 'ultima_actividad',
   fecha_pago: 'fecha_pago',
   estado: 'estado',
   vuelto: 'vuelto',

@@ -171,10 +171,8 @@ function getContentLabel(product: Producto) {
 }
 
 function getPriceLabel(product: Producto) {
-  const measure = getMeasureName(product);
-
-  if (isVariableWeight(product) && measure) {
-    return `${formatPrice(product.precioVenta)} / ${measure}`;
+  if (isVariableWeight(product)) {
+    return `${formatPrice(product.precioVenta)} / kg`;
   }
 
   return formatPrice(product.precioVenta);
@@ -1195,7 +1193,6 @@ function CartRow({
   quantityInputRef,
 }: CartRowProps) {
   const { product } = item;
-  const measure = getMeasureName(product) || "unidad";
   const [quantityError, setQuantityError] = useState("");
 
   return (
@@ -1272,7 +1269,7 @@ function CartRow({
         ) : (
           <div className="sales-view-weight-controls">
             <label>
-              <span>Precio</span>
+              <span>Precio solicitado</span>
               <span className="sales-view-weight-field">
                 <em>$</em>
                 <input
@@ -1282,12 +1279,12 @@ function CartRow({
                   value={item.priceText}
                   onChange={(event) => onPriceChange(event.target.value)}
                   onFocus={(event) => event.target.select()}
-                  aria-label={`Precio total de ${product.nombre}`}
+                  aria-label={`Precio solicitado de ${product.nombre}`}
                 />
               </span>
             </label>
             <label>
-              <span>Cantidad</span>
+              <span>Cantidad equivalente</span>
               <span className="sales-view-weight-field">
                 <input
                   ref={quantityInputRef}
@@ -1297,11 +1294,12 @@ function CartRow({
                   value={item.quantityText}
                   onChange={(event) => onQuantityChange(event.target.value)}
                   onFocus={(event) => event.target.select()}
-                  aria-label={`Cantidad en ${measure} de ${product.nombre}`}
+                  aria-label={`Cantidad en kilos de ${product.nombre}`}
                 />
-                <em>{measure}</em>
+                <em>kg</em>
               </span>
             </label>
+            <small className="sales-weight-reminder">Ingresa el peso en kilos: 900 gramos equivalen a 0,9 kg.</small>
           </div>
         )}
       </td>

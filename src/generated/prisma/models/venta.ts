@@ -49,6 +49,7 @@ export type VentaMinAggregateOutputType = {
   id_apertura_caja: string | null
   valor_total: number | null
   fecha_de_creacion: Date | null
+  ultima_actividad: Date | null
   fecha_pago: Date | null
   estado: string | null
   vuelto: number | null
@@ -65,6 +66,7 @@ export type VentaMaxAggregateOutputType = {
   id_apertura_caja: string | null
   valor_total: number | null
   fecha_de_creacion: Date | null
+  ultima_actividad: Date | null
   fecha_pago: Date | null
   estado: string | null
   vuelto: number | null
@@ -81,6 +83,7 @@ export type VentaCountAggregateOutputType = {
   id_apertura_caja: number
   valor_total: number
   fecha_de_creacion: number
+  ultima_actividad: number
   fecha_pago: number
   estado: number
   vuelto: number
@@ -115,6 +118,7 @@ export type VentaMinAggregateInputType = {
   id_apertura_caja?: true
   valor_total?: true
   fecha_de_creacion?: true
+  ultima_actividad?: true
   fecha_pago?: true
   estado?: true
   vuelto?: true
@@ -131,6 +135,7 @@ export type VentaMaxAggregateInputType = {
   id_apertura_caja?: true
   valor_total?: true
   fecha_de_creacion?: true
+  ultima_actividad?: true
   fecha_pago?: true
   estado?: true
   vuelto?: true
@@ -147,6 +152,7 @@ export type VentaCountAggregateInputType = {
   id_apertura_caja?: true
   valor_total?: true
   fecha_de_creacion?: true
+  ultima_actividad?: true
   fecha_pago?: true
   estado?: true
   vuelto?: true
@@ -250,6 +256,7 @@ export type VentaGroupByOutputType = {
   id_apertura_caja: string | null
   valor_total: number
   fecha_de_creacion: Date
+  ultima_actividad: Date
   fecha_pago: Date | null
   estado: string
   vuelto: number
@@ -289,6 +296,7 @@ export type ventaWhereInput = {
   id_apertura_caja?: Prisma.UuidNullableFilter<"venta"> | string | null
   valor_total?: Prisma.IntFilter<"venta"> | number
   fecha_de_creacion?: Prisma.DateTimeFilter<"venta"> | Date | string
+  ultima_actividad?: Prisma.DateTimeFilter<"venta"> | Date | string
   fecha_pago?: Prisma.DateTimeNullableFilter<"venta"> | Date | string | null
   estado?: Prisma.StringFilter<"venta"> | string
   vuelto?: Prisma.IntFilter<"venta"> | number
@@ -309,6 +317,7 @@ export type ventaOrderByWithRelationInput = {
   id_apertura_caja?: Prisma.SortOrderInput | Prisma.SortOrder
   valor_total?: Prisma.SortOrder
   fecha_de_creacion?: Prisma.SortOrder
+  ultima_actividad?: Prisma.SortOrder
   fecha_pago?: Prisma.SortOrderInput | Prisma.SortOrder
   estado?: Prisma.SortOrder
   vuelto?: Prisma.SortOrder
@@ -333,6 +342,7 @@ export type ventaWhereUniqueInput = Prisma.AtLeast<{
   id_apertura_caja?: Prisma.UuidNullableFilter<"venta"> | string | null
   valor_total?: Prisma.IntFilter<"venta"> | number
   fecha_de_creacion?: Prisma.DateTimeFilter<"venta"> | Date | string
+  ultima_actividad?: Prisma.DateTimeFilter<"venta"> | Date | string
   fecha_pago?: Prisma.DateTimeNullableFilter<"venta"> | Date | string | null
   estado?: Prisma.StringFilter<"venta"> | string
   vuelto?: Prisma.IntFilter<"venta"> | number
@@ -352,6 +362,7 @@ export type ventaOrderByWithAggregationInput = {
   id_apertura_caja?: Prisma.SortOrderInput | Prisma.SortOrder
   valor_total?: Prisma.SortOrder
   fecha_de_creacion?: Prisma.SortOrder
+  ultima_actividad?: Prisma.SortOrder
   fecha_pago?: Prisma.SortOrderInput | Prisma.SortOrder
   estado?: Prisma.SortOrder
   vuelto?: Prisma.SortOrder
@@ -376,6 +387,7 @@ export type ventaScalarWhereWithAggregatesInput = {
   id_apertura_caja?: Prisma.UuidNullableWithAggregatesFilter<"venta"> | string | null
   valor_total?: Prisma.IntWithAggregatesFilter<"venta"> | number
   fecha_de_creacion?: Prisma.DateTimeWithAggregatesFilter<"venta"> | Date | string
+  ultima_actividad?: Prisma.DateTimeWithAggregatesFilter<"venta"> | Date | string
   fecha_pago?: Prisma.DateTimeNullableWithAggregatesFilter<"venta"> | Date | string | null
   estado?: Prisma.StringWithAggregatesFilter<"venta"> | string
   vuelto?: Prisma.IntWithAggregatesFilter<"venta"> | number
@@ -390,6 +402,7 @@ export type ventaCreateInput = {
   num_venta?: number
   valor_total: number
   fecha_de_creacion?: Date | string
+  ultima_actividad?: Date | string
   fecha_pago?: Date | string | null
   estado: string
   vuelto?: number
@@ -410,6 +423,7 @@ export type ventaUncheckedCreateInput = {
   id_apertura_caja?: string | null
   valor_total: number
   fecha_de_creacion?: Date | string
+  ultima_actividad?: Date | string
   fecha_pago?: Date | string | null
   estado: string
   vuelto?: number
@@ -425,6 +439,7 @@ export type ventaUpdateInput = {
   id_venta?: Prisma.StringFieldUpdateOperationsInput | string
   valor_total?: Prisma.IntFieldUpdateOperationsInput | number
   fecha_de_creacion?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ultima_actividad?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   fecha_pago?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   estado?: Prisma.StringFieldUpdateOperationsInput | string
   vuelto?: Prisma.IntFieldUpdateOperationsInput | number
@@ -445,6 +460,7 @@ export type ventaUncheckedUpdateInput = {
   id_apertura_caja?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   valor_total?: Prisma.IntFieldUpdateOperationsInput | number
   fecha_de_creacion?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ultima_actividad?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   fecha_pago?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   estado?: Prisma.StringFieldUpdateOperationsInput | string
   vuelto?: Prisma.IntFieldUpdateOperationsInput | number
@@ -463,6 +479,7 @@ export type ventaCreateManyInput = {
   id_apertura_caja?: string | null
   valor_total: number
   fecha_de_creacion?: Date | string
+  ultima_actividad?: Date | string
   fecha_pago?: Date | string | null
   estado: string
   vuelto?: number
@@ -476,6 +493,7 @@ export type ventaUpdateManyMutationInput = {
   id_venta?: Prisma.StringFieldUpdateOperationsInput | string
   valor_total?: Prisma.IntFieldUpdateOperationsInput | number
   fecha_de_creacion?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ultima_actividad?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   fecha_pago?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   estado?: Prisma.StringFieldUpdateOperationsInput | string
   vuelto?: Prisma.IntFieldUpdateOperationsInput | number
@@ -492,6 +510,7 @@ export type ventaUncheckedUpdateManyInput = {
   id_apertura_caja?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   valor_total?: Prisma.IntFieldUpdateOperationsInput | number
   fecha_de_creacion?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ultima_actividad?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   fecha_pago?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   estado?: Prisma.StringFieldUpdateOperationsInput | string
   vuelto?: Prisma.IntFieldUpdateOperationsInput | number
@@ -518,6 +537,7 @@ export type ventaCountOrderByAggregateInput = {
   id_apertura_caja?: Prisma.SortOrder
   valor_total?: Prisma.SortOrder
   fecha_de_creacion?: Prisma.SortOrder
+  ultima_actividad?: Prisma.SortOrder
   fecha_pago?: Prisma.SortOrder
   estado?: Prisma.SortOrder
   vuelto?: Prisma.SortOrder
@@ -542,6 +562,7 @@ export type ventaMaxOrderByAggregateInput = {
   id_apertura_caja?: Prisma.SortOrder
   valor_total?: Prisma.SortOrder
   fecha_de_creacion?: Prisma.SortOrder
+  ultima_actividad?: Prisma.SortOrder
   fecha_pago?: Prisma.SortOrder
   estado?: Prisma.SortOrder
   vuelto?: Prisma.SortOrder
@@ -558,6 +579,7 @@ export type ventaMinOrderByAggregateInput = {
   id_apertura_caja?: Prisma.SortOrder
   valor_total?: Prisma.SortOrder
   fecha_de_creacion?: Prisma.SortOrder
+  ultima_actividad?: Prisma.SortOrder
   fecha_pago?: Prisma.SortOrder
   estado?: Prisma.SortOrder
   vuelto?: Prisma.SortOrder
@@ -697,6 +719,7 @@ export type ventaCreateWithoutVendedorInput = {
   num_venta?: number
   valor_total: number
   fecha_de_creacion?: Date | string
+  ultima_actividad?: Date | string
   fecha_pago?: Date | string | null
   estado: string
   vuelto?: number
@@ -715,6 +738,7 @@ export type ventaUncheckedCreateWithoutVendedorInput = {
   id_apertura_caja?: string | null
   valor_total: number
   fecha_de_creacion?: Date | string
+  ultima_actividad?: Date | string
   fecha_pago?: Date | string | null
   estado: string
   vuelto?: number
@@ -762,6 +786,7 @@ export type ventaScalarWhereInput = {
   id_apertura_caja?: Prisma.UuidNullableFilter<"venta"> | string | null
   valor_total?: Prisma.IntFilter<"venta"> | number
   fecha_de_creacion?: Prisma.DateTimeFilter<"venta"> | Date | string
+  ultima_actividad?: Prisma.DateTimeFilter<"venta"> | Date | string
   fecha_pago?: Prisma.DateTimeNullableFilter<"venta"> | Date | string | null
   estado?: Prisma.StringFilter<"venta"> | string
   vuelto?: Prisma.IntFilter<"venta"> | number
@@ -776,6 +801,7 @@ export type ventaCreateWithoutAperturaInput = {
   num_venta?: number
   valor_total: number
   fecha_de_creacion?: Date | string
+  ultima_actividad?: Date | string
   fecha_pago?: Date | string | null
   estado: string
   vuelto?: number
@@ -794,6 +820,7 @@ export type ventaUncheckedCreateWithoutAperturaInput = {
   id_vendedor: string
   valor_total: number
   fecha_de_creacion?: Date | string
+  ultima_actividad?: Date | string
   fecha_pago?: Date | string | null
   estado: string
   vuelto?: number
@@ -836,6 +863,7 @@ export type ventaCreateWithoutDetallesInput = {
   num_venta?: number
   valor_total: number
   fecha_de_creacion?: Date | string
+  ultima_actividad?: Date | string
   fecha_pago?: Date | string | null
   estado: string
   vuelto?: number
@@ -855,6 +883,7 @@ export type ventaUncheckedCreateWithoutDetallesInput = {
   id_apertura_caja?: string | null
   valor_total: number
   fecha_de_creacion?: Date | string
+  ultima_actividad?: Date | string
   fecha_pago?: Date | string | null
   estado: string
   vuelto?: number
@@ -885,6 +914,7 @@ export type ventaUpdateWithoutDetallesInput = {
   id_venta?: Prisma.StringFieldUpdateOperationsInput | string
   valor_total?: Prisma.IntFieldUpdateOperationsInput | number
   fecha_de_creacion?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ultima_actividad?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   fecha_pago?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   estado?: Prisma.StringFieldUpdateOperationsInput | string
   vuelto?: Prisma.IntFieldUpdateOperationsInput | number
@@ -904,6 +934,7 @@ export type ventaUncheckedUpdateWithoutDetallesInput = {
   id_apertura_caja?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   valor_total?: Prisma.IntFieldUpdateOperationsInput | number
   fecha_de_creacion?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ultima_actividad?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   fecha_pago?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   estado?: Prisma.StringFieldUpdateOperationsInput | string
   vuelto?: Prisma.IntFieldUpdateOperationsInput | number
@@ -919,6 +950,7 @@ export type ventaCreateWithoutPagosInput = {
   num_venta?: number
   valor_total: number
   fecha_de_creacion?: Date | string
+  ultima_actividad?: Date | string
   fecha_pago?: Date | string | null
   estado: string
   vuelto?: number
@@ -938,6 +970,7 @@ export type ventaUncheckedCreateWithoutPagosInput = {
   id_apertura_caja?: string | null
   valor_total: number
   fecha_de_creacion?: Date | string
+  ultima_actividad?: Date | string
   fecha_pago?: Date | string | null
   estado: string
   vuelto?: number
@@ -968,6 +1001,7 @@ export type ventaUpdateWithoutPagosInput = {
   id_venta?: Prisma.StringFieldUpdateOperationsInput | string
   valor_total?: Prisma.IntFieldUpdateOperationsInput | number
   fecha_de_creacion?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ultima_actividad?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   fecha_pago?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   estado?: Prisma.StringFieldUpdateOperationsInput | string
   vuelto?: Prisma.IntFieldUpdateOperationsInput | number
@@ -987,6 +1021,7 @@ export type ventaUncheckedUpdateWithoutPagosInput = {
   id_apertura_caja?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   valor_total?: Prisma.IntFieldUpdateOperationsInput | number
   fecha_de_creacion?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ultima_actividad?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   fecha_pago?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   estado?: Prisma.StringFieldUpdateOperationsInput | string
   vuelto?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1003,6 +1038,7 @@ export type ventaCreateManyVendedorInput = {
   id_apertura_caja?: string | null
   valor_total: number
   fecha_de_creacion?: Date | string
+  ultima_actividad?: Date | string
   fecha_pago?: Date | string | null
   estado: string
   vuelto?: number
@@ -1016,6 +1052,7 @@ export type ventaUpdateWithoutVendedorInput = {
   id_venta?: Prisma.StringFieldUpdateOperationsInput | string
   valor_total?: Prisma.IntFieldUpdateOperationsInput | number
   fecha_de_creacion?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ultima_actividad?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   fecha_pago?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   estado?: Prisma.StringFieldUpdateOperationsInput | string
   vuelto?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1034,6 +1071,7 @@ export type ventaUncheckedUpdateWithoutVendedorInput = {
   id_apertura_caja?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   valor_total?: Prisma.IntFieldUpdateOperationsInput | number
   fecha_de_creacion?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ultima_actividad?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   fecha_pago?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   estado?: Prisma.StringFieldUpdateOperationsInput | string
   vuelto?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1051,6 +1089,7 @@ export type ventaUncheckedUpdateManyWithoutVendedorInput = {
   id_apertura_caja?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   valor_total?: Prisma.IntFieldUpdateOperationsInput | number
   fecha_de_creacion?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ultima_actividad?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   fecha_pago?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   estado?: Prisma.StringFieldUpdateOperationsInput | string
   vuelto?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1066,6 +1105,7 @@ export type ventaCreateManyAperturaInput = {
   id_vendedor: string
   valor_total: number
   fecha_de_creacion?: Date | string
+  ultima_actividad?: Date | string
   fecha_pago?: Date | string | null
   estado: string
   vuelto?: number
@@ -1079,6 +1119,7 @@ export type ventaUpdateWithoutAperturaInput = {
   id_venta?: Prisma.StringFieldUpdateOperationsInput | string
   valor_total?: Prisma.IntFieldUpdateOperationsInput | number
   fecha_de_creacion?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ultima_actividad?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   fecha_pago?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   estado?: Prisma.StringFieldUpdateOperationsInput | string
   vuelto?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1097,6 +1138,7 @@ export type ventaUncheckedUpdateWithoutAperturaInput = {
   id_vendedor?: Prisma.StringFieldUpdateOperationsInput | string
   valor_total?: Prisma.IntFieldUpdateOperationsInput | number
   fecha_de_creacion?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ultima_actividad?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   fecha_pago?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   estado?: Prisma.StringFieldUpdateOperationsInput | string
   vuelto?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1114,6 +1156,7 @@ export type ventaUncheckedUpdateManyWithoutAperturaInput = {
   id_vendedor?: Prisma.StringFieldUpdateOperationsInput | string
   valor_total?: Prisma.IntFieldUpdateOperationsInput | number
   fecha_de_creacion?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ultima_actividad?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   fecha_pago?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   estado?: Prisma.StringFieldUpdateOperationsInput | string
   vuelto?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1170,6 +1213,7 @@ export type ventaSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   id_apertura_caja?: boolean
   valor_total?: boolean
   fecha_de_creacion?: boolean
+  ultima_actividad?: boolean
   fecha_pago?: boolean
   estado?: boolean
   vuelto?: boolean
@@ -1191,6 +1235,7 @@ export type ventaSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   id_apertura_caja?: boolean
   valor_total?: boolean
   fecha_de_creacion?: boolean
+  ultima_actividad?: boolean
   fecha_pago?: boolean
   estado?: boolean
   vuelto?: boolean
@@ -1209,6 +1254,7 @@ export type ventaSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   id_apertura_caja?: boolean
   valor_total?: boolean
   fecha_de_creacion?: boolean
+  ultima_actividad?: boolean
   fecha_pago?: boolean
   estado?: boolean
   vuelto?: boolean
@@ -1227,6 +1273,7 @@ export type ventaSelectScalar = {
   id_apertura_caja?: boolean
   valor_total?: boolean
   fecha_de_creacion?: boolean
+  ultima_actividad?: boolean
   fecha_pago?: boolean
   estado?: boolean
   vuelto?: boolean
@@ -1236,7 +1283,7 @@ export type ventaSelectScalar = {
   revision?: boolean
 }
 
-export type ventaOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id_venta" | "num_venta" | "id_vendedor" | "id_apertura_caja" | "valor_total" | "fecha_de_creacion" | "fecha_pago" | "estado" | "vuelto" | "redondeo" | "recibo" | "clave_cliente" | "revision", ExtArgs["result"]["venta"]>
+export type ventaOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id_venta" | "num_venta" | "id_vendedor" | "id_apertura_caja" | "valor_total" | "fecha_de_creacion" | "ultima_actividad" | "fecha_pago" | "estado" | "vuelto" | "redondeo" | "recibo" | "clave_cliente" | "revision", ExtArgs["result"]["venta"]>
 export type ventaInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   vendedor?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   apertura?: boolean | Prisma.venta$aperturaArgs<ExtArgs>
@@ -1268,6 +1315,7 @@ export type $ventaPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
     id_apertura_caja: string | null
     valor_total: number
     fecha_de_creacion: Date
+    ultima_actividad: Date
     fecha_pago: Date | null
     estado: string
     vuelto: number
@@ -1708,6 +1756,7 @@ export interface ventaFieldRefs {
   readonly id_apertura_caja: Prisma.FieldRef<"venta", 'String'>
   readonly valor_total: Prisma.FieldRef<"venta", 'Int'>
   readonly fecha_de_creacion: Prisma.FieldRef<"venta", 'DateTime'>
+  readonly ultima_actividad: Prisma.FieldRef<"venta", 'DateTime'>
   readonly fecha_pago: Prisma.FieldRef<"venta", 'DateTime'>
   readonly estado: Prisma.FieldRef<"venta", 'String'>
   readonly vuelto: Prisma.FieldRef<"venta", 'Int'>

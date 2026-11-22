@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { withAuth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
+import { z } from "zod";
+import { deleteProvider } from "@/lib/delete-provider";
 import {
   deleteCloudinaryImage,
   uploadCloudinaryImage,
@@ -42,6 +44,20 @@ type ProviderPayload = {
 };
 
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+export const DELETE = withAuth(async (request) => {
+  const parsed = z.object({ id_proveedor: z.uuid(), productos: z.array(z.uuid()) }).safeParse(await request.json().catch(() => null));
+  if (!parsed.success) return NextResponse.json({ message: "Los datos de confirmación no son válidos." }, { status: 400 });
+  try {
+    const result = await prisma.$transaction((tx) => deleteProvider(tx, parsed.data.id_proveedor, parsed.data.productos));
+    if (result.status === "not_found") return NextResponse.json({ message: "El proveedor ya no existe." }, { status: 404 });
+    if (result.status === "changed") return NextResponse.json({ message: "Los productos asociados cambiaron. Revisa la lista antes de confirmar.", productos: result.products }, { status: 409 });
+    return NextResponse.json({ status: "ok" });
+  } catch (error) {
+    console.error("Error eliminando proveedor:", error);
+    return NextResponse.json({ message: "No se pudo eliminar el proveedor. Inténtalo nuevamente." }, { status: 500 });
+  }
+});
 
 function optionalText(value: string | null | undefined) {
   const normalized = value?.trim();

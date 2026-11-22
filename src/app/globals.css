@@ -5837,10 +5837,20 @@ html[data-high-contrast="true"] .sales-view-empty-icon {
 .internal-code-panel > button { padding: 9px 12px; border: 1px solid var(--grey-color); border-radius: 8px; cursor: pointer; color: var(--foreground); background: var(--background); }
 .internal-code-panel > button:disabled { opacity: .5; cursor: not-allowed; }
 .internal-code-panel > p { width: 100%; margin: 0; }
+.provider-delete-list { max-height: 180px; overflow-y: auto; padding-left: 24px; overflow-wrap: anywhere; }
+.provider-delete-button { margin-top: 10px; padding: 10px 14px; border: 1px solid var(--danger-color); border-radius: 8px; color: var(--danger-color); background: transparent; cursor: pointer; font: inherit; font-weight: 700; }
+.provider-delete-button:disabled { opacity: .5; cursor: not-allowed; }
 
 .sales-view-weight-controls label {
   display: grid;
   gap: 2px;
+}
+
+.sales-weight-reminder {
+  color: var(--light-dark-color);
+  display: block;
+  font-size: 0.75rem;
+  max-width: 230px;
 }
 
 .sales-view-weight-controls label > span:first-child {
