@@ -17,10 +17,11 @@ export function SyncProvider({ children }: { children: ReactNode }) {
       try {
         const response = await fetch("/api/sincronizacion", { cache: "no-store", signal: controller.signal });
         if (!response.ok) { if (response.status === 401) last = null; return; }
-        const data = await response.json() as { revision?: string };
+        const data = await response.json() as { revision?: string; cierreAutomaticoPendiente?: number };
         if (!data.revision) return;
-        if (last !== null && last !== data.revision) setRevision((value) => value + 1);
-        last = data.revision;
+        const current = `${data.revision}:${data.cierreAutomaticoPendiente ?? 0}`;
+        if (last !== null && last !== current) setRevision((value) => value + 1);
+        last = current;
       } catch { /* Se reintenta en la siguiente consulta. */ }
       finally { pending = false; }
     }

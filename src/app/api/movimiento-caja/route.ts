@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { withAuth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
+import { isCashPastDeadline, processAutomaticCashClose } from "@/lib/automatic-cash-close";
 
 const movementSchema = z.discriminatedUnion("tipo", [
   z.object({
@@ -21,6 +22,7 @@ const movementSchema = z.discriminatedUnion("tipo", [
 
 export const GET = withAuth(async (request) => {
   try {
+    await processAutomaticCashClose();
     const [user, open, reasons] = await Promise.all([
       prisma.user.findUnique({ where: { correo: request.correo }, select: { id: true } }),
       prisma.apertura_caja.findFirst({ where: { horario_cierre: null }, select: { id_apertura: true } }),
@@ -39,6 +41,7 @@ export const POST = withAuth(async (request) => {
   if (!parsed.success) return NextResponse.json({ message: parsed.error.issues[0]?.message ?? "Datos inválidos." }, { status: 400 });
 
   try {
+    await processAutomaticCashClose();
     const user = await prisma.user.findUnique({ where: { correo: request.correo }, select: { id: true } });
     if (!user) return NextResponse.json({ message: "Usuario no encontrado." }, { status: 401 });
     const result = await prisma.$transaction(async (tx) => {
@@ -53,6 +56,7 @@ export const POST = withAuth(async (request) => {
       }
       const open = await tx.apertura_caja.findFirst({ where: { horario_cierre: null } });
       if (!open) return { status: 409 as const, message: "Abre una caja antes de registrar movimientos." };
+      if (await isCashPastDeadline(tx, open.id_apertura)) return { status: 409 as const, message: "La caja debe cerrarse por cambio de día. Completa las ventas con pagos pendientes antes de registrar movimientos." };
 
       const { tipo, movimiento } = parsed.data;
       const reason = tipo === "egreso"

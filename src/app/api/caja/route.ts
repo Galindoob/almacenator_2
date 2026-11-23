@@ -5,6 +5,7 @@ import type { Prisma } from "@/generated/prisma/client";
 import { withAuth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { canCloseCashRegister } from "@/lib/cash-authorization";
+import { processAutomaticCashClose } from "@/lib/automatic-cash-close";
 
 const closingSchema = z.object({
   saldo_cierre: z.number().int().nonnegative().max(2147483647),
@@ -20,6 +21,7 @@ function serializeCashRegister(cashRegister: CashRecord) {
     id_usuario_apertura: cashRegister.id_usuario_apertura,
     horario_apertura: cashRegister.horario_apertura,
     horario_cierre: cashRegister.horario_cierre,
+    cierre_automatico: cashRegister.cierre_automatico,
     saldo_apertura: cashRegister.saldo_apertura,
     saldo_cierre: cashRegister.saldo_cierre,
     saldo_esperado: cashRegister.saldo_esperado,
@@ -41,12 +43,13 @@ function serializeCashRegister(cashRegister: CashRecord) {
 
 export const GET = withAuth(async (request) => {
   try {
+    const automaticClose = await processAutomaticCashClose();
     await expirePendingSales();
     const user = await prisma.user.findUnique({ where: { correo: request.correo }, select: { id: true, role: { select: { role: true } } } });
     if (!user) return NextResponse.json({ message: "Usuario no encontrado." }, { status: 404 });
 
     const open = await prisma.apertura_caja.findFirst({ where: { horario_cierre: null }, include: cashInclude, orderBy: { horario_apertura: "desc" } });
-    const previous = open ? null : await prisma.apertura_caja.findFirst({ where: { horario_cierre: { not: null } }, orderBy: { horario_cierre: "desc" }, select: { valor_real: true } });
+    const previous = open ? null : await prisma.apertura_caja.findFirst({ where: { horario_cierre: { not: null } }, orderBy: { horario_cierre: "desc" }, select: { valor_real: true, cierre_automatico: true } });
     const ventasPendientes = open ? await prisma.venta.count({ where: { id_apertura_caja: open.id_apertura, estado: "pendiente" } }) : 0;
     const ventasCompletadas = open ? await prisma.venta.count({ where: { id_apertura_caja: open.id_apertura, estado: "completado" } }) : 0;
 
@@ -58,6 +61,8 @@ export const GET = withAuth(async (request) => {
       ventasPendientes,
       ventasCompletadas,
       saldoDisponible: previous?.valor_real ?? null,
+      saldoProvisional: previous?.cierre_automatico ?? false,
+      cierreAutomaticoPendiente: automaticClose.status === "blocked" ? automaticClose.pendingPaid : 0,
     }, { headers: { "Cache-Control": "no-store" } });
   } catch (error) {
     console.error("Error consultando caja:", error);
@@ -67,6 +72,7 @@ export const GET = withAuth(async (request) => {
 
 export const POST = withAuth(async (request) => {
   try {
+    await processAutomaticCashClose();
     const user = await prisma.user.findUnique({ where: { correo: request.correo }, select: { id: true } });
     if (!user) return NextResponse.json({ message: "Usuario no encontrado." }, { status: 404 });
 
@@ -107,6 +113,7 @@ export const PATCH = withAuth(async (request) => {
   if (!parsed.success) return NextResponse.json({ message: parsed.error.issues[0]?.message ?? "Datos de cierre inválidos." }, { status: 400 });
 
   try {
+    await processAutomaticCashClose();
     const user = await prisma.user.findUnique({ where: { correo: request.correo }, select: { id: true } });
     if (!user) return NextResponse.json({ message: "Usuario no encontrado." }, { status: 404 });
 

@@ -2,6 +2,7 @@ import { z } from "zod";
 import type { Prisma } from "@/generated/prisma/client";
 import { roundCashAmount } from "@/lib/cash-rounding";
 import { calculatePromotion, promotionCondition } from "@/lib/promotion-pricing";
+import { isCashPastDeadline } from "@/lib/automatic-cash-close";
 
 const money = z.number().int().min(0).max(2147483647);
 const quantity = z.number().finite().min(0).max(999999).refine(
@@ -130,12 +131,14 @@ export async function executeSaleCommand(tx: Tx, userId: string, command: SaleCo
   await tx.$queryRaw`SELECT id FROM users WHERE id = ${userId}::uuid FOR UPDATE`;
   const openCashRegister = await tx.apertura_caja.findFirst({ where: { horario_cierre: null }, select: { id_apertura: true } });
   if (!openCashRegister) throw new SaleError("Abre la caja antes de registrar ventas.");
+  const pastDeadline = await isCashPastDeadline(tx, openCashRegister.id_apertura);
   if (command.action === "create") {
     const replay = await tx.venta.findUnique({ where: { clave_cliente: command.key } });
     if (replay) {
       if (replay.id_vendedor !== userId) throw new SaleError("Operación no disponible.");
       return readSale(tx, replay.id_venta);
     }
+    if (pastDeadline) throw new SaleError("La caja debe cerrarse por cambio de día. Completa las ventas con pagos pendientes antes de iniciar otra venta.");
     if (await tx.venta.count({ where: { id_vendedor: userId, id_apertura_caja: openCashRegister.id_apertura, estado: "pendiente" } }) >= 5) {
       throw new SaleError("Solo puedes mantener cinco ventas pendientes al mismo tiempo.");
     }
@@ -159,6 +162,9 @@ export async function executeSaleCommand(tx: Tx, userId: string, command: SaleCo
     }
   }
   if (sale.estado !== "pendiente") throw new SaleError("La venta ya está cerrada.");
+  if (pastDeadline && command.action !== "cancel" && !(command.action === "pay" && sale.pagos.length)) {
+    throw new SaleError("La caja debe cerrarse por cambio de día. Completa las ventas con pagos pendientes antes de continuar.");
+  }
   if (sale.revision !== command.revision) throw new SaleError("La venta cambió en otra ventana. Se actualizarán sus datos; revísalos antes de continuar.");
   if (command.action !== "pay" && sale.pagos.length) throw new SaleError("No puedes modificar ni eliminar una venta con pagos registrados.");
 

@@ -17,6 +17,14 @@ El remitente debe pertenecer a un dominio verificado en Resend. Sin estas variab
 
 Las ventas pendientes sin pagos caducan tras una hora desde la última modificación de productos. La limpieza también se ejecuta al consultar ventas, transacciones o caja. Para ejecutar la limpieza sin usuarios conectados, configura un programador externo para enviar cada cinco minutos una solicitud GET a `/api/tareas/ventas-expiradas`, con el encabezado `Authorization: Bearer <CRON_SECRET>`. Configura `CRON_SECRET` como una clave larga y aleatoria en las variables de entorno del despliegue; sin ella, la ruta rechaza las solicitudes. No publiques la clave en el repositorio. El plan Hobby de Vercel no ofrece cron cada cinco minutos. La tarea procesa hasta 100 ventas por ejecución; ejecuciones posteriores procesan el resto. La migración debe aplicarse antes de desplegar el código.
 
+### Cierre automático de caja
+
+Después del cambio de día en `America/Santiago`, el servidor cierra la caja abierta si no existen ventas pendientes con pagos. Cancela las ventas pendientes sin pagos y libera su stock reservado en la misma transacción. Si hay pagos parciales, conserva la caja abierta y avisa; el vendedor debe completar esas ventas. No se permiten nuevas ventas o movimientos hasta resolverlas.
+
+El cierre automático registra la hora real de ejecución, deja el saldo contado y la diferencia sin registrar y usa el saldo esperado como capital provisional. No sustituye un conteo físico. El historial identifica este tipo de cierre y la siguiente apertura advierte que el capital es provisional.
+
+`vercel.json` programa dos comprobaciones diarias a las 03:00 y 04:00 UTC para cubrir los cambios de horario de Chile. Es obligatorio configurar `CRON_SECRET` en las variables de entorno de producción de Vercel antes de desplegar: Vercel envía la clave como `Authorization: Bearer <CRON_SECRET>` y la ruta rechaza peticiones sin ella. En el plan Hobby la ejecución puede retrasarse hasta 59 minutos; no garantiza el cierre exactamente a medianoche. Mientras un usuario usa la aplicación, la sincronización y las operaciones de caja también revisan si corresponde cerrar. Para mayor precisión sin usuarios conectados se necesita un programador externo más frecuente que invoque la misma ruta autenticada. Sin una tarea programada configurada, se revisará recién cuando haya actividad en la aplicación.
+
 First, run the development server:
 
 ```bash

@@ -4,8 +4,10 @@ import { prisma } from "@/lib/db";
 import { executeSaleCommand, saleCommandSchema, saleInclude, SaleError } from "@/lib/sales";
 import { ensureSaleReceipt } from "@/lib/sale-receipt";
 import { expirePendingSales } from "@/lib/expire-sales";
+import { processAutomaticCashClose } from "@/lib/automatic-cash-close";
 
 export const GET = withAuth(async (request) => {
+  await processAutomaticCashClose();
   await expirePendingSales();
   const user = await prisma.user.findUnique({ where: { correo: request.correo }, select: { id: true } });
   if (!user) return NextResponse.json({ message: "Usuario no encontrado." }, { status: 401 });
@@ -23,8 +25,14 @@ export const POST = withAuth(async (request) => {
     if (!parsed.success) return NextResponse.json({ message: parsed.error.issues[0]?.message ?? "Datos inválidos." }, { status: 400 });
     const user = await prisma.user.findUnique({ where: { correo: request.correo }, select: { id: true } });
     if (!user) return NextResponse.json({ message: "Usuario no encontrado." }, { status: 401 });
+    await processAutomaticCashClose();
     await expirePendingSales();
     const venta = await prisma.$transaction((tx) => executeSaleCommand(tx, user.id, parsed.data), { timeout: 30000 });
+    // If the last partially paid sale has just been completed, retry the close.
+    if (venta?.estado === "completado") {
+      try { await processAutomaticCashClose(); }
+      catch (closeError) { console.error("Venta completada; el cierre automático se reintentará:", closeError); }
+    }
     if (venta?.estado === "completado" && !venta.recibo) {
       try {
         const recibo = await ensureSaleReceipt(venta.id_venta);

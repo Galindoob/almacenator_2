@@ -265,6 +265,7 @@ export const Apertura_cajaScalarFieldEnum = {
   id_usuario_cierre: 'id_usuario_cierre',
   horario_apertura: 'horario_apertura',
   horario_cierre: 'horario_cierre',
+  cierre_automatico: 'cierre_automatico',
   venta_boleta: 'venta_boleta',
   venta_factura: 'venta_factura',
   venta_debito: 'venta_debito',

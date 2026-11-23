@@ -97,6 +97,8 @@ export default function HomePage() {
   const [canCloseCashRegister, setCanCloseCashRegister] = useState(false);
   const [cashRegisterOpener, setCashRegisterOpener] = useState("");
   const [availableOpeningBalance, setAvailableOpeningBalance] = useState<number | null>(null);
+  const [openingBalanceIsProvisional, setOpeningBalanceIsProvisional] = useState(false);
+  const [pendingPaidClose, setPendingPaidClose] = useState(0);
   const [isOpenCashModalVisible, setIsOpenCashModalVisible] = useState(false);
   const [isNoCapitalAlertVisible, setIsNoCapitalAlertVisible] = useState(false);
   const [cashMessage, setCashMessage] = useState("");
@@ -143,6 +145,8 @@ export default function HomePage() {
           puedeCerrar?: boolean;
           caja?: { usuario?: { nombre?: string; apellido?: string } } | null;
           saldoDisponible?: number | null;
+          saldoProvisional?: boolean;
+          cierreAutomaticoPendiente?: number;
           message?: string;
         };
 
@@ -155,6 +159,8 @@ export default function HomePage() {
         setCanCloseCashRegister(Boolean(data.puedeCerrar));
         setCashRegisterOpener([data.caja?.usuario?.nombre, data.caja?.usuario?.apellido].filter(Boolean).join(" "));
         setAvailableOpeningBalance(data.saldoDisponible ?? null);
+        setOpeningBalanceIsProvisional(Boolean(data.saldoProvisional));
+        setPendingPaidClose(data.cierreAutomaticoPendiente ?? 0);
       } catch {
         setCashMessage("No se pudo conectar con el servidor de caja.");
       }
@@ -244,6 +250,7 @@ export default function HomePage() {
       setIsCashRegisterOpen(true);
       setCanCloseCashRegister(true);
       setAvailableOpeningBalance(null);
+      setOpeningBalanceIsProvisional(false);
       setIsOpenCashModalVisible(false);
     } catch {
       setCashMessage("No se pudo conectar con el servidor.");
@@ -272,6 +279,8 @@ export default function HomePage() {
 
         <nav className="home-actions" aria-label="Acciones principales">
           {cashMessage && !isOpenCashModalVisible ? <p className="cash-modal-message" role="alert">{cashMessage}</p> : null}
+          {pendingPaidClose > 0 && isCashRegisterOpen ? <p className="cash-modal-message" role="alert">El cierre automático está pendiente: {pendingPaidClose} {pendingPaidClose === 1 ? "venta tiene un pago parcial" : "ventas tienen pagos parciales"}. Solicita a quien realizó {pendingPaidClose === 1 ? "la venta que la complete" : "las ventas que las complete"}; después se cerrará la caja.</p> : null}
+          {!isCashRegisterOpen && openingBalanceIsProvisional ? <p role="status">La caja anterior se cerró automáticamente. El saldo disponible es provisional porque no se contó el efectivo.</p> : null}
           {isCashRegisterOpen === null && !cashMessage ? <CartLoader compact label="Consultando la caja..." /> : null}
           {isCashRegisterOpen === null && !cashMessage ? null : isCashRegisterOpen ? (
             homeActions.filter((action) => (action.action === "close" && hasCashClosingPrivilege(payload.rol ?? "")) || can(action.action === "sale" ? "ventas_crear" : action.action === "close" ? "caja_abrir_cerrar" : "caja_ingreso_egreso")).map((action) => (
@@ -333,6 +342,7 @@ export default function HomePage() {
           <section className="cash-modal" role="dialog" aria-modal="true">
             <h2>Abrir caja</h2>
             <p>Saldo disponible para la apertura: <strong>$ {availableOpeningBalance?.toLocaleString("es-CL")}</strong></p>
+            {openingBalanceIsProvisional ? <p>Este saldo es provisional: la caja anterior se cerró automáticamente sin conteo físico.</p> : null}
             {cashMessage ? <p className="cash-modal-message">{cashMessage}</p> : null}
             <div className="cash-modal-actions">
               <button type="button" className="cash-modal-cancel" disabled={isSavingCashRegister} onClick={() => { setIsOpenCashModalVisible(false); setCashMessage(""); }}>Cancelar</button>

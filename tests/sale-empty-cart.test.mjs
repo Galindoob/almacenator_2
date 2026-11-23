@@ -12,7 +12,7 @@ function fixture({ secondProduct = false, paid = false, controlled = true } = {}
   const sale = { id_venta: "sale-1", id_apertura_caja: "cash-1", estado: "pendiente", revision: 1, detalles: secondProduct ? [first, second] : [first], pagos: paid ? [{}] : [] };
   const state = { sale, stock: 3, reserved: controlled ? ["instance-1", "instance-2"] : [], removed: false };
   const tx = {
-    $queryRaw: async () => [],
+    $queryRaw: async (strings) => strings.join("").includes("AS due") ? [{ due: false }] : [],
     apertura_caja: { findFirst: async () => ({ id_apertura: "cash-1" }) },
     venta: {
       findFirst: async () => ({ ...sale, detalles: [...sale.detalles] }),

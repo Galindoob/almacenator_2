@@ -2,11 +2,13 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { withAuth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
+import { processAutomaticCashClose } from "@/lib/automatic-cash-close";
 
 const schema = z.object({ id: z.uuid(), tipo: z.enum(["ingreso", "egreso"]), monto: z.number().int().positive().max(2147483647) });
 
 export const GET = withAuth(async (request) => {
   try {
+    await processAutomaticCashClose();
     const [actor, cajas, ventas, movimientos] = await Promise.all([
       prisma.user.findUnique({ where: { correo: request.correo }, include: { role: true } }),
       prisma.apertura_caja.findMany({ orderBy: { horario_apertura: "desc" }, include: { users: { select: { nombre: true, apellido: true } }, usuario_cierre: { select: { nombre: true, apellido: true } } } }),
@@ -27,6 +29,7 @@ export const POST = withAuth(async (request) => {
   const parsed = schema.safeParse(await request.json().catch(() => null));
   if (!parsed.success) return NextResponse.json({ message: "Ingresa un monto válido." }, { status: 400 });
   try {
+    await processAutomaticCashClose();
     const result = await prisma.$transaction(async (tx) => {
       await tx.$queryRaw`SELECT pg_advisory_xact_lock(79104001)::text AS locked`;
       const actor = await tx.user.findUnique({ where: { correo: request.correo }, include: { role: true } });

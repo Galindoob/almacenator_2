@@ -70,6 +70,7 @@ export type Apertura_cajaMinAggregateOutputType = {
   id_usuario_cierre: string | null
   horario_apertura: Date | null
   horario_cierre: Date | null
+  cierre_automatico: boolean | null
   venta_boleta: number | null
   venta_factura: number | null
   venta_debito: number | null
@@ -95,6 +96,7 @@ export type Apertura_cajaMaxAggregateOutputType = {
   id_usuario_cierre: string | null
   horario_apertura: Date | null
   horario_cierre: Date | null
+  cierre_automatico: boolean | null
   venta_boleta: number | null
   venta_factura: number | null
   venta_debito: number | null
@@ -120,6 +122,7 @@ export type Apertura_cajaCountAggregateOutputType = {
   id_usuario_cierre: number
   horario_apertura: number
   horario_cierre: number
+  cierre_automatico: number
   venta_boleta: number
   venta_factura: number
   venta_debito: number
@@ -185,6 +188,7 @@ export type Apertura_cajaMinAggregateInputType = {
   id_usuario_cierre?: true
   horario_apertura?: true
   horario_cierre?: true
+  cierre_automatico?: true
   venta_boleta?: true
   venta_factura?: true
   venta_debito?: true
@@ -210,6 +214,7 @@ export type Apertura_cajaMaxAggregateInputType = {
   id_usuario_cierre?: true
   horario_apertura?: true
   horario_cierre?: true
+  cierre_automatico?: true
   venta_boleta?: true
   venta_factura?: true
   venta_debito?: true
@@ -235,6 +240,7 @@ export type Apertura_cajaCountAggregateInputType = {
   id_usuario_cierre?: true
   horario_apertura?: true
   horario_cierre?: true
+  cierre_automatico?: true
   venta_boleta?: true
   venta_factura?: true
   venta_debito?: true
@@ -347,6 +353,7 @@ export type Apertura_cajaGroupByOutputType = {
   id_usuario_cierre: string | null
   horario_apertura: Date
   horario_cierre: Date | null
+  cierre_automatico: boolean
   venta_boleta: number
   venta_factura: number
   venta_debito: number
@@ -395,6 +402,7 @@ export type apertura_cajaWhereInput = {
   id_usuario_cierre?: Prisma.UuidNullableFilter<"apertura_caja"> | string | null
   horario_apertura?: Prisma.DateTimeFilter<"apertura_caja"> | Date | string
   horario_cierre?: Prisma.DateTimeNullableFilter<"apertura_caja"> | Date | string | null
+  cierre_automatico?: Prisma.BoolFilter<"apertura_caja"> | boolean
   venta_boleta?: Prisma.IntFilter<"apertura_caja"> | number
   venta_factura?: Prisma.IntFilter<"apertura_caja"> | number
   venta_debito?: Prisma.IntFilter<"apertura_caja"> | number
@@ -425,6 +433,7 @@ export type apertura_cajaOrderByWithRelationInput = {
   id_usuario_cierre?: Prisma.SortOrderInput | Prisma.SortOrder
   horario_apertura?: Prisma.SortOrder
   horario_cierre?: Prisma.SortOrderInput | Prisma.SortOrder
+  cierre_automatico?: Prisma.SortOrder
   venta_boleta?: Prisma.SortOrder
   venta_factura?: Prisma.SortOrder
   venta_debito?: Prisma.SortOrder
@@ -458,6 +467,7 @@ export type apertura_cajaWhereUniqueInput = Prisma.AtLeast<{
   id_usuario_cierre?: Prisma.UuidNullableFilter<"apertura_caja"> | string | null
   horario_apertura?: Prisma.DateTimeFilter<"apertura_caja"> | Date | string
   horario_cierre?: Prisma.DateTimeNullableFilter<"apertura_caja"> | Date | string | null
+  cierre_automatico?: Prisma.BoolFilter<"apertura_caja"> | boolean
   venta_boleta?: Prisma.IntFilter<"apertura_caja"> | number
   venta_factura?: Prisma.IntFilter<"apertura_caja"> | number
   venta_debito?: Prisma.IntFilter<"apertura_caja"> | number
@@ -488,6 +498,7 @@ export type apertura_cajaOrderByWithAggregationInput = {
   id_usuario_cierre?: Prisma.SortOrderInput | Prisma.SortOrder
   horario_apertura?: Prisma.SortOrder
   horario_cierre?: Prisma.SortOrderInput | Prisma.SortOrder
+  cierre_automatico?: Prisma.SortOrder
   venta_boleta?: Prisma.SortOrder
   venta_factura?: Prisma.SortOrder
   venta_debito?: Prisma.SortOrder
@@ -521,6 +532,7 @@ export type apertura_cajaScalarWhereWithAggregatesInput = {
   id_usuario_cierre?: Prisma.UuidNullableWithAggregatesFilter<"apertura_caja"> | string | null
   horario_apertura?: Prisma.DateTimeWithAggregatesFilter<"apertura_caja"> | Date | string
   horario_cierre?: Prisma.DateTimeNullableWithAggregatesFilter<"apertura_caja"> | Date | string | null
+  cierre_automatico?: Prisma.BoolWithAggregatesFilter<"apertura_caja"> | boolean
   venta_boleta?: Prisma.IntWithAggregatesFilter<"apertura_caja"> | number
   venta_factura?: Prisma.IntWithAggregatesFilter<"apertura_caja"> | number
   venta_debito?: Prisma.IntWithAggregatesFilter<"apertura_caja"> | number
@@ -544,6 +556,7 @@ export type apertura_cajaCreateInput = {
   id_apertura?: string
   horario_apertura?: Date | string
   horario_cierre?: Date | string | null
+  cierre_automatico?: boolean
   venta_boleta?: number
   venta_factura?: number
   venta_debito?: number
@@ -574,6 +587,7 @@ export type apertura_cajaUncheckedCreateInput = {
   id_usuario_cierre?: string | null
   horario_apertura?: Date | string
   horario_cierre?: Date | string | null
+  cierre_automatico?: boolean
   venta_boleta?: number
   venta_factura?: number
   venta_debito?: number
@@ -600,6 +614,7 @@ export type apertura_cajaUpdateInput = {
   id_apertura?: Prisma.StringFieldUpdateOperationsInput | string
   horario_apertura?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   horario_cierre?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cierre_automatico?: Prisma.BoolFieldUpdateOperationsInput | boolean
   venta_boleta?: Prisma.IntFieldUpdateOperationsInput | number
   venta_factura?: Prisma.IntFieldUpdateOperationsInput | number
   venta_debito?: Prisma.IntFieldUpdateOperationsInput | number
@@ -630,6 +645,7 @@ export type apertura_cajaUncheckedUpdateInput = {
   id_usuario_cierre?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   horario_apertura?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   horario_cierre?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cierre_automatico?: Prisma.BoolFieldUpdateOperationsInput | boolean
   venta_boleta?: Prisma.IntFieldUpdateOperationsInput | number
   venta_factura?: Prisma.IntFieldUpdateOperationsInput | number
   venta_debito?: Prisma.IntFieldUpdateOperationsInput | number
@@ -658,6 +674,7 @@ export type apertura_cajaCreateManyInput = {
   id_usuario_cierre?: string | null
   horario_apertura?: Date | string
   horario_cierre?: Date | string | null
+  cierre_automatico?: boolean
   venta_boleta?: number
   venta_factura?: number
   venta_debito?: number
@@ -681,6 +698,7 @@ export type apertura_cajaUpdateManyMutationInput = {
   id_apertura?: Prisma.StringFieldUpdateOperationsInput | string
   horario_apertura?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   horario_cierre?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cierre_automatico?: Prisma.BoolFieldUpdateOperationsInput | boolean
   venta_boleta?: Prisma.IntFieldUpdateOperationsInput | number
   venta_factura?: Prisma.IntFieldUpdateOperationsInput | number
   venta_debito?: Prisma.IntFieldUpdateOperationsInput | number
@@ -706,6 +724,7 @@ export type apertura_cajaUncheckedUpdateManyInput = {
   id_usuario_cierre?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   horario_apertura?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   horario_cierre?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cierre_automatico?: Prisma.BoolFieldUpdateOperationsInput | boolean
   venta_boleta?: Prisma.IntFieldUpdateOperationsInput | number
   venta_factura?: Prisma.IntFieldUpdateOperationsInput | number
   venta_debito?: Prisma.IntFieldUpdateOperationsInput | number
@@ -741,6 +760,7 @@ export type apertura_cajaCountOrderByAggregateInput = {
   id_usuario_cierre?: Prisma.SortOrder
   horario_apertura?: Prisma.SortOrder
   horario_cierre?: Prisma.SortOrder
+  cierre_automatico?: Prisma.SortOrder
   venta_boleta?: Prisma.SortOrder
   venta_factura?: Prisma.SortOrder
   venta_debito?: Prisma.SortOrder
@@ -785,6 +805,7 @@ export type apertura_cajaMaxOrderByAggregateInput = {
   id_usuario_cierre?: Prisma.SortOrder
   horario_apertura?: Prisma.SortOrder
   horario_cierre?: Prisma.SortOrder
+  cierre_automatico?: Prisma.SortOrder
   venta_boleta?: Prisma.SortOrder
   venta_factura?: Prisma.SortOrder
   venta_debito?: Prisma.SortOrder
@@ -810,6 +831,7 @@ export type apertura_cajaMinOrderByAggregateInput = {
   id_usuario_cierre?: Prisma.SortOrder
   horario_apertura?: Prisma.SortOrder
   horario_cierre?: Prisma.SortOrder
+  cierre_automatico?: Prisma.SortOrder
   venta_boleta?: Prisma.SortOrder
   venta_factura?: Prisma.SortOrder
   venta_debito?: Prisma.SortOrder
@@ -990,6 +1012,7 @@ export type apertura_cajaCreateWithoutUsersInput = {
   id_apertura?: string
   horario_apertura?: Date | string
   horario_cierre?: Date | string | null
+  cierre_automatico?: boolean
   venta_boleta?: number
   venta_factura?: number
   venta_debito?: number
@@ -1018,6 +1041,7 @@ export type apertura_cajaUncheckedCreateWithoutUsersInput = {
   id_usuario_cierre?: string | null
   horario_apertura?: Date | string
   horario_cierre?: Date | string | null
+  cierre_automatico?: boolean
   venta_boleta?: number
   venta_factura?: number
   venta_debito?: number
@@ -1054,6 +1078,7 @@ export type apertura_cajaCreateWithoutUsuario_cierreInput = {
   id_apertura?: string
   horario_apertura?: Date | string
   horario_cierre?: Date | string | null
+  cierre_automatico?: boolean
   venta_boleta?: number
   venta_factura?: number
   venta_debito?: number
@@ -1082,6 +1107,7 @@ export type apertura_cajaUncheckedCreateWithoutUsuario_cierreInput = {
   id_usuario_apertura: string
   horario_apertura?: Date | string
   horario_cierre?: Date | string | null
+  cierre_automatico?: boolean
   venta_boleta?: number
   venta_factura?: number
   venta_debito?: number
@@ -1139,6 +1165,7 @@ export type apertura_cajaScalarWhereInput = {
   id_usuario_cierre?: Prisma.UuidNullableFilter<"apertura_caja"> | string | null
   horario_apertura?: Prisma.DateTimeFilter<"apertura_caja"> | Date | string
   horario_cierre?: Prisma.DateTimeNullableFilter<"apertura_caja"> | Date | string | null
+  cierre_automatico?: Prisma.BoolFilter<"apertura_caja"> | boolean
   venta_boleta?: Prisma.IntFilter<"apertura_caja"> | number
   venta_factura?: Prisma.IntFilter<"apertura_caja"> | number
   venta_debito?: Prisma.IntFilter<"apertura_caja"> | number
@@ -1178,6 +1205,7 @@ export type apertura_cajaCreateWithoutCapitalInput = {
   id_apertura?: string
   horario_apertura?: Date | string
   horario_cierre?: Date | string | null
+  cierre_automatico?: boolean
   venta_boleta?: number
   venta_factura?: number
   venta_debito?: number
@@ -1207,6 +1235,7 @@ export type apertura_cajaUncheckedCreateWithoutCapitalInput = {
   id_usuario_cierre?: string | null
   horario_apertura?: Date | string
   horario_cierre?: Date | string | null
+  cierre_automatico?: boolean
   venta_boleta?: number
   venta_factura?: number
   venta_debito?: number
@@ -1248,6 +1277,7 @@ export type apertura_cajaUpdateWithoutCapitalInput = {
   id_apertura?: Prisma.StringFieldUpdateOperationsInput | string
   horario_apertura?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   horario_cierre?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cierre_automatico?: Prisma.BoolFieldUpdateOperationsInput | boolean
   venta_boleta?: Prisma.IntFieldUpdateOperationsInput | number
   venta_factura?: Prisma.IntFieldUpdateOperationsInput | number
   venta_debito?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1277,6 +1307,7 @@ export type apertura_cajaUncheckedUpdateWithoutCapitalInput = {
   id_usuario_cierre?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   horario_apertura?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   horario_cierre?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cierre_automatico?: Prisma.BoolFieldUpdateOperationsInput | boolean
   venta_boleta?: Prisma.IntFieldUpdateOperationsInput | number
   venta_factura?: Prisma.IntFieldUpdateOperationsInput | number
   venta_debito?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1302,6 +1333,7 @@ export type apertura_cajaCreateWithoutMovimientosInput = {
   id_apertura?: string
   horario_apertura?: Date | string
   horario_cierre?: Date | string | null
+  cierre_automatico?: boolean
   venta_boleta?: number
   venta_factura?: number
   venta_debito?: number
@@ -1331,6 +1363,7 @@ export type apertura_cajaUncheckedCreateWithoutMovimientosInput = {
   id_usuario_cierre?: string | null
   horario_apertura?: Date | string
   horario_cierre?: Date | string | null
+  cierre_automatico?: boolean
   venta_boleta?: number
   venta_factura?: number
   venta_debito?: number
@@ -1372,6 +1405,7 @@ export type apertura_cajaUpdateWithoutMovimientosInput = {
   id_apertura?: Prisma.StringFieldUpdateOperationsInput | string
   horario_apertura?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   horario_cierre?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cierre_automatico?: Prisma.BoolFieldUpdateOperationsInput | boolean
   venta_boleta?: Prisma.IntFieldUpdateOperationsInput | number
   venta_factura?: Prisma.IntFieldUpdateOperationsInput | number
   venta_debito?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1401,6 +1435,7 @@ export type apertura_cajaUncheckedUpdateWithoutMovimientosInput = {
   id_usuario_cierre?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   horario_apertura?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   horario_cierre?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cierre_automatico?: Prisma.BoolFieldUpdateOperationsInput | boolean
   venta_boleta?: Prisma.IntFieldUpdateOperationsInput | number
   venta_factura?: Prisma.IntFieldUpdateOperationsInput | number
   venta_debito?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1426,6 +1461,7 @@ export type apertura_cajaCreateWithoutVentasInput = {
   id_apertura?: string
   horario_apertura?: Date | string
   horario_cierre?: Date | string | null
+  cierre_automatico?: boolean
   venta_boleta?: number
   venta_factura?: number
   venta_debito?: number
@@ -1455,6 +1491,7 @@ export type apertura_cajaUncheckedCreateWithoutVentasInput = {
   id_usuario_cierre?: string | null
   horario_apertura?: Date | string
   horario_cierre?: Date | string | null
+  cierre_automatico?: boolean
   venta_boleta?: number
   venta_factura?: number
   venta_debito?: number
@@ -1496,6 +1533,7 @@ export type apertura_cajaUpdateWithoutVentasInput = {
   id_apertura?: Prisma.StringFieldUpdateOperationsInput | string
   horario_apertura?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   horario_cierre?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cierre_automatico?: Prisma.BoolFieldUpdateOperationsInput | boolean
   venta_boleta?: Prisma.IntFieldUpdateOperationsInput | number
   venta_factura?: Prisma.IntFieldUpdateOperationsInput | number
   venta_debito?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1525,6 +1563,7 @@ export type apertura_cajaUncheckedUpdateWithoutVentasInput = {
   id_usuario_cierre?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   horario_apertura?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   horario_cierre?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cierre_automatico?: Prisma.BoolFieldUpdateOperationsInput | boolean
   venta_boleta?: Prisma.IntFieldUpdateOperationsInput | number
   venta_factura?: Prisma.IntFieldUpdateOperationsInput | number
   venta_debito?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1551,6 +1590,7 @@ export type apertura_cajaCreateManyUsersInput = {
   id_usuario_cierre?: string | null
   horario_apertura?: Date | string
   horario_cierre?: Date | string | null
+  cierre_automatico?: boolean
   venta_boleta?: number
   venta_factura?: number
   venta_debito?: number
@@ -1575,6 +1615,7 @@ export type apertura_cajaCreateManyUsuario_cierreInput = {
   id_usuario_apertura: string
   horario_apertura?: Date | string
   horario_cierre?: Date | string | null
+  cierre_automatico?: boolean
   venta_boleta?: number
   venta_factura?: number
   venta_debito?: number
@@ -1598,6 +1639,7 @@ export type apertura_cajaUpdateWithoutUsersInput = {
   id_apertura?: Prisma.StringFieldUpdateOperationsInput | string
   horario_apertura?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   horario_cierre?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cierre_automatico?: Prisma.BoolFieldUpdateOperationsInput | boolean
   venta_boleta?: Prisma.IntFieldUpdateOperationsInput | number
   venta_factura?: Prisma.IntFieldUpdateOperationsInput | number
   venta_debito?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1626,6 +1668,7 @@ export type apertura_cajaUncheckedUpdateWithoutUsersInput = {
   id_usuario_cierre?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   horario_apertura?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   horario_cierre?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cierre_automatico?: Prisma.BoolFieldUpdateOperationsInput | boolean
   venta_boleta?: Prisma.IntFieldUpdateOperationsInput | number
   venta_factura?: Prisma.IntFieldUpdateOperationsInput | number
   venta_debito?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1653,6 +1696,7 @@ export type apertura_cajaUncheckedUpdateManyWithoutUsersInput = {
   id_usuario_cierre?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   horario_apertura?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   horario_cierre?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cierre_automatico?: Prisma.BoolFieldUpdateOperationsInput | boolean
   venta_boleta?: Prisma.IntFieldUpdateOperationsInput | number
   venta_factura?: Prisma.IntFieldUpdateOperationsInput | number
   venta_debito?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1676,6 +1720,7 @@ export type apertura_cajaUpdateWithoutUsuario_cierreInput = {
   id_apertura?: Prisma.StringFieldUpdateOperationsInput | string
   horario_apertura?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   horario_cierre?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cierre_automatico?: Prisma.BoolFieldUpdateOperationsInput | boolean
   venta_boleta?: Prisma.IntFieldUpdateOperationsInput | number
   venta_factura?: Prisma.IntFieldUpdateOperationsInput | number
   venta_debito?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1704,6 +1749,7 @@ export type apertura_cajaUncheckedUpdateWithoutUsuario_cierreInput = {
   id_usuario_apertura?: Prisma.StringFieldUpdateOperationsInput | string
   horario_apertura?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   horario_cierre?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cierre_automatico?: Prisma.BoolFieldUpdateOperationsInput | boolean
   venta_boleta?: Prisma.IntFieldUpdateOperationsInput | number
   venta_factura?: Prisma.IntFieldUpdateOperationsInput | number
   venta_debito?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1731,6 +1777,7 @@ export type apertura_cajaUncheckedUpdateManyWithoutUsuario_cierreInput = {
   id_usuario_apertura?: Prisma.StringFieldUpdateOperationsInput | string
   horario_apertura?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   horario_cierre?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cierre_automatico?: Prisma.BoolFieldUpdateOperationsInput | boolean
   venta_boleta?: Prisma.IntFieldUpdateOperationsInput | number
   venta_factura?: Prisma.IntFieldUpdateOperationsInput | number
   venta_debito?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1805,6 +1852,7 @@ export type apertura_cajaSelect<ExtArgs extends runtime.Types.Extensions.Interna
   id_usuario_cierre?: boolean
   horario_apertura?: boolean
   horario_cierre?: boolean
+  cierre_automatico?: boolean
   venta_boleta?: boolean
   venta_factura?: boolean
   venta_debito?: boolean
@@ -1836,6 +1884,7 @@ export type apertura_cajaSelectCreateManyAndReturn<ExtArgs extends runtime.Types
   id_usuario_cierre?: boolean
   horario_apertura?: boolean
   horario_cierre?: boolean
+  cierre_automatico?: boolean
   venta_boleta?: boolean
   venta_factura?: boolean
   venta_debito?: boolean
@@ -1863,6 +1912,7 @@ export type apertura_cajaSelectUpdateManyAndReturn<ExtArgs extends runtime.Types
   id_usuario_cierre?: boolean
   horario_apertura?: boolean
   horario_cierre?: boolean
+  cierre_automatico?: boolean
   venta_boleta?: boolean
   venta_factura?: boolean
   venta_debito?: boolean
@@ -1890,6 +1940,7 @@ export type apertura_cajaSelectScalar = {
   id_usuario_cierre?: boolean
   horario_apertura?: boolean
   horario_cierre?: boolean
+  cierre_automatico?: boolean
   venta_boleta?: boolean
   venta_factura?: boolean
   venta_debito?: boolean
@@ -1909,7 +1960,7 @@ export type apertura_cajaSelectScalar = {
   total?: boolean
 }
 
-export type apertura_cajaOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id_apertura" | "id_usuario_apertura" | "id_usuario_cierre" | "horario_apertura" | "horario_cierre" | "venta_boleta" | "venta_factura" | "venta_debito" | "venta_credito" | "venta_efectivo" | "total_debito" | "total_credito" | "total_efectivo" | "saldo_apertura" | "saldo_cierre" | "diferencia" | "saldo_esperado" | "valor_real" | "comentario" | "venta_transferencia" | "total_transferencia" | "total", ExtArgs["result"]["apertura_caja"]>
+export type apertura_cajaOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id_apertura" | "id_usuario_apertura" | "id_usuario_cierre" | "horario_apertura" | "horario_cierre" | "cierre_automatico" | "venta_boleta" | "venta_factura" | "venta_debito" | "venta_credito" | "venta_efectivo" | "total_debito" | "total_credito" | "total_efectivo" | "saldo_apertura" | "saldo_cierre" | "diferencia" | "saldo_esperado" | "valor_real" | "comentario" | "venta_transferencia" | "total_transferencia" | "total", ExtArgs["result"]["apertura_caja"]>
 export type apertura_cajaInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   users?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   usuario_cierre?: boolean | Prisma.apertura_caja$usuario_cierreArgs<ExtArgs>
@@ -1942,6 +1993,7 @@ export type $apertura_cajaPayload<ExtArgs extends runtime.Types.Extensions.Inter
     id_usuario_cierre: string | null
     horario_apertura: Date
     horario_cierre: Date | null
+    cierre_automatico: boolean
     venta_boleta: number
     venta_factura: number
     venta_debito: number
@@ -2392,6 +2444,7 @@ export interface apertura_cajaFieldRefs {
   readonly id_usuario_cierre: Prisma.FieldRef<"apertura_caja", 'String'>
   readonly horario_apertura: Prisma.FieldRef<"apertura_caja", 'DateTime'>
   readonly horario_cierre: Prisma.FieldRef<"apertura_caja", 'DateTime'>
+  readonly cierre_automatico: Prisma.FieldRef<"apertura_caja", 'Boolean'>
   readonly venta_boleta: Prisma.FieldRef<"apertura_caja", 'Int'>
   readonly venta_factura: Prisma.FieldRef<"apertura_caja", 'Int'>
   readonly venta_debito: Prisma.FieldRef<"apertura_caja", 'Int'>

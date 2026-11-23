@@ -192,6 +192,7 @@ model apertura_caja {
   id_usuario_cierre   String?   @db.Uuid
   horario_apertura    DateTime  @default(now()) @db.Timestamptz(6)
   horario_cierre      DateTime? @db.Timestamptz(6)
+  cierre_automatico   Boolean   @default(false)
   venta_boleta        Int       @default(0)
   venta_factura       Int       @default(0)
   venta_debito        Int       @default(0)

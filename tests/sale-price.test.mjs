@@ -11,7 +11,7 @@ function fixture({ promotion = false, role = "cajero", permissions = [], paid = 
   const sale = { id_venta: "sale", id_apertura_caja: "cash", estado: "pendiente", revision: 1, detalles: [detail], pagos: paid ? [{}] : [] };
   const state = { catalogPrice: 1000, total: 3000 };
   const tx = {
-    $queryRaw: async () => [],
+    $queryRaw: async (strings) => strings.join("").includes("AS due") ? [{ due: false }] : [],
     apertura_caja: { findFirst: async () => ({ id_apertura: "cash" }) },
     venta: { findFirst: async () => sale, findUniqueOrThrow: async () => sale, update: async ({ data }) => { state.total = data.valor_total; sale.revision++; } },
     promociones: { findUnique: async () => promotion ? { id_promocion: "promo" } : null },
