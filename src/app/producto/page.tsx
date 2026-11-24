@@ -3071,7 +3071,7 @@ function StockModalView({
               ) : null}
             </div>
             <p>Tu nuevo stock será: {addedStock}</p>
-            {message ? <p className="stock-modal-message">{message}</p> : null}
+            {message && !showExpirationConfirm ? <p className="stock-modal-message" role="alert">{message}</p> : null}
             <div className="stock-modal-actions">
               <button type="button" onClick={onClose}>
                 Cancelar
@@ -3231,13 +3231,15 @@ function StockModalView({
             <section className="comment-modal" role="dialog" aria-modal="true">
               <h3>{expirationDate ? "El producto vencerá en:" : "Lote sin fecha de vencimiento"}</h3>
               {expirationDate ? <p>{expirationSummary}</p> : <p>El stock se registrará sin fecha de vencimiento.</p>}
+              {expirationDate && timeError ? <p className="stock-modal-message" role="alert">{timeError}</p> : null}
+              {message ? <p className="stock-modal-message" role="alert">{message}</p> : null}
               <div className="stock-modal-actions">
                 <button type="button" onClick={onBackFromExpirationConfirm}>
                   Volver
                 </button>
                 <button
                   type="button"
-                  disabled={isSaving}
+                  disabled={isSaving || Boolean(expirationDate && !isFutureExpirationDate(expirationDate, chileToday))}
                   onClick={onAcceptExpirationConfirm}
                 >
                   {isSaving ? "Guardando..." : "OK"}

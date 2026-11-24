@@ -23,6 +23,8 @@ try {
   await db.exec("SET TIME ZONE 'UTC'");
   await server.start();
   prisma = new PrismaClient({ adapter: new PrismaPg({ connectionString: `postgresql://postgres:postgres@${server.getServerConn()}/postgres`, max: 1 }), errorFormat: "minimal" });
+  process.env.DATABASE_URL ||= "postgresql://test:test@localhost:5432/test";
+  globalThis.prisma = prisma;
   const role = await prisma.role.create({ data: { role: "test" } });
   const user = await prisma.user.create({ data: { nombre: "Test", apellido: "Sales", contrasena: "not-a-login", roleid: role.id } });
   await prisma.apertura_caja.create({ data: { id_usuario_apertura: user.id, saldo_apertura: 1000, saldo_esperado: 1000, valor_real: 1000 } });
@@ -286,6 +288,43 @@ try {
   const reopened = await prisma.apertura_caja.create({ data: { id_usuario_apertura: user.id, saldo_apertura: closedCash.valor_real, saldo_esperado: closedCash.valor_real, valor_real: closedCash.valor_real } });
   assert.equal(reopened.saldo_apertura, expectedCash);
   console.log("PASS automatic close, paid-sale protection, inventory release, provisional balance and reopening");
+
+  // Exercise the stock endpoint against this disposable database with the external time API unavailable.
+  process.env.SECRET_KEY = "stock-integration-test-secret";
+  const master = await prisma.role.create({ data: { role: "master" } });
+  const stockUser = await prisma.user.create({ data: { nombre: "Stock", apellido: "Test", correo: "stock-test@example.invalid", contrasena: "test", roleid: master.id } });
+  const jwt = (await import("jsonwebtoken")).default;
+  const token = jwt.sign({ sub: stockUser.id, correo: stockUser.correo, nombre: stockUser.nombre, apellido: stockUser.apellido, rol: "master" }, process.env.SECRET_KEY);
+  const { NextRequest } = await import("next/server.js");
+  const { GET: chileTime } = await jiti.import("../src/app/api/hora-chile/route.ts");
+  const { POST: addStock } = await jiti.import("../src/app/api/movimiento-stock/route.ts");
+  const originalFetch = globalThis.fetch;
+  try {
+    globalThis.fetch = async () => { throw new Error("Servicio externo no disponible"); };
+    const dateResponse = await chileTime();
+    assert.equal(dateResponse.status, 200);
+    const { fecha: today } = await dateResponse.json();
+    const tomorrow = new Date(`${today}T00:00:00Z`);
+    tomorrow.setUTCDate(tomorrow.getUTCDate() + 1);
+    const beforeStock = await stock();
+    const submitStock = (expiration, quantity = 1) => addStock(new NextRequest("http://localhost/api/movimiento-stock", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Cookie: `minigest_login=${token}` },
+      body: JSON.stringify({ producto: product.id, cantidad: quantity, stock_restante: beforeStock + quantity, costo_sin_iva: 500, costo_con_iva: 595, tipo: 2, fecha_vencimiento: expiration }),
+    }));
+    const invalid = await submitStock(today);
+    assert.equal(invalid.status, 400, "A date that expires today must be rejected");
+    assert.equal(await stock(), beforeStock);
+    const added = await submitStock(tomorrow.toISOString().slice(0, 10), 3);
+    assert.equal(added.status, 200);
+    assert.equal(await stock(), beforeStock + 3);
+    const noDate = await submitStock(null);
+    assert.equal(noDate.status, 200);
+    assert.equal(await stock(), beforeStock + 4);
+    console.log("PASS stock with a future date or no date without external time API, and rejection of today's date");
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
 } finally {
   if (prisma) await prisma.$disconnect();
   await server.stop();

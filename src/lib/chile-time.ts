@@ -1,20 +1,17 @@
-export async function getChileCurrentDate() {
-  const response = await fetch(
-    "https://timeapi.io/api/Time/current/zone?timeZone=America/Santiago",
-    { cache: "no-store", signal: AbortSignal.timeout(5000) },
-  );
+import type { Prisma } from "@/generated/prisma/client";
 
-  if (!response.ok) {
-    throw new Error("No se pudo consultar la hora de Chile.");
+type DatabaseClock = Pick<Prisma.TransactionClient, "$queryRaw">;
+
+export async function getChileCurrentDate(database?: DatabaseClock) {
+  // Use the database clock rather than the cashier's computer or a third-party API.
+  const clock = database ?? (await import("@/lib/db")).prisma;
+  const [result] = await clock.$queryRaw<{ fecha: string }[]>`
+    SELECT to_char(clock_timestamp() AT TIME ZONE 'America/Santiago', 'YYYY-MM-DD') AS fecha
+  `;
+
+  if (!result || !/^\d{4}-\d{2}-\d{2}$/.test(result.fecha)) {
+    throw new Error("La base de datos devolvió una fecha de Chile inválida.");
   }
 
-  const data = (await response.json()) as { dateTime?: unknown };
-  const dateTime = typeof data.dateTime === "string" ? data.dateTime : "";
-  const currentDate = dateTime.slice(0, 10);
-
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(currentDate)) {
-    throw new Error("La API devolvió una fecha de Chile inválida.");
-  }
-
-  return currentDate;
+  return result.fecha;
 }
